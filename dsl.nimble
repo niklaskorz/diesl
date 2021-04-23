@@ -1,7 +1,7 @@
 # Package
 
 version       = "0.1.0"
-author        = "Samuel Melm"
+author        = "Artur Hochhalter, Benjamin Sparks, Niklas Korz, Samuel Melm"
 description   = "The diesl language"
 license       = "MIT"
 srcDir        = "src"
