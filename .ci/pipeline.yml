@@ -1,0 +1,26 @@
+
+default:
+    image: registry.gitlab.com/pvs-hd/ot/diesl
+
+stages:
+    - test
+    - publish-coverage
+
+test:
+    stage: test
+    script:
+        - coco --target tests/*.nim --cov !tests --compiler=--hints:off
+    artifacts:
+        reports:
+            junit: result.xml
+        paths:
+            - coverage/
+
+pages:
+    stage: publish-coverage
+    script:
+        - cp -r coverage/ public/
+    artifacts:
+        paths:
+            - public/
+

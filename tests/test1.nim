@@ -6,7 +6,15 @@
 # To run these tests, simply execute `nimble test`.
 
 import unittest
+import streams
+
+let resultFile = openFileStream("result.xml", fmWrite)
+
+let outputFormatter = newJUnitOutputFormatter(resultFile)
+addOutputFormatter(outputFormatter)
 
 import dsl
 test "can add":
   check add(5, 5) == 10
+
+outputFormatter.close()
