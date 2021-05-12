@@ -19,32 +19,35 @@ type
         data: seq[T]
 
     StringColumn = DBColumn[string]
-    IntColumn = DBColumn[int]
-    FloatColumn = DBColumn[float]
-    BoolColumn = DBColumn[bool]
+    # IntColumn = DBColumn[int]
+    # FloatColumn = DBColumn[float]
+    # BoolColumn = DBColumn[bool]
     
-    # DBSchema = Table[string, DBType]
+    DBSchema = Table[string, DBType]
 
     DBTable = object 
-        # schema: DBSchema
+        schema: DBSchema
         data: Table[string, StringColumn]
 
 
 template `.` (table: DBTable, name: untyped): StringColumn = 
-    # assert table.schema[name] == typeString
-    table.data[astToStr(name)]
+    let columnName = astToStr(name)
+    assert table.schema[columnName] == typeString
+
+    table.data[columnName]
+
 
 template map(column: StringColumn, f: (string) -> string): StringColumn =
     newStringColumn(column.name, column.data.map(f))
 
 
 proc newDBTable*(columns: varargs[StringColumn]): DBTable =
-    var table = initTable[string, StringColumn]()
+    result = DBTable(data: initTable[string, StringColumn](), schema: initTable[string, DBType]())
 
     for column in columns:
-        table[column.name] = column
+        result.data[column.name] = column
+        result.schema[column.name] = typeString
 
-    return DBTable(data: table)
 
 proc newStringColumn*(name: string, data: seq[string]): StringColumn = 
     return StringColumn(name: name, data: data, valueType: typeString)
