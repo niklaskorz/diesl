@@ -1,7 +1,7 @@
 import subprocess
 
 
-def notes_to_comments(infile, outfile):
+def notes_to_comments(infile: str, outfile: str):
     with open(infile, "r", encoding="utf-8") as f:
         lines = f.read()
         lines = lines.replace("Note Note", "Note Comment")

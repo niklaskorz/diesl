@@ -1,45 +1,57 @@
 from pathlib import Path
+import re
 
 
-def get_exercise_num_as_string(filename):
-    name = Path(filename).name
-    ueb = name[3]
-    if name[4] != "-":
-        ueb += name[4]
-    return ueb
+exercise_name_re = re.compile(r"^ueb(\d+)\-([a-z]+)\-(\d{4})\.lyx$")
 
 
-def create_ex_name(filename):
-    file = Path(filename).name
-    name = "Ü-" + file[-6] + file[-5] + "-" + get_exercise_num_as_string(file) + "-"
-    return name
+def create_exercise_out_name(file_path: str, ex_count: int) -> str:
+    file_name = Path(file_path).name
+    match = exercise_name_re.match(file_name)
+    if match is None:
+        raise ValueError(f"File name {file_name} does not match exercise name pattern")
+    exercise_num = match.group(1)
+    year = match.group(3)
+    return f"Ü-{year}-{exercise_num}-{ex_count}.tex"
 
 
-def separate_exercises(latex_file, out_folder):
+def separate_exercises(latex_file: str, out_folder: Path):
     # takes a latex file and separates the individual exercises into folder out_path
     work_array = []
     ex_count = 0
+
     with open(latex_file, encoding="utf-8") as input_file:
         stop_string = "aufgabe{"
+
         for line in input_file:
             if stop_string in line:
-                out_name = create_ex_name(latex_file) + str(ex_count)
+                out_name = create_exercise_out_name(latex_file, ex_count)
                 ex_count += 1
+
                 # lyx export does not always put \aufgabe in new line
-                a = line.split("\\aufgabe")
-                a[1] = "\\aufgabe" + a[1]
-                work_array.append(a[0])
+                target = "\\aufgabe"
+                target_index = line.find(target)
+                if target_index == -1:
+                    before_target = line
+                    after_target = ""
+                else:
+                    before_target = line[:target_index]
+                    after_target = line[target_index:]
+
+                work_array.append(before_target)
                 with open(
-                    out_folder.absolute() / (out_name + ".tex"),
+                    out_folder.absolute() / out_name,
                     "w+",
                     encoding="utf-8",
                 ) as output_file:
                     output_file.writelines(work_array)
-                work_array = [a[1]]
+                work_array = [after_target]
+
             elif "\\end{document}" not in line:
                 work_array.append(line)
-    out_name = create_ex_name(latex_file) + str(ex_count)
+
+    out_name = create_exercise_out_name(latex_file, ex_count)
     with open(
-        out_folder.absolute() / (out_name + ".tex"), "w+", encoding="utf-8"
+        out_folder.absolute() / out_name, "w+", encoding="utf-8"
     ) as output_file:
         output_file.writelines(work_array)
