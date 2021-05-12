@@ -35,7 +35,11 @@ template `.`*(table: DBTable, name: untyped): StringColumn =
     table.data[columnName]
 
 
-template map*(column: StringColumn, f: (string) -> string): StringColumn =
+proc newStringColumn*(name: string, data: seq[string]): StringColumn = 
+    return StringColumn(name: name, data: data, valueType: typeString)
+
+
+proc map*(column: StringColumn, f: (string) -> string): StringColumn =
     newStringColumn(column.name, column.data.map(f))
 
 
@@ -47,14 +51,3 @@ proc newDBTable*(columns: varargs[StringColumn]): DBTable =
         result.schema[column.name] = typeString
 
 
-proc newStringColumn*(name: string, data: seq[string]): StringColumn = 
-    return StringColumn(name: name, data: data, valueType: typeString)
-
-
-when isMainModule:
-    let dbTable = newDBTable(
-        newStringColumn(name = "people", data = @["Artur Hochhalter", "Benjamin Sparks", "Niklas Korz", "Samuel Melm"])
-    )
-
-    echo dbTable.people
-    echo dbTable.people.map(name => name.split(" ")[0])
