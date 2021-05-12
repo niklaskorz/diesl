@@ -1,4 +1,4 @@
-import os
+import subprocess
 
 
 def notes_to_comments(infile, outfile):
@@ -9,5 +9,16 @@ def notes_to_comments(infile, outfile):
         out.write(lines)
 
 
-def lyx_to_latex(lyxfile):
-    os.system("lyx -e pdflatex " + lyxfile)
+def lyx_to_latex(lyxfile: str):
+    # check=True raises a CalledProcessError exception if the program
+    # exits with a non-zero exit code.
+    # The raised exception includes the stdout and stderr logs.
+    subprocess.run(["lyx", "-e", "pdflatex", lyxfile], check=True)
+
+
+def check_lyx():
+    """
+    Checks if lyx is installed and executable.
+    Raises a CalledProcessError on failure.
+    """
+    subprocess.run(["lyx", "--version"], check=True)

@@ -1,10 +1,9 @@
-from pathlib import Path
-
-from exercise_mgr.Settings import Settings
-from exercise_mgr.populate import lyx_to_latex, split_all_tex
+from .. import Settings
+from . import lyx_to_latex, split_all_tex
 
 
 def main():
+    lyx_to_latex.check_lyx()
     paths = [Settings.files / str(i) for i in range(12, 20)]
     for path in paths:
         files = path.glob("*.lyx")
