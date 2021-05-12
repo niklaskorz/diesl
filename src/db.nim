@@ -1,52 +1,59 @@
+import sequtils
+import strutils
 import sugar
 import tables
 
+{.experimental: "dotOperators".}
+
 type
-  Type = enum
-    typeString
-    typeInt
-    typeBool
-  Column = object of RootObj
-    name: string
-    valueType: Type
-  Schema = tables.Table[string, Type]
-  Table = object of RootObj
-    schema: Schema
-  OperationType = enum
-    opGt
-    opGe
-    opLt
-    opLe
-    opEq
-    opNe
-    opAdd
-    opSub
-    opMul
-    opDiv
-  IBinaryOperation = tuple[
-    opType: OperationType,
+    DBType = enum
+        typeString
+        typeInt
+        typeBool
 
-  ]
-  BinaryOperation = object of RootObj
-    opType: OperationType
-    a: Column
-    b: Column
+    BaseColumn = object of RootObj
+        name: string
+        valueType: DBType
 
-proc `[]`(table: Table, col: string): Column =
-  return Column(name: col, valueType: table.schema[col])
+    DBColumn[T] = object of BaseColumn
+        data: seq[T]
 
-proc `>=`(a: Column, b: Column): BinaryOperation =
-  return BinaryOperation(opType: opGe, a: a, b: b)
+    StringColumn = DBColumn[string]
+    IntColumn = DBColumn[int]
+    FloatColumn = DBColumn[float]
+    BoolColumn = DBColumn[bool]
+    
+    # DBSchema = Table[string, DBType]
 
-proc map(table: Table, f: (Table) -> BinaryOperation): BinaryOperation =
-  return f(table)
+    DBTable = object 
+        # schema: DBSchema
+        data: Table[string, StringColumn]
+
+
+template `.` (table: DBTable, name: untyped): StringColumn = 
+    # assert table.schema[name] == typeString
+    table.data[astToStr(name)]
+
+template map(column: StringColumn, f: (string) -> string): StringColumn =
+    newStringColumn(column.name, column.data.map(f))
+
+
+proc newDBTable*(columns: varargs[StringColumn]): DBTable =
+    var table = initTable[string, StringColumn]()
+
+    for column in columns:
+        table[column.name] = column
+
+    return DBTable(data: table)
+
+proc newStringColumn*(name: string, data: seq[string]): StringColumn = 
+    return StringColumn(name: name, data: data, valueType: typeString)
+
 
 when isMainModule:
-  let people = Table(schema: {
-    "name": typeString,
-    "age": typeInt,
-    "height": typeInt,
-    "isFullAge": typeBool
-  }.toTable())
-  echo(people)
-  echo(people.map(x => x["age"] >= x["height"]))
+    let dbTable: DBTable = newDBTable(
+        newStringColumn(name = "people", data = @["Artur Hochhalter", "Benjamin Sparks", "Niklas Korz", "Samuel Melm"])
+    )
+
+    echo dbTable.people
+    echo dbTable.people.map(name => name.split(" ")[0])
