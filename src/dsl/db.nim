@@ -1,15 +1,11 @@
 import sequtils
-import strutils
 import sugar
 import tables
 
 {.experimental: "dotOperators".}
 
 type
-    DBType = enum
-        typeString
-        typeInt
-        typeBool
+    DBType = enum typeString typeInt typeBool
 
     DBColumn[T] = object of RootObj
         name: string
