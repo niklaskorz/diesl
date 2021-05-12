@@ -1,0 +1,882 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass scrartcl
+\begin_preamble
+%\usepackage[ngerman]{babel}
+\usepackage{xspace}
+\usepackage{caption}
+\usepackage[autolanguage]{numprint}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{ifthen}
+\usepackage{paralist}
+\usepackage{scrpage2}
+\usepackage{hyperref}
+%\usepackage{libertine} 
+
+\newcommand{\uebnr}{2}
+\newcommand{\uebabgabe}{07.05.2019, 11:00 Uhr}
+
+\newcommand{\uebdatum}{30.04.2019}
+ 
+\newcounter{uebnummer}
+\setcounter{uebnummer}{0}
+
+\newcommand{\aufgabe}[1]{\stepcounter{uebnummer}\section*{Aufgabe \arabic{uebnummer} \hfill(#1 \ifthenelse{\equal{#1}{1}}{Punkt}{Punkte})}}
+
+\pagestyle{scrheadings}
+
+\ifoot{\footnotesize{\uebnr{}. Übung IBN -- SoSe 2019}}
+\cfoot{}
+\ofoot{\thepage}
+
+%\newcommand{\befehl}[1]{"`\texttt{#1}"'\xspace}
+\setlength{\parindent}{0pt} 
+\end_preamble
+\options headinclude,footinclude,DIV14,smallheadings,ngerman
+\use_default_options false
+\maintain_unincluded_children false
+\language ngerman
+\language_package default
+\inputencoding utf8
+\fontencoding T1
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 11
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 1
+\use_package mhchem 0
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Stichwortverzeichnis
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style polish
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+Universität Heidelberg 
+\begin_inset space \hfill{}
+\end_inset
+
+Lehrstuhl für Parallele und Verteilte Systeme (PVS)
+\begin_inset Newline newline
+\end_inset
+
+ Sommersemester 2019 
+\begin_inset space \hfill{}
+\end_inset
+
+Diego Costa, Artur Andrzejak
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+
+\series bold
+\size large
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+uebnr{}
+\end_layout
+
+\end_inset
+
+.
+ Übung zur Vorlesung 
+\begin_inset Quotes gld
+\end_inset
+
+Betriebssysteme und Netzwerke
+\begin_inset Quotes grd
+\end_inset
+
+ (IBN)
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+
+\end_layout
+
+\end_inset
+
+
+\series default
+\size default
+
+\begin_inset VSpace 2ex*
+\end_inset
+
+Abgabedatum: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+uebabgabe
+\end_layout
+
+\end_inset
+
+
+\series bold
+\size large
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+
+\end_layout
+
+\end_inset
+
+
+\series default
+\size default
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0ex"
+width "100col%"
+height "0.5pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Extra Exercise on Bash-Shell Script
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{4}
+\end_layout
+
+\end_inset
+
+ In this exercise, you will create a script that organizes a folder full
+ of images based on each image's creation date or last modified date.
+ In details, the script should work as follows:
+\end_layout
+
+\begin_layout Enumerate
+The script should receive a directory path as input.
+ Any non-directory path should be rejected by the script with a proper error
+ message.
+\end_layout
+
+\begin_layout Enumerate
+The script should then inspect every 
+\family typewriter
+.jpeg
+\family default
+ and 
+\family typewriter
+.png
+\family default
+ file within this directory and create a subfolder per each year-month found
+ in the files creation date or last modified date.
+ Each subfolder should be named using the following format YYYY-MM (e.g.,
+ 2019-01, 2019-02).
+\end_layout
+
+\begin_layout Enumerate
+Then, the script should move the files to their respective folder, based
+ on each file creation date/last modified date.
+ 
+\end_layout
+
+\begin_layout Standard
+For instance, running the script with the input of a directory 
+\family typewriter
+dir
+\family default
+ containing the following files (filename, creation date/ last modified
+ date):
+\end_layout
+
+\begin_layout LyX-Code
+dir/
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+pic1.jpeg 2019-03-21
+\end_layout
+
+\begin_layout LyX-Code
+pic2.jpeg 2019-03-28
+\end_layout
+
+\begin_layout LyX-Code
+pic3.png  2019-04-02
+\end_layout
+
+\begin_layout LyX-Code
+file.txt  2019-04-04
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+Should yield the following file structure:
+\end_layout
+
+\begin_layout LyX-Code
+dir/
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+file.txt 2019-04-04
+\end_layout
+
+\begin_layout LyX-Code
+2019-03/
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+pic1.jpeg 2019-03-21
+\end_layout
+
+\begin_layout LyX-Code
+pic2.jpeg 2019-03-28
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+2019-04/
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+pic3.png  2019-04-02
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{2}
+\end_layout
+
+\end_inset
+
+Linux verwendet neben 
+\emph on
+fork()
+\emph default
+ den Systemaufruf 
+\emph on
+clone()
+\emph default
+, um neue Prozesse oder Threads zu erzeugen.
+\end_layout
+
+\begin_layout Description
+a.
+ Beschreiben Sie kurz die Parameter dieses Systemaufrufs.
+ Beschreiben Sie die Unterschiede zu 
+\emph on
+fork()
+\emph default
+.
+\end_layout
+
+\begin_layout Description
+b.
+ Der Parameter 
+\emph on
+int
+\emph default
+ 
+\emph on
+flags
+\emph default
+ erlaubt eine feine Abstufung, welche Ressourcen sich Elternprozess und
+ Kindprozess teilen.
+ Listen Sie die einzelnen Optionen auf und beschreiben Sie kurz deren Bedeutung.
+ Bei welchem Wert von 
+\emph on
+flags
+\emph default
+ werden maximal viele Ressourcen gemeinsam verwendet (eine symbolische Angabe
+ reicht)?
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+#12-3-1
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{4}
+\end_layout
+
+\end_inset
+
+ Erinnern Sie sich an den Befehl 
+\family typewriter
+fork()
+\family default
+ und wie er funktioniert.
+ Was bedeutet der Rückgabewert von 
+\family typewriter
+fork()
+\family default
+? Beantworten Sie folgende Fragen.
+ Wenn Sie sich nicht sicher sind, oder Ihre Antwort einfach praktisch überprüfen
+ wollen, fügen Sie eventuell Ausgaben oder 
+\family typewriter
+sleep(...)
+\family default
+-Befehle ein, kompilieren und starten Sie das Programm.
+ In einer Bash-Shell können Sie sich mit dem Befehl 
+\family typewriter
+ps
+\family default
+ über laufende Prozesse informieren.
+ 
+\end_layout
+
+\begin_layout Standard
+Wie viele Prozesse (inklusive des 1.
+ Elternprozesses) werden durch die folgenden beiden Programme jeweils erzeugt?
+ Zeichnen Sie jeweils den Graph der entstehenden Prozesshierarchie, wobei
+ dem Elternprozess das Label 
+\begin_inset Quotes gld
+\end_inset
+
+1
+\begin_inset Quotes grd
+\end_inset
+
+ zugeordnet wird.
+ Das erste Kind von Elternprozess 
+\begin_inset Quotes gld
+\end_inset
+
+1
+\begin_inset Quotes grd
+\end_inset
+
+ sei dann 
+\begin_inset Quotes gld
+\end_inset
+
+1.1
+\begin_inset Quotes grd
+\end_inset
+
+, das zweite 
+\begin_inset Quotes gld
+\end_inset
+
+1.2
+\begin_inset Quotes grd
+\end_inset
+
+, usw.
+\end_layout
+
+\begin_layout Description
+Programm
+\begin_inset space ~
+\end_inset
+
+1:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout LyX-Code
+
+\size small
+int main(int argc, char* argv[]) {
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+  int i=0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+  if (fork()!=0) i++;
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+  if (i!=0) fork();
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+  if (fork()!=0||i!=0) i++;
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+  if (fork()==0&&i==0) fork();
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+  return 0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+Programm
+\begin_inset space ~
+\end_inset
+
+2:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout LyX-Code
+
+\size small
+int main(int argc, char* argv[]) {
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+  int i=0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+  if (fork()!=0) i+=2;
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+  if (fork()==0) i-=1;
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+  if (fork()!=0) i-=1;
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+  if (fork()*i==0) fork();
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+  return 0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{2}
+\end_layout
+
+\end_inset
+
+Bearbeiten Sie folgende Aufgabe in einer bash-Shell.
+ Dazu können Sie ein eigenes System benutzen, oder sich beim URZ im Linux-Termin
+alserver
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+name "https://public.urz.uni-heidelberg.de/service-katalog/index.html?p=serverdienste/linux-terminalserver.html"
+target "https://public.urz.uni-heidelberg.de/service-katalog/index.html?p=serverdienste/linux-terminalserver.html"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ einloggen.
+\end_layout
+
+\begin_layout Standard
+Speichern Sie folgendes C-Programm unter dem Dateinamen 
+\emph on
+test.c
+\emph default
+ und kompilieren Sie es (
+\family typewriter
+gcc test.c -o test
+\family default
+).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout LyX-Code
+#include <stdlib.h>
+\end_layout
+
+\begin_layout LyX-Code
+int main () {
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+if (fork() > 0) { sleep(1000); }
+\end_layout
+
+\begin_layout LyX-Code
+else { exit(0); }
+\end_layout
+
+\begin_layout LyX-Code
+return 0;
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+} 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Führen Sie nacheinander Folgendes aus:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+./test &
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+./test
+\end_layout
+
+\begin_layout Itemize
+Drücken Sie Strg+Z
+\end_layout
+
+\begin_layout Standard
+Lassen Sie sich jetzt die Prozesshierarchie der Prozesse Ihrer Terminalsitzung
+ anzeigen: 
+\family typewriter
+ps T -H
+\family default
+.
+ Beschreiben Sie die Hierarchie und wie sie zustande kommt.
+ Lassen Sie sich die gesamte Prozesshierarchie anzeigen (
+\family typewriter
+ps -eH
+\family default
+).
+ Auf welcher Tiefe im Baum findet Ihre Sitzung statt?
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+1P
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Schauen Sie in den man-pages zu 
+\family typewriter
+ps
+\family default
+ nach, welche Prozesszustände vorliegen (Abschnitt 
+\begin_inset Quotes pld
+\end_inset
+
+Process state codes
+\begin_inset Quotes prd
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{4}
+\end_layout
+
+\end_inset
+
+Schauen Sie das Video 
+\emph on
+Learning How to Learn - Introduction to Memory - Procrastination, Memory,
+ and Sleep
+\emph default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+name "https://www.youtube.com/watch?v=0egaPpfFFLI"
+target "https://www.youtube.com/watch?v=0egaPpfFFLI"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+ Hier werden zwei Arten des Gedächtnisses eingeführt und erklärt.
+\end_layout
+
+\begin_layout Itemize
+Benennen und vergleichen Sie die beiden Arten des Gedächtnisses.
+\end_layout
+
+\begin_layout Itemize
+Vergleichen Sie die beiden Gedächtnissysteme mit Speichersystemen in der
+ Speicherhierarchie (Vorlesung 2).
+ Betrachen Sie dabei die Aspekte Größe, Geschwindigkeit und Flüchtigkeit.
+\end_layout
+
+\begin_layout Itemize
+Wie groß sind die beiden Gedächtnissysteme, d.h.
+ wie viele Einheiten können sie jeweils enthalten und wie werden diese Einheiten
+ im Video genannt?
+\end_layout
+
+\begin_layout Itemize
+Es kann Information von beiden Systemen ins jeweils andere bewegt werden.
+ Worin unterscheiden sich diese Richtungen? Für eine der beiden Richtungen
+ wird im Video eine Technik erklärt.
+ Benennen und beschreiben Sie sie.
+ 
+\end_layout
+
+\end_body
+\end_document

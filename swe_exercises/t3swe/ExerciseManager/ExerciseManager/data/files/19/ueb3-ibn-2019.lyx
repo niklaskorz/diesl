@@ -1,0 +1,667 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass scrartcl
+\begin_preamble
+%\usepackage[ngerman]{babel}
+\usepackage{xspace}
+\usepackage{caption}
+\usepackage[autolanguage]{numprint}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{ifthen}
+\usepackage{paralist}
+\usepackage{scrpage2}
+\usepackage{hyperref}
+%\usepackage{libertine} 
+
+\newcommand{\uebnr}{3}
+\newcommand{\uebabgabe}{14.05.2019, 11:00 Uhr}
+
+\newcommand{\uebdatum}{07.05.2019}
+ 
+\newcounter{uebnummer}
+\setcounter{uebnummer}{0}
+
+\newcommand{\aufgabe}[1]{\stepcounter{uebnummer}\section*{Aufgabe \arabic{uebnummer} \hfill(#1 \ifthenelse{\equal{#1}{1}}{Punkt}{Punkte})}}
+
+\pagestyle{scrheadings}
+
+\ifoot{\footnotesize{\uebnr{}. Übung IBN -- SoSe 2019}}
+\cfoot{}
+\ofoot{\thepage}
+
+%\newcommand{\befehl}[1]{"`\texttt{#1}"'\xspace}
+\setlength{\parindent}{0pt} 
+\end_preamble
+\options headinclude,footinclude,DIV14,smallheadings,ngerman
+\use_default_options false
+\maintain_unincluded_children false
+\language ngerman
+\language_package default
+\inputencoding utf8
+\fontencoding T1
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 11
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 1
+\use_package mhchem 0
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Stichwortverzeichnis
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style polish
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+Universität Heidelberg 
+\begin_inset space \hfill{}
+\end_inset
+
+Lehrstuhl für Parallele und Verteilte Systeme (PVS)
+\begin_inset Newline newline
+\end_inset
+
+ Sommersemester 2019 
+\begin_inset space \hfill{}
+\end_inset
+
+Diego Costa, Artur Andrzejak
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+
+\series bold
+\size large
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+uebnr{}
+\end_layout
+
+\end_inset
+
+.
+ Übung zur Vorlesung 
+\begin_inset Quotes gld
+\end_inset
+
+Betriebssysteme und Netzwerke
+\begin_inset Quotes grd
+\end_inset
+
+ (IBN)
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+
+\end_layout
+
+\end_inset
+
+
+\series default
+\size default
+
+\begin_inset VSpace 2ex*
+\end_inset
+
+Abgabedatum: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+uebabgabe
+\end_layout
+
+\end_inset
+
+
+\series bold
+\size large
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+
+\end_layout
+
+\end_inset
+
+
+\series default
+\size default
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0ex"
+width "100col%"
+height "0.5pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+IPC Pipeline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{5}
+\end_layout
+
+\end_inset
+
+Schreiben Sie ein Programm (Shell-Skript oder C), bei dem zwei Prozesse
+ erzeugt werden.
+ Der Prozess A schickt einen String an einen anderen Prozess B.
+ Dann kehrt Prozess B die Reihenfolge der Zeichen in dem empfangenen String
+ um, und anschließend schickt er das Ergebnis an den Prozess A zurück.
+ So z.B.
+ wird aus dem String „Hello World“ der String „dlroW olleH“.
+ Verwenden Sie für die Kommunikation der Prozesse anonyme Pipes (wahlweise
+ unter Linux oder Windows).
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{2}
+\end_layout
+
+\end_inset
+
+Fügen Sie in das Programm mit Bezeichnung Algorithmus 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "alg:shared-memory"
+
+\end_inset
+
+ für die Platzhaltern 
+\family typewriter
+???
+\family default
+ geeignet folgende Befehle ein: 
+\family typewriter
+shmat, shmctl, shmdt, shmget
+\family default
+.
+ Erklären Sie jeden der Befehle kurz.
+\begin_inset Float algorithm
+placement h
+wide false
+sideways false
+status collapsed
+
+\begin_layout LyX-Code
+#include <stdio.h>
+\end_layout
+
+\begin_layout LyX-Code
+#include <sys/types.h>
+\end_layout
+
+\begin_layout LyX-Code
+#include <sys/ipc.h>
+\end_layout
+
+\begin_layout LyX-Code
+#include <sys/shm.h>
+\end_layout
+
+\begin_layout LyX-Code
+#include <sys/wait.h>
+\end_layout
+
+\begin_layout LyX-Code
+#include <stdlib.h>
+\end_layout
+
+\begin_layout LyX-Code
+int main(){
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+int i, shmID, *shared_mem, count=0, total=0,rnd;
+\end_layout
+
+\begin_layout LyX-Code
+shmID = ???(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0644);
+\end_layout
+
+\begin_layout LyX-Code
+shared_mem = (int*)???(shmID,0,0);
+\end_layout
+
+\begin_layout LyX-Code
+*shared_mem = 0;
+\end_layout
+
+\begin_layout LyX-Code
+if (fork())
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+for (i=0; i<500; i++){
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+*shared_mem+=1;
+\end_layout
+
+\begin_layout LyX-Code
+printf("
+\backslash
+n Elternprozess: %i", *shared_mem);
+\end_layout
+
+\begin_layout LyX-Code
+sleep(2);
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+}
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+else
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+for (i=0; i<500;i++){
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+*shared_mem+=1;
+\end_layout
+
+\begin_layout LyX-Code
+printf("
+\backslash
+n Kindprozess: %i", *shared_mem);
+\end_layout
+
+\begin_layout LyX-Code
+rnd=rand();
+\end_layout
+
+\begin_layout LyX-Code
+sleep(rnd%3);
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+}
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+???(shared_mem);
+\end_layout
+
+\begin_layout LyX-Code
+???(shmID, IPC_RMID, 0);
+\end_layout
+
+\begin_layout LyX-Code
+return 0;
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+}
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "alg:shared-memory"
+
+\end_inset
+
+Programm (mit Lücken), das shared memory verwenden soll
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Kompilieren Sie das Programm und führen es aus.
+ Welches Verhalten können Sie beobachten (ist dies wie erwartet)? Versuchen
+ Sie, falls möglich, Ihre Beobachtungen zu erklären.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{4}
+\end_layout
+
+\end_inset
+
+Lesen Sie den Abschnitt 4.4 des Buches 
+\emph on
+The Linux Kernel
+\emph default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.tldp.org/LDP/tlk/tlk-toc.html"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ durch (siehe
+\emph on
+ Processes
+\emph default
+ /
+\emph on
+ 4.4 Files
+\emph default
+).
+\end_layout
+
+\begin_layout Enumerate
+Wie groß ist die maximale Anzahl der geöffneten Dateien eines Prozesses
+ laut diesem Text? Was ist diese Anzahl auf heutigen Linux-Systemen, bzw.
+ kann sie verändert werden? Begründen Sie die zweite Antwort mit einer Quellenan
+gabe.
+\end_layout
+
+\begin_layout Enumerate
+Weiterhin betrachten Sie den Quelltext der 
+\family typewriter
+task_struct
+\family default
+ (PCB in Linux) des neuesten Linux-Kernels
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+target "http://elixir.free-electrons.com/linux/latest/source/include/linux/sched.h"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+ In welchen Zeilen finden Sie eine Datenstruktur mit den Informationen zu
+ allen geöffneten Dateien eines Prozesses?
+\end_layout
+
+\begin_layout Enumerate
+Finden Sie den Quelltext von 
+\family typewriter
+struct file
+\family default
+, der Datenstruktur mit der Information zu einer 
+\emph on
+einzigen
+\emph default
+ geöffnetem Datei (Hinweis: Betrachten Sie das Diagramm in dem o.g.
+ Abschnitt 4.4, und suchen Sie via Google nach relevanten Variablennahmen).
+ Geben Sie den Link zum Quelltext und die Zeilennummer an.
+ Schätzen Sie dann den minimalen Speicherbedarf dieser Datenstruktur.
+ Zur Vereinfachung nehmen Sie an, dass jeder Eintrag (Variable, Pointer,
+ interne struct usw.) genau 4 Bytes belegt.
+ Nehmen Sie zur weiteren Vereinfachung an, dass alle 
+\family typewriter
+#ifdef
+\family default
+ erfüllt sind (falls vorhanden).
+\end_layout
+
+\begin_layout Enumerate
+Können Sie in der Datenstruktur 
+\family typewriter
+struct file
+\family default
+ den Wert des Dateidescriptors zu der entsprechenden geöffneten Datei identifizi
+eren? Falls ja, geben Sie die Zeile und den Variablennamen an.
+ Bei 
+\begin_inset Quotes pld
+\end_inset
+
+nein
+\begin_inset Quotes prd
+\end_inset
+
+ erläutern Sie, wo man den Wert des zugehörigen Dateidescriptors findet.
+ Überlegen Sie sich einen Grund, warum man das so implementiert hat, und
+ geben Sie diesen an.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{1}
+\end_layout
+
+\end_inset
+
+Wenn ein Threadwechsel auf einer CPU stattfindet, entsteht ein gewisser
+ Overhead an Zeit, in dem keiner der beteiligten Threads seine Rechnung
+ fortführen kann.
+ Beschreiben Sie, was beim Prozesswechsel passiert und nennen Sie die tatsächlic
+hen Gründe, warum dieser Overhead entsteht.
+ Schauen Sie sich dazu die in der Vorlesung genannten Videos an.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{4}
+\end_layout
+
+\end_inset
+
+Bei dem Programm aus Vorlesung 6 („POSIX Pthreads – Beispiel“) sind die
+ Aktionen „Erzeugung eines Threads“ und „Nachricht drucken“ zufällig miteinander
+ verschachtelt.
+\end_layout
+
+\begin_layout Enumerate
+Schreiben Sie das Programm so um, dass die Ausführung die folgende strikte
+ Reihenfolge einhält: „Erzeugung von Thread 1“; „Nachricht von Thread 1
+ drucken“; „Beenden von Thread 1“; „Erzeugung von Thread 2“; …, usw.
+ Testen Sie Ihr Programm anschließend.
+ 
+\series bold
+
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series bold
+Bitte reichen Sie Ihr Programm in Moodle ein.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Was ist (bei Ihrer Implementierung und Ihrem System) der maximale Wert 
+\begin_inset Formula $N_{\max}$
+\end_inset
+
+ der Konstante 
+\emph on
+NUM_THREADS
+\emph default
+, bei dem die Ausführung des Programms etwa 10 Sekunden dauert (eine Näherung
+ reicht)?
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Exercises not included
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

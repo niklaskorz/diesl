@@ -1,0 +1,690 @@
+%% LyX 2.3.4.4 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[11pt,a4paper,ngerman,headinclude,footinclude,DIV14,smallheadings,ngerman]{scrartcl}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\setlength{\parskip}{\medskipamount}
+\setlength{\parindent}{0pt}
+\usepackage{babel}
+\usepackage{verbatim}
+\usepackage{calc}
+\usepackage{graphicx}
+\usepackage[unicode=true]
+ {hyperref}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+\pdfpageheight\paperheight
+\pdfpagewidth\paperwidth
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+%\usepackage[ngerman]{babel}
+\usepackage{xspace}
+\usepackage{caption}
+\usepackage[autolanguage]{numprint}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{ifthen}
+\usepackage{paralist}
+\usepackage{scrpage2}
+\usepackage[a4paper]{geometry}
+\geometry{bmargin=4.5cm}
+%\usepackage{libertine} 
+
+\newcommand{\uebnr}{11}
+\newcommand{\uebabgabe}{19.07.2016, 12:00 Uhr}
+
+\newcommand{\uebdatum}{12.07.2016}
+ 
+\newcounter{uebnummer}
+\setcounter{uebnummer}{0}
+
+\newcommand{\aufgabe}[1]{\stepcounter{uebnummer}\section*{Aufgabe \arabic{uebnummer} \hfill(#1 \ifthenelse{\equal{#1}{1}}{Punkt}{Punkte})}}
+
+\pagestyle{scrheadings}
+
+\ifoot{\footnotesize{\uebnr{}. Übung IBN -- SoSe 2016}}
+\cfoot{}
+\ofoot{\thepage}
+
+%\newcommand{\befehl}[1]{"`\texttt{#1}"'\xspace}
+\setlength{\parindent}{0pt} 
+
+% for quotations:
+\makeatletter
+\newenvironment{chapquote}[2][2em]
+  {\setlength{\@tempdima}{#1}%
+   \def\chapquote@author{#2}%
+   \parshape 1 \@tempdima \dimexpr\textwidth-2\@tempdima\relax%
+   \itshape}
+  {\par\normalfont\hfill--\ \chapquote@author\hspace*{\@tempdima}\par\bigskip}
+\makeatother
+
+\makeatother
+
+\begin{document}
+Universität Heidelberg \hfill{}Lehrstuhl für Parallele und Verteilte
+Systeme (PVS)\\
+ Sommersemester 2016 \hfill{}Artur Andrzejak, Lutz Büch
+
+\begin{center}
+\textbf{\large{}\uebnr{}. Übung zur Vorlesung ,,Betriebssysteme
+und Netzwerke`` (IBN)\\}\vspace*{2ex}
+Abgabedatum: \uebabgabe\textbf{\large{}\\}\rule{1\columnwidth}{0.5pt}
+\par\end{center}
+
+\begin{comment}
+Router, DHCP, NAT, ICMP, Routingalgorithmen
+
+DHCP, NAT, ICMP evtl. auf dem nächsten Zettel.
+\end{comment}
+
+\aufgabe{Bonus, 2}Die FIFA/UEFA Fußball-Welt- und Europameisterschaften
+brechen regelmäßig Rekorde beim Streamingverkehr (mehrere Terabits
+pro Sekunde)\footnote{\href{https://labs.ripe.net/Members/fergalc/internet-traffic-during-euro-2012-final-conclusions}{https://labs.ripe.net/Members/fergalc/internet-traffic-during-euro-2012-final-conclusions}\href{http://variety.com/2014/digital/news/world-cup-sets-new-internet-video-streaming-record-1201221997/}{http://variety.com/2014/digital/news/world-cup-sets-new-internet-video-streaming-record-1201221997/}\href{http://advanced-television.com/2016/06/20/euro-2016-record-streaming-traffic/}{http://advanced-television.com/2016/06/20/euro-2016-record-streaming-traffic/}}.
+Solche enormen Durchsätze lassen sich nicht einem einfachen Server-Client-Modell
+realisieren. Recherchieren und erklären Sie, was Content Delivery
+Networks sind, wie Request Routing funktioniert und wie daran DNS
+beteiligt ist.%
+\begin{comment}
+http://de.wikipedia.org/wiki/Content\_Delivery\_Network\#Funktionsweise
+\end{comment}
+
+\aufgabe{2}Verbinden Sie sich mit einem Rechner mit dem Uninetz.
+\begin{description}
+\item [{a)}] Was ist ihre IP-Adresse? Sind Sie über ein NAT mit dem Internet
+verbunden? Was ist der Netzpräfix? Wie viele Hosts können sich maximal
+in diesem Subnetz anschließen? Geben Sie an, wie Sie diese Daten herausgefunden
+haben.
+\item [{b)}] Recherchieren Sie, was ein Smurf-Angriff\footnote{\href{http://de.wikipedia.org/wiki/Smurf-Angriff}{http://de.wikipedia.org/wiki/Smurf-Angriff}}
+ist. Erklären Sie mit eigenen Worten das Prinzip und was es mit ICMP
+zu tun hat. Warum funktioniert ein solcher Angriff heute in der Regel
+nicht mehr?%
+\begin{comment}
+Zur letzten Frage: http://en.wikipedia.org/wiki/Smurf\_attack\#History\\
+und http://en.wikipedia.org/wiki/Smurf\_attack\#Mitigation
+\end{comment}
+\begin{comment}
+\#14-12-1
+\end{comment}
+\end{description}
+\medskip{}
+
+\fbox{\begin{minipage}[t]{1\columnwidth - 2\fboxsep - 2\fboxrule}%
+\begin{chapquote}{Leslie Lamport, \textit{\LaTeX, Lamport-Uhr}} A distributed system is one in which the failure of a computer you didn't even know existed can render your own computer unusable.\end{chapquote}%
+\end{minipage}}
+
+\aufgabe{2}Betrachten Sie die Netzkonfiguration aus der folgenden
+Abbildung (Kurose et al., Abbildung 4.22, Seite 390). Nehmen Sie an,
+dass der ISP dem Router die Adresse 126.13.89.67 zuweist und dass
+die Netzadresse des Heimnetzes 192.168/16 ist. 
+\begin{description}
+\item [{a)}] Weisen Sie allen Schnittstellen im Heimnetz Adressen zu.
+\item [{b)}] Nehmen Sie an, dass jeder Host zwei laufende TCP-Verbindungen
+hat, die alle mit Port 80 auf Host 128.119.40.86 verbunden sind. Erstellen
+Sie die sechs entsprechenden Einträge in der NAT-Übersetzungstabelle.
+\end{description}
+\begin{center}
+\includegraphics[scale=0.3,bb = 0 0 200 100, draft, type=eps]{NAT.pdf}
+\par\end{center}
+
+\begin{comment}
+\begin{figure}
+\caption{\protect\includegraphics[bb = 0 0 200 100, draft, type=eps]{../../../Material/IBN/Übungssammlung/1011-14-3.jpg}}
+\end{figure}
+\end{comment}
+\begin{comment}
+\#10/11-14-3 \#13-9-9
+\end{comment}
+\begin{comment}
+Kurose Kap 4, Problem 18 a) Home addresses: 192.168.0.1, 192.168.0.2,
+192.168.0.3 with the router interface being 192.168.0.4 b) NAT Translation
+Table WAN Side LAN Side 128.119.40.86, 4000 192.168.0.1, 3345 128.119.40.86,
+4001 192.168.0.1, 3346 128.119.40.86, 4002 192.168.0.2, 3445 128.119.40.86,
+4003 192.168.0.2, 3446 128.119.40.86, 4004 192.168.0.3, 3545 128.119.40.86,
+4005 192.168.0.3, 3546 \\
+
+Silvestre Zabala, 18. Juli 2013:
+
+Nach IBN 07 Folie 31 und Kurose (5. Auflage) Seite 360 steht in der
+NAT-Tabelle die Quelladresse des Routers.
+\end{comment}
+
+\aufgabe{2}Mit dem Tool j-Algo\footnote{\href{http://j-algo.binaervarianz.de/}{http://j-algo.binaervarianz.de/}}
+können Sie verschiedene Algorithmen visualisieren. Führen Sie den
+Dijkstra-Algorithmus an dem Beispielgraphen aus, der mit j-Algo geliefert
+wird (\emph{examples\textbackslash dijkstra\textbackslash vorlesungsgraph.jalgo}).
+\begin{itemize}
+\item Überlegen Sie sich allgemein: Wie viele grüne Kanten wird es geben,
+wenn man einen verbundenen Graphen mit $n$ Knoten eingibt?%
+\begin{comment}
+Es werden immer n-1 Kanten sein, da die grünen Kanten einen Spannbaum
+repräsentieren.
+\end{comment}
+\item Ergeben die grün markierten Kanten (immer) einen minimalen Spannbaum?
+Falls ja, begründen Sie dies. Falls nein, geben Sie ein Gegenbeispiel.
+\begin{comment}
+Nein, als Gegenbeispiel betrachte man folgenden Graphen (Notation:
+(Knoten1, Kantengewicht, Knoten2)):
+
+(1,2,2), (1,2,3), (1,2,4), (2,1,3), (3,1,4)
+
+Der Baum, der bei Dijkstra entsteht, wenn man als Startknoten 1 auswählt,
+hat Gewicht 6, während ein Minimaler Spannbaum Gewicht 4 hat.
+\end{comment}
+\end{itemize}
+\aufgabe{3}Betrachten Sie die Netzwerktopologie mit drei Knoten aus
+dem Beispiel zum Distanzvektor-Routing-Algorithmus aus der Vorlesung
+N07. Statt den dort angegebenen Kantengewichten sollen nun folgende
+gelten: c(x,y)=5, c(y,z)=6 und c(z,x)=2. Berechnen Sie die Entfernungstabellen
+nach dem Initialisierungsschritt und nach jeder Iteration einer synchronen
+Version des Distanzvektor-Algorithmus (analog zum genannten Beispiel
+aus Vorlesung N08). Dann nehmen Sie eine Änderung des Kantengewichts
+c(y,z) auf 8 vor. Wie lange dauert es, bis die Knoten ihre Tabellen
+auf den neuesten Stand gebracht haben?%
+\begin{comment}
+x
+
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & 0 & 5 & 2\tabularnewline
+\hline 
+\textbf{y} & \ensuremath{\infty} & \ensuremath{\infty} & \ensuremath{\infty}\tabularnewline
+\hline 
+\textbf{z} & \ensuremath{\infty} & \ensuremath{\infty} & \ensuremath{\infty}\tabularnewline
+\hline 
+\end{tabular} =>%
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & 0 & 5 & 2\tabularnewline
+\hline 
+\textbf{y} & 5 & 0 & 6\tabularnewline
+\hline 
+\textbf{z} & 2 & 6 & 0\tabularnewline
+\hline 
+\end{tabular}=> Änderung zu c(y,z)=8 =>%
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & 0 & 5 & 2\tabularnewline
+\hline 
+\textbf{y} & 5 & 0 & 8\tabularnewline
+\hline 
+\textbf{z} & 2 & 8 & 0\tabularnewline
+\hline 
+\end{tabular}=>%
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & 0 & 5 & 2\tabularnewline
+\hline 
+\textbf{y} & 5 & 0 & 8\tabularnewline
+\hline 
+\textbf{z} & 2 & 8 & 0\tabularnewline
+\hline 
+\end{tabular}=>%
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & 0 & 5 & 2\tabularnewline
+\hline 
+\textbf{y} & 5 & 0 & 7\tabularnewline
+\hline 
+\textbf{z} & 2 & 7 & 0\tabularnewline
+\hline 
+\end{tabular}
+
+y
+
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & \ensuremath{\infty} & \ensuremath{\infty} & \ensuremath{\infty}\tabularnewline
+\hline 
+\textbf{y} & 5 & 0 & 6\tabularnewline
+\hline 
+\textbf{z} & \ensuremath{\infty} & \ensuremath{\infty} & \ensuremath{\infty}\tabularnewline
+\hline 
+\end{tabular}=> %
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & 0 & 5 & 2\tabularnewline
+\hline 
+\textbf{y} & 5 & 0 & 6\tabularnewline
+\hline 
+\textbf{z} & 2 & 6 & 0\tabularnewline
+\hline 
+\end{tabular}=> Änderung zu c(y,z)=8 =>%
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & 0 & 5 & 2\tabularnewline
+\hline 
+\textbf{y} & 5 & 0 & 8\tabularnewline
+\hline 
+\textbf{z} & 2 & 8 & 0\tabularnewline
+\hline 
+\end{tabular}=>%
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & 0 & 5 & 2\tabularnewline
+\hline 
+\textbf{y} & 5 & 0 & 7\tabularnewline
+\hline 
+\textbf{z} & 2 & 7 & 0\tabularnewline
+\hline 
+\end{tabular}=>%
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & 0 & 5 & 2\tabularnewline
+\hline 
+\textbf{y} & 5 & 0 & 7\tabularnewline
+\hline 
+\textbf{z} & 2 & 7 & 0\tabularnewline
+\hline 
+\end{tabular}
+
+z
+
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & \ensuremath{\infty} & \ensuremath{\infty} & \ensuremath{\infty}\tabularnewline
+\hline 
+\textbf{y} & \ensuremath{\infty} & \ensuremath{\infty} & \ensuremath{\infty}\tabularnewline
+\hline 
+\textbf{z} & 2 & 6 & 0\tabularnewline
+\hline 
+\end{tabular}=> %
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & 0 & 5 & 2\tabularnewline
+\hline 
+\textbf{y} & 5 & 0 & 6\tabularnewline
+\hline 
+\textbf{z} & 2 & 6 & 0\tabularnewline
+\hline 
+\end{tabular}=> Änderung zu c(y,z)=8 =>%
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & 0 & 5 & 2\tabularnewline
+\hline 
+\textbf{y} & 5 & 0 & 8\tabularnewline
+\hline 
+\textbf{z} & 2 & 8 & 0\tabularnewline
+\hline 
+\end{tabular}=>%
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & 0 & 5 & 2\tabularnewline
+\hline 
+\textbf{y} & 5 & 0 & 7\tabularnewline
+\hline 
+\textbf{z} & 2 & 7 & 0\tabularnewline
+\hline 
+\end{tabular}=>%
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \textbf{x} & \textbf{y} & \textbf{z}\tabularnewline
+\hline 
+\hline 
+\textbf{x} & 0 & 5 & 2\tabularnewline
+\hline 
+\textbf{y} & 5 & 0 & 7\tabularnewline
+\hline 
+\textbf{z} & 2 & 7 & 0\tabularnewline
+\hline 
+\end{tabular}
+\end{comment}
+\begin{comment}
+\#14-12-5
+\end{comment}
+
+\aufgabe{Bonus, 3}Lesen Sie im Artikel \emph{Use Protection if Peering
+Promiscuously}\footnote{\href{http://research.dyn.com/2014/11/use-protection-if-peering-promiscuously/}{http://research.dyn.com/2014/11/use-protection-if-peering-promiscuously/}}
+der Dyn DNS Company die Abschnitte \emph{Recap: How this works} sowie
+\emph{Conclusion} und beantworten Sie folgende Fragen:
+\begin{itemize}
+\item Was ist Peering und warum setzen es ISPs ein?%
+\begin{comment}
+1/2 P
+
+Peering ist ein einvernehmliches Abkommen zweier mit einander verbundener
+ISPs, Netzwerkverkehr (in beide Richtungen), der zwischen beiden ISPs
+verläuft, kostenfrei weiterzuleiten.
+\end{comment}
+\item Was ist ein Routing Leak und was ist jeweils die Ursache der Routing
+Leaks?%
+\begin{comment}
+1P
+
+Route leaks sind ein Verstoß gegen das BGP und bestehen im falschen
+Verlautbaren von Routing-Information an Nachbarn. Im Szenario 1 erfährt
+ISP B von ISP A die Routing-Information zu ISP A's Kunden. Er gibt
+diese fälschlicherweise an seine anderen Nachbarn unverändert als
+direkte Routing-Informationen weiter (und verkürzt so die scheinbaren
+Kosten von Routen zu A's Kunden über B). Damit wird Verkehr von B's
+Nachbarn zu Kunden von A über B geleitet werden, obwohl dies nicht
+unbedingt der kürzeste Weg ist. Im Szenario 2 gibt B umgekehrt die
+Routing-Informationen von seinen Nachbarn direkt an A weiter. So sehen
+für die A die Routen über B am günstigsten aus und ausgehender Verkehr
+von A an Nachbarn von B wird über B geroutet werden.
+\end{comment}
+\item Was bedeuten die roten Dreiecke mit den Ausrufezeichen und was die
+grünen bzw. violetten Pfeile in den animierten Diagrammen?%
+\begin{comment}
+1/2 P
+
+Grüne Pfeile bedeuten BGP-Announcements, wobei gefälschte Announcements
+(die gegen das Protokoll verstoßen) mit den roten Dreiecken gekennzeichnet
+sind.
+
+Violette Pfeile bezeichnen die Pfade des entsprechenden Internetverkehrs
+aufgrund der Routing-Information.
+\end{comment}
+\item Was empfiehlt Dyn als Gegenmaßnahmen gegen Routing Leaks?%
+\begin{comment}
+1P
+\begin{itemize}
+\item Filter und Überwachung einsetzen, um sicherzustellen, dass keine gefälschten
+Routen akzeptiert werden
+\item Die Pfade überwachen, die der Verkehr nimmt, der durchs eigene Netzwerk
+geht - u.a. mit Software aus dem Hause Dyn (,,use protection'')
+- um festzustellen, ob ein Peer Routes leakt.
+\item Peering vermeiden, falls es sich vom Volumen eh nicht lohnt
+\end{itemize}
+\end{comment}
+\end{itemize}
+\aufgabe{2}Erinnern Sie sich an das ARP-Protokoll (Vorlesung 08).
+Was erwarten Sie beim Ausführen folgender Befehle? Sie können Ihre
+These auch mit Wireshark überprüfen.
+\begin{itemize}
+\item \texttt{arp -d <IP-des-Gateways>} (benötigt i.d.R. Administratorrechte)%
+\begin{comment}
+1/2 P
+
+Dieser Befehl löscht den Eintrag, der die MAC-Adresse zur IP des Gateways
+zuordnet. Da jeder Verkehr ins weitere Internet über das Gateway geht,
+wird die MAC-Adresse bald benötigt (viele Anwendungen im Hintergrund
+nutzen das Internet). Daher wird es bald ein ARP-Request vom eigenen
+Host geben, der vom Gateway beantwortet wird.
+\end{comment}
+\item \texttt{ping <Broadcast-Adresse-des-Subnetzes>} (bei Linux muss man
+noch die Option \texttt{-b} hinzufügen)%
+\begin{comment}
+1/2 P
+
+Je nach Layout des Subnetzes wird diese Ping-Nachricht an einige oder
+alle Hosts des Subnetzes geschickt werden. Nicht alle erreichten Hosts,
+die auf die ICMP-Nachricht antworten, kennen die MAC-Adresse unseres
+Hosts und sie werden dementsprechend ARP-Requests (per Broadcast)
+mit der Absender-IP des Ping verschicken. Der eigene Host wird diese
+dann (per Unicast) beantworten.
+\end{comment}
+\item Recherchieren und erklären Sie \emph{ARP-Spoofing} und wozu es eingesetzt
+wird.
+\end{itemize}
+\aufgabe{2}Betrachten Sie folgende Netzwerkkonfiguration. Die beiden
+Zeilen neben einem Netzwerkinterface geben die IP-Adresse (oben) und
+die MAC-Adresse (unten) an.
+
+\begin{center}
+\includegraphics[width=1\columnwidth,bb = 0 0 200 100, draft, type=eps]{MAC.png}
+\par\end{center}
+\begin{itemize}
+\item Wird der Adapter von B die Rahmen verarbeiten, wenn A Tausende von
+Rahmen an den Gateway-Router sendet, wobei jeder Rahmen an die LAN-Adresse
+des Gateway-Routers adressiert ist? Falls dies zutrifft, wird der
+Adapter von B die IP-Datagramme in diesen Rahmen an B's Netzwerkschicht
+weiterleiten? Wie würden Ihre Antworten lauten, wenn A Rahmen mit
+der Broadcast-Adresse des LAN senden würde?%
+\begin{comment}
+1P
+
+B's Adapter wird die Rahmen lesen, aber nicht im Protokollstapel weiter
+nach oben leiten (falls das Protokoll korrekt implementiert ist),
+da die Adresse nicht mit der eigenen übereinstimmt. Im Fall der Broadcastadresse
+gibt es die Datagramme an die IP-Schicht weiter (siehe obige Aufgabe
+mit ping).
+\end{comment}
+\item Angenommen, A sendet ein Datagramm an F. Geben Sie die Quell- und
+Ziel-MAC-Adresse des Rahmens an, der das IP-Datagramm verkapselt,
+während
+
+\begin{enumerate}
+\item es von A an den linken Router bzw.
+\item vom linken Router an den rechten Router bzw.
+\item vom rechten Router an F
+\end{enumerate}
+geschickt wird. Geben Sie auch jeweils die IP-Adressen des verkapselten
+Datagramms zu jedem der drei Zeitpunkte an.%
+\begin{comment}
+1/2 P
+\begin{enumerate}
+\item von A an den linken Router:
+
+\begin{itemize}
+\item Quell-MAC-Adresse: 00-00-00-00-00-00, Ziel-MAC-Adresse: 22-22-22-22-22-22
+\item Quell-IP: 111.111.111.001, Destination IP: 133.333.333.003
+\end{itemize}
+\item vom linken Router an den rechten Router:
+
+\begin{itemize}
+\item Quell-MAC-Adresse: 33-33-33-33-33-33, Ziel-MAC-Adresse: 55-55-55-55-55-55
+\item Quell-IP: 111.111.111.001, Destination IP: 133.333.333.003
+\end{itemize}
+\item vom rechten Router an F:
+
+\begin{itemize}
+\item Quell-MAC-Adresse: 88-88-88-88-88-88, Ziel-MAC-Adresse: 99-99-99-99-99-99
+\item Quell-IP: 111.111.111.001, Destination IP: 133.333.333.003
+\end{itemize}
+\end{enumerate}
+\end{comment}
+
+\item Nehmen Sie jetzt an, dass der linke Router durch einen Switch ersetzt
+wird und dass A, B, C, D und der rechte Router sternförmig mit diesem
+Switch verbunden sind. Nehmen Sie an, A sendet erneut ein Datagramm
+an F. Geben Sie die Quell- und Ziel-MAC-Adresse des Rahmens an, der
+das IP-Datagramm verkapselt, während
+
+\begin{enumerate}
+\item es von A an den Switch bzw.
+\item vom Switch an den rechten Router bzw.
+\item vom rechten Router an F
+\end{enumerate}
+geschickt wird. Geben Sie auch jeweils die IP-Adressen des verkapselten
+Datagramms zu jedem der drei Zeitpunkte an.%
+\begin{comment}
+1/2 P
+\begin{enumerate}
+\item von A an den Switch:
+
+\begin{itemize}
+\item Quell-MAC-Adresse: 00-00-00-00-00-00, Ziel-MAC-Adresse: 55-55-55-55-55-55
+\item Quell-IP: 111.111.111.001, Destination IP: 133.333.333.003
+\end{itemize}
+\item vom Switch an den rechten Router:
+
+\begin{itemize}
+\item Quell-MAC-Adresse: 00-00-00-00-00-00, Ziel-MAC-Adresse: 55-55-55-55-55-55
+\item Quell-IP: 111.111.111.001, Destination IP: 133.333.333.003
+\end{itemize}
+\item vom rechten Router an F:
+
+\begin{itemize}
+\item Quell-MAC-Adresse: 88-88-88-88-88-88, Ziel-MAC-Adresse: 99-99-99-99-99-99
+\item Quell-IP: 111.111.111.001, Destination IP: 133.333.333.003
+\end{itemize}
+\end{enumerate}
+\end{comment}
+
+\end{itemize}
+\aufgabe{Bonus, 2}Bei der Einwahl in unverschlüsselte WLANs, etwa
+in Cafés und Hotels (oder WLANs wie UNI-WEBACCESS\footnote{\href{https://www.urz.uni-heidelberg.de/netz/laptop/wism-webauth.html}{https://www.urz.uni-heidelberg.de/netz/laptop/wism-webauth.html}}),
+muss man zunächst die Geschäftsbedingungen akzeptieren, sich anmelden
+oder über einen Bezahlservice einen zeitbeschränkten Internetzugang
+erwerben. Dies geschieht heute oft über sogenannte ,,Captive Portals''\footnote{\href{http://www.golem.de/news/captive-portals-ein-workaround-der-bald-nicht-mehr-funktionieren-wird-1602-118963.html}{http://www.golem.de/news/captive-portals-ein-workaround-der-bald-nicht-mehr-funktionieren-wird-1602-118963.html}}.
+\begin{itemize}
+\item Erklären Sie in eigenen Worten, wie ein Captive Portal technisch implementiert
+wird.
+\item Geben Sie vier der Probleme an, die die HTTP-Arbeitsgruppe des IETF
+im Kontext von Captive Portals\footnote{\href{https://github.com/httpwg/wiki/wiki/Captive-Portals}{https://github.com/httpwg/wiki/wiki/Captive-Portals}}
+identifiziert hat, und erklären Sie sie in eigenen Worten.
+\end{itemize}
+\aufgabe{Bonus, 1}Lesen Sie die Geschichte der ,,500-Meilen-Email''\footnote{\href{http://www.ibiblio.org/harris/500milemail.html}{http://www.ibiblio.org/harris/500milemail.html}}.
+Um weitere Details zu klären, gibt es ein FAQ\footnote{\href{http://www.ibiblio.org/harris/500milemail-faq.html}{http://www.ibiblio.org/harris/500milemail-faq.html}}
+zur Geschichte. Beantworten Sie folgende Fragen:
+\begin{description}
+\item [{a)}] In welcher Schicht des TCP/IP-Stapels liegt die Fehlerursache?
+Was war die Ursache? %
+\begin{comment}
+Die Fehlerursache liegt in der Anwendungsschicht, beim SMTP-Protokoll.
+Die SMTP-Software war aktualisiert worden. Die Konfigurationsdatei
+passte nicht zur neuen Version, wurde aber ohne einen Fehler anzuzeigen
+eingelesen. Konfigurationsoptionen, die die neue Version nicht richtig
+parsen konnten, wurden auf den Defaultwert 0 gesetzt. Insbesondere
+wurde der Timeout-Wert zum Verbinden zu einem SMTP-Server auf 0 gesetzt.
+Experimentell ließ sich feststellen, dass effektiv nach etwa 3ms ein
+Verbindungsversuch abgebrochen wurde.
+\end{comment}
+\item [{b)}] Warum erwähnt der Autor, dass das Campusnetz nach seiner Erinnerung
+keine Router einsetzte? Wieso gab es auch Orte, die weniger als 500
+Meilen entfernt liegen und trotzdem nicht per Email erreichbar waren?%
+\begin{comment}
+Dass keine Router im Netzwerk vorhanden waren, führte dazu dass bis
+zum Anschluss ans Internet keine Verarbeitungsverzögerung, Warteschlangenverzögerung
+oder Übertragungsverzögerung auftraten. So kam bis zum entfernten
+SMTP-Server wenig Verzögerung zur Ausbreitungsverzögerung hinzu.
+
+Manche Standorte waren zwar geographisch näher als 500 Meilen, aber
+bezüglich der Netzwerktopologie weiter entfernt. Hinzukommen kann
+bei bestimmten Routen zusätzlicher Delay durch Middleboxes wie Firewalls.
+\end{comment}
+\begin{comment}
+\#14-11-1
+\end{comment}
+\end{description}
+\aufgabe{3}Erinnern Sie sich an \emph{Einen Tag im Leben einer Web-Anfrage.}
+Angenommen, Sie schreiben Ihr eigenes Betriebssystem und wollen selbst
+den TCP/IP-Netzwerkstapel implementieren (inklusive Firmware für Ihre
+Ethernet-Netzwerkkarte). Zählen Sie (in der Reihenfolge der ersten
+Verwendung) die Protokolle auf, die bei einem Aufruf einer Webseite
+benutzt werden. Nehmen Sie dabei an, dass Sie Ihren Computer erst
+unmittelbar vor diesem Aufruf an ein Netzwerk anschließen. Der Netzwerkadministrator
+hat Ihnen gesagt, dass Sie keine feste IP-Adresse zugewiesen bekommen.
+
+Geben Sie für jedes Protokoll an, wie viele einzelne Aktionen bezüglich
+dieses Protokolls auf Ihrem Computer (mindestens) durchgeführt werden
+müssen, bis der Aufruf durchgeführt ist. Welche Gegebenheiten oder
+Ereignisse können dazu führen, dass mehr Schritte (auf Ihrem Computer)
+unternommen werden müssen, und welche Protokolle betrifft dies?%
+\begin{comment}
+1. CSMA/CD: Um irgendwelche Rahmen zu verschicken, muss gelauscht
+werden, ob die Ethernet-Leitung frei ist. Der erste Rahmen enthält
+die DHCP-DISCOVER-Anfrage.
+
+2. UDP: Die DHCP-Nachricht wird in UDP verpackt
+
+3. IP: Die UDP-Nachricht wird in IP verpackt (mit Broadcast-Adresse)
+
+4. DHCP: DISCOVER-Anfrage, um eine IP-Adresse anzufragen
+
+5. ARP: Der Host kennt jetzt seine eigene IP, die seines Gateways/First-hop-Routers
+und die des DNS-Servers. Jetzt will er erfahren, unter welcher MAC-Adresse
+der Gateway zu erreichen ist. Oder, falls der DNS-Server im gleichen
+Subnetz liegt, dessen MAC-Adresse.
+
+6. DNS: Jetzt muss die URL aufgelöst werden.
+
+7. TCP: Jetzt soll der erste Datenstrom geöffnet werden. Alle bisherigen
+Nachrichten waren von organisatorischer Natur und benötigen nicht
+die Transportschicht oder lediglich UDP.
+
+8. HTTP: Nachdem alle Adressen klar sind und eine TCP-Verbindung besteht,
+kann die HTTP-Anfrage gestellt werden.
+
+HTTP: mind. 2 Aktionen: 1xRequest schicken, 1xResponse entgegennehmen
+(möglicherweise mehr Nachrichten: inkompatible Version, Webseite verzogen/unbekannt/unerreichbar...
+- dadurch natürlich auch mehr TCP- und IP-Aktionen)
+
+TCP: mind. 5 Aktionen: 1xSYN schicken, 1xSYNACK entgegennehmen, 1xHTTP-Request
+verpacken (gleichzeitig das SYNACK ack'en), 1xHTTP-Response entpacken
+(angenommen, dass die Webseite klein genug ist), 1xACK für HTTP-Response
+abschicken (möglicherweise mehr Nachrichten: Pakete gehen verloren
+bei Verbindungsaufbau oder bei Stromübertragung, HTTP-Nachricht ist
+länger als ein Paket...)
+
+DHCP: mind. 4 Aktionen: 1xDHCPDISCOVER abschicken, 1xDHCPOFFER entgegennehmen,
+1xDHCPREQUEST abschicken, um das Angebot anzunehmen, 1xDHCPACK entgegennehmen
+(möglicherweise mehr Nachrichten: Falls es mehrere DHCP-Server gibt,
+die auf das DISCOVER antworten, kommen evtl. mehrere DHCPOFFERs an;
+falls Client oder Server aus einem Grund eine bestimmte Adresszuweisung
+ablehnen; falls der User sich viel Zeit im Browser lässt, könnte die
+Lease-Zeit ablaufen und ein DHCP-Refresh wird notwendig...)
+
+UDP: mind. 6 Aktionen: je ein Paket pro DHCP- und DNS-Nachricht
+
+IP: mind. 11 Aktionen: je ein Datagramm pro UDP- bzw. TCP-Paket (möglichweise
+mehr Datagramme: falls die MTU auf einer Teilstrecke überschritten
+wird, muss erneut gesendet werden, Datagramme können verloren gehen...)
+
+ARP: mind. 2 Aktionen: 1xARP-Request an IP-Adresse des Gateway schicken,
+1xARP-Reply entgegennehmen und in ARP-Cache eintragen (möglicherweise
+mehr Aktionen: es können jederzeit ARP-Requests eingehen, da Teilnehmer
+des Netzwerks diese broadcasten - ARP-Replies hingegen gehen nur gezielt
+an deren Adressaten)
+
+DNS: mind. 2 Aktionen: 1xDNS-Anfrage schicken, 1xDNS-Antwort entgegennehmen
+
+CSMA/CD: mind. 11 Aktionen: alle 11+ IP-Datagramme müssen in Rahmen
+verpackt werden und auf die Leitung gesendet werden; dabei achtet
+der Netzwerkcontroller darauf, dass die MTU des ausgehenden Links
+nicht überschritten wird (auf anderen Links später könnte dies allerdings
+der Fall sein, was mehr Rahmen erforderlich machen kann - je nach
+IP-Implementation auf den beteiligten Knoten; außerdem kann es zu
+Kollisionen kommen, falls es sich nicht um geswitchtes Ethernet handelt)
+\end{comment}
+\begin{comment}
+\#15-12-7
+\end{comment}
+
+\end{document}
