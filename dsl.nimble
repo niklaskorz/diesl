@@ -5,6 +5,7 @@ author        = "Artur Hochhalter, Benjamin Sparks, Niklas Korz, Samuel Melm"
 description   = "The diesl language"
 license       = "MIT"
 srcDir        = "src"
+bin           = @["db"]
 
 
 # Dependencies
