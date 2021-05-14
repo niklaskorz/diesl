@@ -31,6 +31,13 @@ template `.`*(table: DBTable, name: untyped): StringColumn =
   table.data[columnName]
 
 
+template `.=`*(table: var DBTable, name, expression: untyped) =
+  let columnName = astToStr(name)
+  assert table.schema[columnName] == typeString
+
+  table.data[columnName] = expression
+
+
 proc newStringColumn*(name: string, data: seq[string]): StringColumn =
   return StringColumn(name: name, data: data, valueType: typeString)
 
