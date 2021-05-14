@@ -12,8 +12,15 @@ proc trim*(column: StringColumn, direction: TextDirection = both): StringColumn 
   return column.map(str => str.strip(leading = leading, trailing = trailing))
 
 
+# TODO: add option to replace first and all occurences
 proc replace*(column: StringColumn, target, substitution: string) : StringColumn =
   return column.map(str => str.replace(target, substitution))
+
+
+# TODO: this should really take varargs but some weird nim bug (or feature?) prevents that
+# the @ is neccessary and really not intuetive
+proc replaceAll*(column: StringColumn, replacements: seq[(string, string)]) : StringColumn =
+  return column.map(str => str.multiReplace(replacements))
 
 
 proc remove*(column: StringColumn, target: string) : StringColumn =

@@ -36,6 +36,13 @@ test "replace substring":
   check actual == expected
 
 
+test "replace multiple substrings":
+  let actual = dbTable.text.replaceAll(@{"ba": "to", "fo": "ta"})
+  let expected = newStringColumn(name = "text", data = @["  tao", "  tor  ", "toz  "])
+
+  check actual == expected
+
+
 test "remove substring":
   let actual = dbTable.text.remove("ba")
   let expected = newStringColumn(name = "text", data = @["  foo", "  r  ", "z  "])
