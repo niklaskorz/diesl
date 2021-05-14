@@ -9,21 +9,21 @@ let dbTable = newDBTable(
 )
 
 test "trim left":
-  let actual = dbTable.text.trim(trimLeft)
+  let actual = dbTable.text.trim(left)
   let expected = newStringColumn(name = "text", data = @["foo", "bar  ", "baz  "])
 
   check actual == expected
 
 
 test "trim right":
-  let actual = dbTable.text.trim(trimRight)
+  let actual = dbTable.text.trim(right)
   let expected = newStringColumn(name = "text", data = @["  foo", "  bar", "baz"])
 
   check actual == expected
 
 
 test "trim both":
-  let actual = dbTable.text.trim(trimBoth)
+  let actual = dbTable.text.trim(both)
   let expected = newStringColumn(name = "text", data = @["foo", "bar", "baz"])
 
   check actual == expected
@@ -43,3 +43,22 @@ test "remove substring":
   check actual == expected
 
 
+test "add left":
+  let actual = dbTable.text.add("XXX", left)
+  let expected = newStringColumn(name = "text", data = @["XXX  foo", "XXX  bar  ", "XXXbaz  "])
+
+  check actual == expected
+
+
+test "add right":
+  let actual = dbTable.text.add("XXX", right)
+  let expected = newStringColumn(name = "text", data = @["  fooXXX", "  bar  XXX", "baz  XXX"])
+
+  check actual == expected
+
+
+test "add both":
+  let actual = dbTable.text.add("XXX", both)
+  let expected = newStringColumn(name = "text", data = @["XXX  fooXXX", "XXX  bar  XXX", "XXXbaz  XXX"])
+
+  check actual == expected
