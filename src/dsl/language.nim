@@ -10,3 +10,6 @@ proc trim*(column: StringColumn, direction: TrimDirection = trimBoth): StringCol
   let trailing = direction == trimBoth or direction == trimRight
 
   return column.map(str => str.strip(leading = leading, trailing = trailing))
+
+proc replace*(column: StringColumn, target, substitution: string) : StringColumn =
+  return column.map(str => str.replace(target, substitution))

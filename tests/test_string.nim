@@ -27,3 +27,10 @@ test "trim both":
   let expected = newStringColumn(name = "text", data = @["foo", "bar", "baz"])
 
   check actual == expected
+
+
+test "replace string":
+  let actual = dbTable.text.replace("ba", "to")
+  let expected = newStringColumn(name = "text", data = @["  foo", "  tor  ", "toz  "])
+
+  check actual == expected
