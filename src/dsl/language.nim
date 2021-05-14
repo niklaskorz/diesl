@@ -11,5 +11,10 @@ proc trim*(column: StringColumn, direction: TrimDirection = trimBoth): StringCol
 
   return column.map(str => str.strip(leading = leading, trailing = trailing))
 
+
 proc replace*(column: StringColumn, target, substitution: string) : StringColumn =
   return column.map(str => str.replace(target, substitution))
+
+
+proc remove*(column: StringColumn, target: string) : StringColumn =
+  return column.replace(target, "")

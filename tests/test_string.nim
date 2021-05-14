@@ -29,8 +29,17 @@ test "trim both":
   check actual == expected
 
 
-test "replace string":
+test "replace substring":
   let actual = dbTable.text.replace("ba", "to")
   let expected = newStringColumn(name = "text", data = @["  foo", "  tor  ", "toz  "])
 
   check actual == expected
+
+
+test "remove substring":
+  let actual = dbTable.text.remove("ba")
+  let expected = newStringColumn(name = "text", data = @["  foo", "  r  ", "z  "])
+
+  check actual == expected
+
+
