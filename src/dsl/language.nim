@@ -72,6 +72,13 @@ proc add*(column: StringColumn, addition: string, direction: TextDirection): Str
       return column.map(str => addition & str & addition)
 
 
+proc `+`*(column: StringColumn, addition: string): StringColumn  = 
+  add(column, addition, right)
+
+proc `+`*(addition: string, column: StringColumn) : StringColumn = 
+  add(column, addition, left)
+
+
 proc toLower*(column: StringColumn) : StringColumn = 
   ## Replaces all symbols with their lower case counter part (provided they have one)
   return column.map(toLower)

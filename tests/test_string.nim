@@ -64,9 +64,23 @@ test "add left":
   check actual == expected
 
 
+test "add left using +":
+  let actual = "XXX" + dbTable.text
+  let expected = dbTable.text.add("XXX", left)
+
+  check actual == expected
+
+
 test "add right":
   let actual = dbTable.text.add("XXX", right)
   let expected = newStringColumn(name = "text", data = @["  fooXXX", "  bar  XXX", "baz  XXX"])
+
+  check actual == expected
+
+
+test "add right using +":
+  let actual = dbTable.text + "XXX"
+  let expected = dbTable.text.add("XXX", right)
 
   check actual == expected
 
