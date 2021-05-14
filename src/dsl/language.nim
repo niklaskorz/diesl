@@ -30,3 +30,9 @@ proc add*(column: StringColumn, addedString: string, direction: TextDirection): 
       return column.map(str => addedString & str & addedString)
 
 
+proc toLower*(column: StringColumn) : StringColumn = 
+  return column.map(toLower)
+
+
+proc toUpper*(column: StringColumn) : StringColumn = 
+  return column.map(toUpper)

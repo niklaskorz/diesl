@@ -64,6 +64,28 @@ test "add both":
   check actual == expected
 
 
+test "to lower case":
+  let table = newDBTable(
+      newStringColumn(name = "text", data = @["goOdBYe", "Hello"])
+  )
+  
+  let actual = table.text.toLower()
+  let expected = newStringColumn(name = "text", data = @["goodbye", "hello"])
+
+  check actual == expected
+
+
+test "to upper case":
+  let table = newDBTable(
+      newStringColumn(name = "text", data = @["goOdBYe", "Hello"])
+  )
+  
+  let actual = table.text.toUpper()
+  let expected = newStringColumn(name = "text", data = @["GOODBYE", "HELLO"])
+
+  check actual == expected
+
+
 test "split":
   skip()
   # TODO: this does not work at the moment because map(str => str.split) would have to return Column[seq[string]]
