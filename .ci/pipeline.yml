@@ -9,7 +9,7 @@ stages:
 test:
     stage: test
     script:
-        - coco --target tests/*.nim --cov="src" --compiler=--hints:off
+        - coco  --cov="src" --compiler=--hints:off
     artifacts:
         paths:
             - coverage/
