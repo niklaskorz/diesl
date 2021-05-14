@@ -126,17 +126,13 @@ test "substring":
   check actual == expected
 
 
-test "split":
-  skip()
-  # TODO: this does not work at the moment because map(str => str.split) would have to return Column[seq[string]]
-  # let table = newDBTable(
-  #     newStringColumn(name = "text", data = @["goodbye,world", "hello,universe"])
-  # )
-  #
-  # let actual = table.text.split(",", into = @["greeting", "thing"])
-  # let expected = newDBTable(
-  #   newStringColumn(name = "greeting", data = @["goodbye", "hello"]),
-  #   newStringColumn(name = "thing", data = @["world", "universe"]),
-  # )
-  #
-  # check actual == expected
+test "substring using []":
+  let table = newDBTable(
+    newStringColumn(name = "text", data = @["ABCDEF", "123456789"])
+  )
+
+  let actual = table.text[2..4]
+  let expected = table.text.substring(2..4)
+
+  check actual == expected
+

@@ -25,7 +25,16 @@ proc trim*(column: StringColumn, direction: TextDirection = both): StringColumn 
 
 # TODO: error handling
 proc substring*(column: StringColumn, range: HSlice) : StringColumn =
+  ## Selects a substring according to the given `range`.
+  ##
+  ## Note that the range is inclusive.
+  ##
+  ## `column.substring(2..4)` selects the 2nd, 3rd and 4th character from every entry
+
   return column.map(str => str[range])
+
+proc `[]`*(column: StringColumn, range: HSlice): StringColumn = 
+  column.subString(range)
 
 # TODO: add option to replace first and all occurences
 proc replace*(column: StringColumn, target, replacement: string) : StringColumn =
