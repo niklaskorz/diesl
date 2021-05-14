@@ -6,13 +6,21 @@ stages:
     - test
     - publish-coverage
 
-test:
+
+unit-tests:
+    stage: test
+
+
+test-coverage:
     stage: test
     script:
         - coco  --cov="src" --compiler=--hints:off
     artifacts:
         paths:
             - coverage/
+    rules:
+        if: '$CI_COMMIT_BRANCH == "master"'
+        if: '$CI_COMMIT_BRANCH == "develop"'
 
 pages:
     stage: publish-coverage
@@ -22,3 +30,6 @@ pages:
         paths:
             - public/
 
+    rules:
+        if: '$CI_COMMIT_BRANCH == "master"'
+        if: '$CI_COMMIT_BRANCH == "develop"'
