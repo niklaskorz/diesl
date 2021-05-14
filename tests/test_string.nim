@@ -1,7 +1,7 @@
 
 import unittest
 import dsl
-import dsl/db
+import dsl/[db, language]
 
 
 let dbTable = newDBTable(
