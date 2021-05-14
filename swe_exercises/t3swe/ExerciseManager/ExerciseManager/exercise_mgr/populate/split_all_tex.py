@@ -1,43 +1,74 @@
+from typing import Tuple, Iterator
 from pathlib import Path
+import re
 
 
-def get_exercise_num_as_string(filename):
-    name = Path(filename).name
-    ueb = name[3]
-    if name[4] != "-":
-        ueb += name[4]
-    return ueb
+exercise_name_re = re.compile(r"^ueb(\d+)\-([a-z]+)\-(\d{4})\.lyx$")
 
 
-def create_ex_name(filename):
-    file = Path(filename).name
-    name = "Ü-" + file[-6] + file[-5] + "-" + get_exercise_num_as_string(file) + "-"
-    return name
+def extract_year_and_problem_set_number(file_path: str) -> Tuple[str, str]:
+    file_name = Path(file_path).name
+    match = exercise_name_re.match(file_name)
+    if match is None:
+        raise ValueError(f"File name {file_name} does not match exercise name pattern")
+    exercise_num = match.group(1)
+    year = match.group(3)
+    return year, exercise_num
 
 
-def separate_exercises(latex_file, out_folder):
+def create_exercise_out_name(file_path: str, ex_count: int) -> str:
+    year, exercise_num = extract_year_and_problem_set_number(file_path)
+    return f"Ü-{year}-{exercise_num}-{ex_count}.tex"
+
+
+def read_problemset(file_path: str) -> Iterator[str]:
+    with open(file_path, encoding="utf-8") as f:
+        for line in f:
+            yield line
+
+
+def save_header_and_exercises(
+    input_path: str, out_folder: Path, exercises: Iterator[Tuple(int, str)]
+):
+    for ex_count, text in exercises:
+        out_name = create_exercise_out_name(input_path, ex_count)
+        with open(
+            out_folder.absolute() / out_name, "w+", encoding="utf-8"
+        ) as output_file:
+            output_file.write(text)
+
+
+def split_problemset_into_header_and_exercises(
+    lines: Iterator[str],
+) -> Iterator[Tuple(int, str)]:
     # takes a latex file and separates the individual exercises into folder out_path
-    f = open(latex_file, encoding='utf-8')
-    stop_string = "aufgabe{"
-    work_array = []
+    buffer = ""
     ex_count = 0
-    for line in f:
+    stop_string = "aufgabe{"
+
+    for line in lines:
         if stop_string in line:
-            other_filename = create_ex_name(latex_file) + str(ex_count)
-            ex_count += 1
-            file = open(out_folder.absolute() / (other_filename + ".tex"), "w+", encoding='utf-8')
             # lyx export does not always put \aufgabe in new line
-            a = line.split('\\aufgabe')
-            a[1] = '\\aufgabe' + a[1]
-            work_array.append(a[0])
-            file.writelines(work_array)
-            file.close()
-            work_array = [a[1]]
-            continue
-        if "\\end{document}" not in line:
-            work_array.append(line)
-    other_filename = create_ex_name(latex_file) + str(ex_count)
-    file = open(out_folder.absolute() / (other_filename + ".tex"), "w+", encoding='utf-8')
-    file.writelines(work_array)
-    file.close()
-    f.close()
+            target = "\\aufgabe"
+            target_index = line.find(target)
+            if target_index == -1:
+                before_target = line
+                after_target = ""
+            else:
+                before_target = line[:target_index]
+                after_target = line[target_index:]
+
+            buffer += before_target
+            yield ex_count, buffer
+
+            ex_count += 1
+            buffer = after_target
+            if not buffer.endswith("\n"):
+                buffer += "\n"
+
+        elif "\\end{document}" not in line:
+            buffer += line
+            if not buffer.endswith("\n"):
+                buffer += "\n"
+
+    yield ex_count, buffer
