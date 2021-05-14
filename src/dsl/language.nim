@@ -29,3 +29,4 @@ proc add*(column: StringColumn, addedString: string, direction: TextDirection): 
     of both:
       return column.map(str => addedString & str & addedString)
 
+
