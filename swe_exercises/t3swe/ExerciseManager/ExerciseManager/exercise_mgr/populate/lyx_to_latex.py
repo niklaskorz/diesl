@@ -16,9 +16,12 @@ def lyx_to_latex(lyxfile: str):
     subprocess.run(["lyx", "-e", "pdflatex", lyxfile], check=True)
 
 
-def check_lyx():
+def check_lyx() -> bool:
     """
     Checks if lyx is installed and executable.
-    Raises a CalledProcessError on failure.
     """
-    subprocess.run(["lyx", "--version"], check=True)
+    try:
+        subprocess.run(["lyx", "--version"], check=True)
+    except subprocess.CalledProcessError:
+        return False
+    return True
