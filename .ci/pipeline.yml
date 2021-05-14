@@ -9,6 +9,11 @@ stages:
 
 unit-tests:
     stage: test
+    script:
+        - nimble test_ci
+    artifacts:
+        reports:
+            junit: result.xml
 
 
 test-coverage:
@@ -19,8 +24,8 @@ test-coverage:
         paths:
             - coverage/
     rules:
-        if: '$CI_COMMIT_BRANCH == "master"'
-        if: '$CI_COMMIT_BRANCH == "develop"'
+        - if: '$CI_COMMIT_BRANCH == "master"'
+        - if: '$CI_COMMIT_BRANCH == "develop"'
 
 pages:
     stage: publish-coverage
@@ -31,5 +36,5 @@ pages:
             - public/
 
     rules:
-        if: '$CI_COMMIT_BRANCH == "master"'
-        if: '$CI_COMMIT_BRANCH == "develop"'
+        - if: '$CI_COMMIT_BRANCH == "master"'
+        - if: '$CI_COMMIT_BRANCH == "develop"'
