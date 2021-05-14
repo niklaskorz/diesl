@@ -1,13 +1,11 @@
-import dsl/db
-import sugar
-import strutils
+import dsl/[db, language]
 
 
 when isMainModule:
-    let dbTable = newDBTable(
-        newStringColumn(name = "people", data = @["Artur Hochhalter", "Benjamin Sparks", "Niklas Korz", "Samuel Melm"])
-    )
-
-    echo dbTable.people 
-    echo dbTable.people.map(name => name.split(" ")[0])
+  var dbTable = newDBTable(
+      newStringColumn(name = "text", data = @["  foo", "  bar  ", "baz  "])
+  )
+  
+  echo dbTable.text
+  echo dbTable.text.trim(trimBoth)
 
