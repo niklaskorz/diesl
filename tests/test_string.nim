@@ -83,6 +83,7 @@ test "to lower case":
 
 
 test "to upper case":
+  # TODO: one table for all tests
   let table = newDBTable(
       newStringColumn(name = "text", data = @["goOdBYe", "Hello"])
   )
@@ -93,10 +94,20 @@ test "to upper case":
   check actual == expected
 
 
+test "substring":
+  let table = newDBTable(
+    newStringColumn(name = "text", data = @["ABCDEF", "123456789"])
+  )
+
+  let actual = table.text.substring(2..4)
+  let expected = newStringColumn(name = "text", data = @["CDE", "345"])
+
+  check actual == expected
+
+
 test "split":
   skip()
   # TODO: this does not work at the moment because map(str => str.split) would have to return Column[seq[string]]
-  # TODO: one table for all tests
   # let table = newDBTable(
   #     newStringColumn(name = "text", data = @["goodbye,world", "hello,universe"])
   # )

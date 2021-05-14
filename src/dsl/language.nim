@@ -12,6 +12,10 @@ proc trim*(column: StringColumn, direction: TextDirection = both): StringColumn 
   return column.map(str => str.strip(leading = leading, trailing = trailing))
 
 
+# TODO: error handling
+proc substring*(column: StringColumn, range: HSlice) : StringColumn =
+  return column.map(str => str[range])
+
 # TODO: add option to replace first and all occurences
 proc replace*(column: StringColumn, target, substitution: string) : StringColumn =
   return column.map(str => str.replace(target, substitution))
