@@ -4,10 +4,11 @@ default:
 
 stages:
     - test
+    - docs
     - publish-coverage
 
 
-unit-tests:
+unit tests:
     stage: test
     script:
         - nimble test_ci
@@ -16,7 +17,7 @@ unit-tests:
             junit: result.xml
 
 
-test-coverage:
+test coverage:
     stage: test
     script:
         - coco  --cov="src" --compiler=--hints:off
@@ -27,10 +28,20 @@ test-coverage:
         - if: '$CI_COMMIT_BRANCH == "master"'
         - if: '$CI_COMMIT_BRANCH == "develop"'
 
+build docs:
+    stage: docs
+    script:
+        - nimble docgen
+    artifacts:
+        paths:
+            - htmldocs/
+
 pages:
     stage: publish-coverage
     script:
-        - cp -r coverage/ public/
+        - mkdir public
+        - mv coverage/ public/coverage
+        - mv htmldocs/ public/documentation
     artifacts:
         paths:
             - public/
