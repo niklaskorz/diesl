@@ -3,7 +3,7 @@ from pathlib import Path
 import re
 
 
-exercise_name_re = re.compile(r"^ueb(\d+)\-([a-z]+)\-(\d{4})\.lyx$")
+exercise_name_re = re.compile(r"^ueb(\d+)\-([a-z]+)\-(\d{4})\.(.*)$")
 
 
 def extract_year_and_problem_set_number(file_path: str) -> Tuple[str, str]:
