@@ -30,3 +30,5 @@ venv/
 exercise_mgr/generated_pdf_and_tex/
 data/files/*/split/
 data/files/*/comment/
+
+__pycache__/

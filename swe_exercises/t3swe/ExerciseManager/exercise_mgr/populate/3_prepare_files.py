@@ -1,5 +1,5 @@
 import sys
-from .. import Settings
+from ..Settings import settings
 from . import lyx_to_latex, split_all_tex
 from .split_all_tex import (
     read_problemset,
@@ -13,7 +13,7 @@ def main():
         print("lyx is not installed or not accessible, aborting")
         sys.exit(1)
 
-    paths = [Settings.files / str(i) for i in range(12, 20)]
+    paths = [settings.files / str(i) for i in range(19, 20)]
     for path in paths:
         files = path.glob("*.lyx")
         (path / "comment").mkdir(exist_ok=True)
@@ -27,11 +27,6 @@ def main():
             iter_exercises = split_problemset_into_header_and_exercises(iter_lines)
             save_header_and_exercises(input_path, out_folder, iter_exercises)
         print(path)
-    # ueb1-ibn-2012.tex is an exception since it already is a tex file
-    split_all_tex.separate_exercises(
-        str(Settings.files / "12" / "ueb1-ibn-2012.tex"),
-        (Settings.files / "12" / "split"),
-    )
 
 
 if __name__ == "__main__":

@@ -28,7 +28,7 @@ def read_problemset(file_path: str) -> Iterator[str]:
 
 
 def save_header_and_exercises(
-    input_path: str, out_folder: Path, exercises: Iterator[Tuple(int, str)]
+    input_path: str, out_folder: Path, exercises: Iterator[Tuple[int, str]]
 ):
     for ex_count, text in exercises:
         out_name = create_exercise_out_name(input_path, ex_count)
@@ -40,7 +40,7 @@ def save_header_and_exercises(
 
 def split_problemset_into_header_and_exercises(
     lines: Iterator[str],
-) -> Iterator[Tuple(int, str)]:
+) -> Iterator[Tuple[int, str]]:
     # takes a latex file and separates the individual exercises into folder out_path
     buffer = ""
     ex_count = 0
