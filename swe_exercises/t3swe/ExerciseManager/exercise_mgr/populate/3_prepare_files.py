@@ -11,7 +11,7 @@ from .split_all_tex import (
 def main():
     if not lyx_to_latex.check_lyx():
         print("lyx is not installed or not accessible, aborting")
-        sys.executable(1)
+        sys.exit(1)
 
     paths = [Settings.files / str(i) for i in range(12, 20)]
     for path in paths:
