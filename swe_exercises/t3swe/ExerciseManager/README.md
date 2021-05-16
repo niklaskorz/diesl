@@ -1,6 +1,9 @@
 # ExerciseMgr
+
 An application for selection and arrangement of exercises from a database
+
 ## Links
+
 [Repo Structure](presentations/Stucture.pdf)<br/>
 [Timetable](presentations/ExerciseMgr_Overview.pdf)<br/>
 [Database Spreadsheet](https://docs.google.com/spreadsheets/d/1Lylci601lkUr0L-GBdMdQOvSfVu1yNaE8roOhhNNHXI/edit?usp=sharing) <br/>
@@ -14,3 +17,15 @@ An application for selection and arrangement of exercises from a database
 
 ## SQLite Viewer
 [Link](http://inloop.github.io/sqlite-viewer/)
+
+## Setup
+
+```sh
+pip3 install -r requirements.txt
+```
+
+## Execution
+
+```
+python3 -m exercise_mgr.populate.3_prepare_files
+```
