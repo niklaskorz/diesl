@@ -19,4 +19,5 @@ proc test_db*() =
       check actual == expected
 
 
-test_db()
+when isMainModule:
+  test_db()
