@@ -1,0 +1,98 @@
+Geschichte der BS
+BS-Schnittstellen
+Prozesse, IPC, Threads, Synchronisation
+Speichermanagement
+Dateisysteme & I/O
+Deadlocks
+Prozess-Scheduling
+Sonstiges BS
+Einführung & Geschichte Netzwerke
+Anwendungsschicht
+Transportschicht
+Netzwerkschicht
+Sicherungsschicht
+Zusammenfassung Netzwerke
+Transportschicht
+Programmieraufgabe
+Rechenaufgabe
+Stapelverarbeitung#1
+Multiprogramming#1
+Time-Sharing#1
+Personal Computing#1
+GUIs, verteilte Betriebssysteme#1
+BS für mobile Geräte#1
+Wichtige Hardwarekonzepte: Interrupts, (DMA, Speicherhierarchie, Caches), CPU-Register, Ausführungsmodi, Assembler#2
+Systemaufrufe: POSIX: Beispiel des Aufrufs von read(); Systemaufrufe in Windows; Parameterübergabe#2
+Shell-Programmierung#2
+Prozesse in einem BS: Process control block (PCB)#3
+Prozessverwaltung (Einführung)#3
+Prozesszustände#3
+Prozesserzeugung und Prozesshierarchien#3
+Inter-Prozess Kommunikation (IPC): Message Passing#3
+IPC: Shared Memory#3
+IPC: Pipes#3
+Dateideskriptoren und Ein-/Ausgabeumleitung#3
+Threads - Einführung#3
+Threads: Implementierungen in Linux und Windows#3
+Ein Multi-Threaded-Programm (Bitcoins zählen)#3
+Synchronisation der Prozesse / Threads: Race Conditions und Wechselseitiger Ausschluss; Kritische Regionen#3
+Wechselseitiger Ausschluss: Lösungen mit aktivem Warten#3
+Semaphore: Grundlagen und Implementation#3
+Synchronisation in in der Praxis / POSIX: locks, condition variables#3
+Swapping#4
+Speichermanagement: Speicherlöcher; Relocation des Codes#4
+Paging - Grundkonzepte: Adressübersetzung, Seitentabellen#4
+Translation Look-Aside Buffer (TLB)#4
+Invertierte Seitentabelle#4
+Hierarchisches Paging#4
+Virtueller Speicher: Paging + Auslagern; Leistung; Demand Paging, Copy-On-Write#4
+Seitenersetzungsalgorithmen#4
+Working Set#4
+Segmentierung#4
+Dateien: Aufgaben, Attribute, Operationen, Dateien kopieren#5
+Verzeichnisse, Links#5
+Implementierung von Dateisystemen: CHS und LBL - Adressierung; Schichtenaufbau#5
+Speicherung von Dateien als Blocksequenzen: Zusammenhängende Belegung, Verkettete Listen, FAT, Inodes#5
+Implementierung von Dateisystemen - historische Beispiele#5
+Linux Dateisysteme ext2, ext3, ext4#5
+Struktur und Scheduling von Festplatten; Seek-Zeit; Algorithmen: SSTF, SCAN, C-SCAN, C-LOOK#5
+RAID#5
+I/O-Grundlagen: Controller, Busse#5
+Deadlocks - Grundlagen#6
+Erkennung von Deadlocks: Graphenanalyse#6
+Erkennung von Deadlocks: Bankieralgorithmus#6
+Verhinderung von Deadlocks (mithilfe des Bankieralgorithmus)#6
+Beseitigung und Vermeidung von Deadlocks#6
+Prozess-Scheduling#7
+Scheduling-Algorithmen#7
+Thread-Scheduling; Evaluierung#7
+Warteschlangentheorie#7
+IT-Sicherheit#8
+BS Android#8
+Grundbegriffe Internet#9
+Internet-Geschichte#9
+Netzwerkrand#9
+Das Innere des Netzwerks#9
+Verzögerung, Verlust und Durchsatz in paketvermittelten Netzen#9
+Schichtmodell der Protokollstacks#9
+Grundlagen von Netzwerkanwendungen#10
+HTTP und das Web#10
+UDP#11
+Socketprogrammierung mit UDP / TCP#11
+Multiplexing / Demultiplexing#11
+TCP: Grundlagen#11
+TCP: Verbindungsverwaltung#11
+TCP: Flusskontrolle#11
+Verlässliche Nachrichtenzustellung: Naiv; Selective Repeat#11
+Verlässliche Zustellung: Go-Back-N#11
+Verlässliche Nachrichtenzustellung: TCP (effizient)#11
+IP: Grundlagen, Adressierung#12
+IPv4: DHCP, NAT, ICMP#12
+IPv6#12
+Routingalgorithmen#12
+Link-State-Algorithmen#12
+Distanzvektor-Algorithmen#12
+Sicherungsschicht: Einführung#13
+Sicherungsschicht: MAC-Adressierung und ARP; Switches; Ethernet#13
+A day in the life of a web request#14
+TCP: Überlastkontrolle#15

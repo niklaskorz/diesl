@@ -1,0 +1,903 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass scrartcl
+\begin_preamble
+%\usepackage[ngerman]{babel}
+\usepackage{xspace}
+\usepackage{caption}
+\usepackage[autolanguage]{numprint}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{ifthen}
+\usepackage{paralist}
+\usepackage{scrpage2}
+\usepackage{hyperref}
+%\usepackage{libertine} 
+
+\newcommand{\uebnr}{2}
+\newcommand{\uebabgabe}{12.05.2020, 11:00 Uhr}
+
+\newcommand{\uebdatum}{05.05.2020}
+ 
+\newcounter{uebnummer}
+\setcounter{uebnummer}{0}
+
+\newcommand{\aufgabe}[1]{\stepcounter{uebnummer}\section*{Aufgabe \arabic{uebnummer} \hfill(#1 \ifthenelse{\equal{#1}{1}}{Punkt}{Punkte})}}
+
+\pagestyle{scrheadings}
+
+\ifoot{\footnotesize{\uebnr{}. Übung IBN -- SoSe 2020}}
+\cfoot{}
+\ofoot{\thepage}
+
+%\newcommand{\befehl}[1]{"`\texttt{#1}"'\xspace}
+\setlength{\parindent}{0pt} 
+\end_preamble
+\options headinclude,footinclude,DIV14,smallheadings,ngerman
+\use_default_options false
+\maintain_unincluded_children false
+\language ngerman
+\language_package default
+\inputencoding utf8
+\fontencoding T1
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 11
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 1
+\use_package mhchem 0
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Stichwortverzeichnis
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style polish
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+Universität Heidelberg 
+\begin_inset space \hfill{}
+\end_inset
+
+AG Parallele und Verteilte Systeme (PVS)
+\begin_inset Newline newline
+\end_inset
+
+ Sommersemester 2020 
+\begin_inset space \hfill{}
+\end_inset
+
+Artur Andrzejak
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+
+\series bold
+\size large
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+uebnr{}
+\end_layout
+
+\end_inset
+
+.
+ Übung zur Vorlesung 
+\begin_inset Quotes gld
+\end_inset
+
+Betriebssysteme und Netzwerke
+\begin_inset Quotes grd
+\end_inset
+
+ (IBN)
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+
+\end_layout
+
+\end_inset
+
+
+\series default
+\size default
+
+\begin_inset VSpace 2ex*
+\end_inset
+
+Abgabedatum: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+uebabgabe
+\end_layout
+
+\end_inset
+
+
+\series bold
+\size large
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+
+\end_layout
+
+\end_inset
+
+
+\series default
+\size default
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0ex"
+width "100col%"
+height "0.5pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Prozess-Erzeugung und Prozess-Zustände
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{2}
+\end_layout
+
+\end_inset
+
+Bearbeiten Sie folgende Aufgabe in einer bash-Shell.
+ Dazu können Sie ein Linux-System oder Windows Subsystem for Linux verwenden
+ (ggf.
+ müssen Sie dazu 
+\family typewriter
+gcc 
+\family default
+installieren).
+ Speichern Sie folgendes C-Programm unter dem Dateinamen 
+\emph on
+test.c
+\emph default
+ und kompilieren Sie es (
+\family typewriter
+gcc test.c -o test
+\family default
+).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout LyX-Code
+#include <stdlib.h>
+\end_layout
+
+\begin_layout LyX-Code
+int main () {
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+if (fork() > 0) { sleep(1000); }
+\end_layout
+
+\begin_layout LyX-Code
+else { exit(0); }
+\end_layout
+
+\begin_layout LyX-Code
+return 0;
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+} 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Führen Sie nacheinander Folgendes aus:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+./test &
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+./test
+\end_layout
+
+\begin_layout Itemize
+Drücken Sie Strg+Z
+\end_layout
+
+\begin_layout Standard
+Beantworten Sie folgende Fragen:
+\end_layout
+
+\begin_layout Itemize
+Lassen Sie sich jetzt die Prozesshierarchie der Prozesse Ihrer Terminalsitzung
+ anzeigen: 
+\family typewriter
+ps T -H
+\family default
+.
+ Beschreiben Sie die Hierarchie und wie sie zustande kommt.
+ 
+\end_layout
+
+\begin_layout Itemize
+Lassen Sie sich die gesamte Prozesshierarchie anzeigen (
+\family typewriter
+ps -eH
+\family default
+).
+ Auf welcher Tiefe im Baum findet Ihre Sitzung statt?
+\end_layout
+
+\begin_layout Itemize
+Schauen Sie in den man-pages zu 
+\family typewriter
+ps
+\family default
+ nach, welche Prozesszustände vorliegen (Abschnitt 
+\begin_inset Quotes pld
+\end_inset
+
+Process state codes
+\begin_inset Quotes prd
+\end_inset
+
+) und beschreiben diese kurz.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Schreiben, Präsentieren
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{1}
+\end_layout
+
+\end_inset
+
+ Erstellen Sie eine kurze aber möglichst korrekte Definition des Begriffs
+ 
+\emph on
+Ausführung eines Prozesses
+\emph default
+ im Einklang mit der Folie „Visualisierung der Ausführung von Threads" der
+ Vorlesung 5.
+ Zur Vereinfachung können Sie annehmen, dass nur ein Thread/Prozess auf
+ einmal ausführen kann, und den Zustand eines Prozesses (Inhalte der Variablen)
+ ignoriert wird.
+ 
+\series bold
+Hinweis
+\series default
+: Eine korrekte Definition des Begriffes 
+\begin_inset Formula $X$
+\end_inset
+
+ kann folgende Struktur haben: „
+\emph on
+
+\begin_inset Formula $X$
+\end_inset
+
+ ist <Einschränkung bzw.
+ Erweiterung bzw.
+ Modifikation bzw.
+ Kombination usw.
+ von bereits bekannten oder allgemeinverständlichen Begriffen>.
+ Dabei gilt <weitere Spezifikationen bzw.
+ Einschränkungen bzw.
+ Eigenschaften von 
+\begin_inset Formula $X$
+\end_inset
+
+>.
+\emph default
+" Aussagen wie „
+\begin_inset Formula $X$
+\end_inset
+
+ hat die Eigenschaft .." oder „
+\begin_inset Formula $X$
+\end_inset
+
+ kommt vor, wenn..." sind keine korrekten Definitionen (überlegen Sie warum
+ - Sie müssen aber nicht darauf antworten).
+ Als gute Beispiele betrachten Sie die Definitionen aus Mathematik-Büchern
+ oder Wikipedia (zum Beispiel die Definition einer Speicherhalde
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+name "https://de.wikipedia.org/wiki/Dynamischer_Speicher"
+target "https://de.wikipedia.org/wiki/Dynamischer_Speicher"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Nebenläufige Programmierung
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{5}
+\end_layout
+
+\end_inset
+
+ Diese Aufgabe dient dem Verständnis, wie nebenläufige (d.h.
+ multi-threaded) Programme tatsächlich abgearbeitet werden.
+ Dieses Verständnis ist sehr hilfreich, um fehlerfreien nebenläufigen Code
+ zu entwickeln.
+ Betrachten Sie dazu die Folie "Visualisierung der Ausführung von Threads"
+ der Vorlesung 5 (genannt im Folgenden Folie 
+\begin_inset Formula $V$
+\end_inset
+
+) mit dem vereinfachten Beispielprogramm zu POSIX Pthreads aus der Vorlesung
+ 4.
+ Beachten Sie, dass in 
+\begin_inset Formula $V$
+\end_inset
+
+ die Spaltennummern bzw.
+ Zeilennummern zu 
+\begin_inset Formula $V$
+\end_inset
+
+ nach der Vorlesung hinzugefügt wurden.
+\end_layout
+
+\begin_layout Enumerate
+Angenommen, dass drei Threads erzeugt werden (wie in der Folie 
+\begin_inset Formula $V$
+\end_inset
+
+, d.h.
+ 
+\family typewriter
+NUM_THREADS
+\family default
+ 3).
+ Wie viele verschiedene 
+\begin_inset Quotes pld
+\end_inset
+
+Matrizen
+\begin_inset Quotes prd
+\end_inset
+
+ zur Darstellung der Abarbeitung (analog der Folie 
+\begin_inset Formula $V$
+\end_inset
+
+) sind möglich? Erläutern Sie Ihr Ergebnis.
+ Zur Vereinfachung können Sie folgendes annehmen:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+jede Iteration der Schleife zur Threaderzeugung (in 
+\family typewriter
+main()
+\family default
+ Zeilen 4 bis 7 bzw.
+ 8) findet ohne Unterbrechung statt,
+\end_layout
+
+\begin_layout Itemize
+jede Ausführung der Thread-Routine 
+\family typewriter
+TaskCode()
+\family default
+ wird ebenfalls nicht unterbrochen,
+\end_layout
+
+\begin_layout Itemize
+die Zeilen 9 bis 12 des Programms werden abgearbeitet, nachdem alle drei
+ erzeugten Threads fertig sind,
+\end_layout
+
+\begin_layout Itemize
+jede andere Zeile des Programms wird atomar ausgeführt, d.h.
+ ein Threadwechsel kann nur 
+\begin_inset Quotes pld
+\end_inset
+
+zwischen den Zeilen
+\begin_inset Quotes prd
+\end_inset
+
+ stattfinden.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Diese Teilaufgabe soll illustrieren, wie einfach es ist, unbeabsichtigt
+ einen Defekt in einen nebenläufigen Code einzubauen.
+ Überlegen Sie sich dazu eine möglichst einfache Modifikation des Programms
+ auf der Folie 
+\begin_inset Formula $V$
+\end_inset
+
+, so dass - je nach Ausführung - jede der beiden Ausgaben B.
+ oder C.
+ in der Quiz-Folie 2 der Vorlesung 5 möglich werden.
+ Erläutern Sie, wie es in Ihrer Programmversion zur Ausgabe C.
+ kommen kann.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Nebenläufige Programmierung
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{2}
+\end_layout
+
+\end_inset
+
+ (
+\series bold
+Bonusaufgabe
+\series default
+) Generalisieren Sie die Aufgabe 2 Teil 1, indem Sie eine Formel oder eine
+ Berechnungsvorschrift für Anzahl der verschiedenen 
+\begin_inset Quotes pld
+\end_inset
+
+Matrizen
+\begin_inset Quotes prd
+\end_inset
+
+ zur Darstellung der Abarbeitung herleiten, die für jede Anzahl der erzeugten
+ Threads funktioniert (d.h.
+ 
+\family typewriter
+NUM_THREADS
+\family default
+ sollte das Argument der Formel sein).
+ Die Formel muss keine geschlossene Form haben, und kann auch Rekursion
+ benutzen.
+ Sie sollten dieselben Vereinfachungen annehmen wie in der Aufgabe 2 Teil
+ 1.
+ Erläutern Sie, wie Sie auf Ihre Formel kommen.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Semaphore 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{2}
+\end_layout
+
+\end_inset
+
+In der Vorlesung wurde gezeigt wie Semaphore benutzt werden können, um den
+ wechselseitigen Ausschluss zu gewährleisten.
+ Hier ist die zugehörige Pseudocode:
+\end_layout
+
+\begin_layout LyX-Code
+wait(S);
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+// critical section
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+signal(S);
+\end_layout
+
+\begin_layout Standard
+Beschreiben Sie jeweils, was passieren würde, wenn der Programmierer einen
+ der folgenden Fehler begeht:
+\end_layout
+
+\begin_layout Description
+a) die Reihenfolge von 
+\family typewriter
+signal()
+\family default
+ und 
+\family typewriter
+wait()
+\family default
+ wird vertauscht,
+\end_layout
+
+\begin_layout Description
+b) der Aufruf 
+\family typewriter
+signal()
+\family default
+ wird durch den (erneuten) Aufruf 
+\family typewriter
+wait()
+\family default
+ ersetzt,
+\end_layout
+
+\begin_layout Description
+c) der Aufruf von 
+\family typewriter
+wait()
+\family default
+ und/oder von 
+\family typewriter
+signal()
+\family default
+ wird ausgelassen.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Condition variables
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{2}
+\end_layout
+
+\end_inset
+
+Schauen Sie sich das Video von Mike Swift "Lecture 3, Unit 2: using condition
+ variables"
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+name "http://goo.gl/stNNx5"
+target "http://goo.gl/stNNx5"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ an.
+ Beantworten Sie anschließend folgende Fragen:
+\end_layout
+
+\begin_layout Description
+a) Wie unterscheiden sich Semaphore im Bezug auf 
+\begin_inset Quotes pld
+\end_inset
+
+Gedächtnis
+\begin_inset Quotes prd
+\end_inset
+
+ von Mutexen und Bedingungsvariablen? Was passiert, wenn ein Thread ein
+ 
+\emph on
+signal
+\emph default
+ broadcastet, aber zu diesem Zeitpunkt kein Thread darauf wartet?
+\end_layout
+
+\begin_layout Description
+b) Warum muss der Mutex zu 
+\emph on
+done
+\emph default
+ aufrechterhalten werden, wenn man das signal broadcastet?
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Learning Proccess
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{4}
+\end_layout
+
+\end_inset
+
+Schauen Sie das Video 
+\emph on
+Learning How to Learn - Introduction to Memory - Procrastination, Memory,
+ and Sleep
+\emph default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+name "https://www.youtube.com/watch?v=0egaPpfFFLI"
+target "https://www.youtube.com/watch?v=0egaPpfFFLI"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+ Hier werden zwei Arten des Gedächtnisses eingeführt und erklärt.
+\end_layout
+
+\begin_layout Itemize
+Benennen und vergleichen Sie die beiden Arten des Gedächtnisses.
+\end_layout
+
+\begin_layout Itemize
+Vergleichen Sie die beiden Gedächtnissysteme mit Speichersystemen in der
+ Speicherhierarchie (Vorlesung 2).
+ Betrachen Sie dabei die Aspekte Größe, Geschwindigkeit und Flüchtigkeit.
+\end_layout
+
+\begin_layout Itemize
+Wie groß sind die beiden Gedächtnissysteme, d.h.
+ wie viele Einheiten können sie jeweils enthalten und wie werden diese Einheiten
+ im Video genannt?
+\end_layout
+
+\begin_layout Itemize
+Es kann Information von beiden Systemen ins jeweils andere bewegt werden.
+ Worin unterscheiden sich diese Richtungen? Für eine der beiden Richtungen
+ wird im Video eine Technik erklärt.
+ Benennen und beschreiben Sie sie.
+ 
+\end_layout
+
+\end_body
+\end_document
