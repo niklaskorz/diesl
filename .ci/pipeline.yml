@@ -9,10 +9,8 @@ stages:
 test:
     stage: test
     script:
-        - coco --target tests/*.nim --cov !tests --compiler=--hints:off
+        - coco  --cov="src" --compiler=--hints:off
     artifacts:
-        reports:
-            junit: result.xml
         paths:
             - coverage/
 
