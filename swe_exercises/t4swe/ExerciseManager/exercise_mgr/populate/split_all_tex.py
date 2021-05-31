@@ -3,7 +3,7 @@ from pathlib import Path
 import re
 
 
-exercise_name_re = re.compile(r"^ueb(\d+)\-([a-z]+)\-(\d{4})\.(.*)$")
+exercise_name_re = re.compile(r"^[a-z]+(\d+)\-([a-z]+)\-(\d{4})\.(.*)$")
 
 
 def extract_year_and_problem_set_number(file_path: str) -> Tuple[str, str]:
@@ -16,9 +16,9 @@ def extract_year_and_problem_set_number(file_path: str) -> Tuple[str, str]:
     return year, exercise_num
 
 
-def create_exercise_out_name(file_path: str, ex_count: int) -> str:
+def create_exercise_out_comment(file_path: str, ex_count: int) -> str:
     year, exercise_num = extract_year_and_problem_set_number(file_path)
-    return f"Ü-{year}-{exercise_num}-{ex_count}.tex"
+    return f"% ---new_exercise year:{year}, ps:{exercise_num}, exnum:{ex_count}"
 
 
 def read_problemset(file_path: str) -> Iterator[str]:
@@ -28,13 +28,12 @@ def read_problemset(file_path: str) -> Iterator[str]:
 
 
 def save_header_and_exercises(
-    input_path: str, out_folder: Path, exercises: Iterator[Tuple[int, str]]
+    input_path: str, out_path: Path, exercises: Iterator[Tuple[int, str]]
 ):
-    for ex_count, text in exercises:
-        out_name = create_exercise_out_name(input_path, ex_count)
-        with open(
-            out_folder.absolute() / out_name, "w+", encoding="utf-8"
-        ) as output_file:
+    with out_path.open(mode="w", encoding="utf-8") as output_file:
+        for ex_count, text in exercises:
+            out_comment = create_exercise_out_comment(input_path, ex_count)
+            output_file.write(out_comment + "\n")
             output_file.write(text)
 
 
