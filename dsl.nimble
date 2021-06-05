@@ -5,12 +5,14 @@ author        = "Artur Hochhalter, Benjamin Sparks, Niklas Korz, Samuel Melm"
 description   = "The diesl language"
 license       = "MIT"
 srcDir        = "src"
-bin           = @["db"]
+bin           = @["dsl"]
 
 
 # Dependencies
 
 requires "nim >= 1.4.4"
+requires "nimscripter == 0.2.0"
+requires "https://gitlab.com/pvs-hd/ot/backend.git#6ad92e7a236147910f9435a8fc05dcd2df7d979b"
 
 
 task test_ci, "runs tests and generates a report":
