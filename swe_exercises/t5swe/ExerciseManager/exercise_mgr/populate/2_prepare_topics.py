@@ -14,12 +14,7 @@ path_topics_json = source_dir / "topics.json"
 def format_topics():
     # topics.csv was created by excel's export ability
     with path_topics.open("r", encoding="utf-8") as file:
-        lines = file.readlines()
-        b = []
-        for line in lines:
-            line_with_ids = topic_cross_to_id(line)
-            if line_with_ids is not None:
-                b.append(line_with_ids)
+        b = list(topic_cross_to_id(file))
     with path_topics_formatted.open("w+", encoding="utf-8") as outfile:
         for line in b:
             outfile.write(line + "\n")
