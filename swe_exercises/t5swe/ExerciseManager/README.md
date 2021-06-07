@@ -27,5 +27,9 @@ pip3 install -r requirements.txt
 ## Execution
 
 ```
+python3 -m exercise_mgr.populate.0_create_database
+python3 -m exercise_mgr.populate.1_populate_topics
+python3 -m exercise_mgr.populate.2_prepare_topics
 python3 -m exercise_mgr.populate.3_prepare_files
+python3 -m exercise_mgr.populate.4_populate_files
 ```
