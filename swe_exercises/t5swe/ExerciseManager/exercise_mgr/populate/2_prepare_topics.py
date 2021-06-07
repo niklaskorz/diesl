@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
-import re
 
+from .topic_cross_to_id import topic_cross_to_id
 from .split_topic import split_topic
 
 
@@ -17,18 +17,9 @@ def format_topics():
         lines = file.readlines()
         b = []
         for line in lines:
-            split = line.split(";")
-            a = split[0]
-            for i in range(1, len(split) - 1):
-                if "Ü" in split[i]:
-                    a += " " + split[i].replace('"', "")
-                if split[i] == "X":
-                    if i < 4:
-                        a += " " + str(i + 14)
-                    else:
-                        a += " " + str(i + 12)
-            if a[0][0] == "Ü":
-                b.append(re.sub(r"\s+", ",", a))
+            line_with_ids = topic_cross_to_id(line)
+            if line_with_ids is not None:
+                b.append(line_with_ids)
     with path_topics_formatted.open("w+", encoding="utf-8") as outfile:
         for line in b:
             outfile.write(line + "\n")
