@@ -36,36 +36,43 @@ proc flatten(node: NimNode) : NimNode =
       return node
 
 
-proc transpileTrim(params: seq[NimNode], table: NimNode): NimNode =
+proc translateDirection(direction: NimNode): NimNode =
+  case direction.strVal:
+    of "beginning":
+      return newIdentNode("left")
+    of "ending":
+      return newIdentNode("right")
+
+
+
+proc transpileTrim(command: NimNode, params: seq[NimNode], table: NimNode): NimNode =
   case params:
     of [@direction, Ident(strVal: "of"), @column]:
-      let columnAccess = newDotExpr( table, column)
-      # echo direction.toStrLit
-      if direction.strVal == "beginning":
-        return newCall(
-          newDotExpr(
-            columnAccess,
-            newIdentNode("trim"),
-          ),
-        newIdentNode("left"),
-        )
-      discard
-    of [@column]:
-      # echo column.toStrLit
-      discard
+      echo direction
+      let columnAccess = newDotExpr(table, column)
+
+      return newCall(
+        newDotExpr(
+          columnAccess,
+          newIdentNode("trim"),
+        ),
+        translateDirection(direction)
+      )
     else:
       echo "no match"
-  return newStrLitNode("trimming")
+  return command
 
 proc transpileCommand(command, table: NimNode): NimNode =
   var command = command.flatten()
   # echo command.treeRepr
 
+  echo command.toStrLit()
   case command:
     of Command[Ident(strVal: "trim"), all @params]:
-      return transpileTrim(params, table)
+      echo "trim"
+      return transpileTrim(command, params, table)
     else:
-      return newCall("echo", newStrLitNode("foo"))
+      return command
 
 
 proc transpileTransform(table: NimNode, commands: NimNode): NimNode =

@@ -15,6 +15,16 @@ let table = newDBTable(
 proc test_natural*() =
   suite "natural syntax for string operations":
 
+    # TODO: test that there is no ast transformation in this case
+    # since it is not needed 
+    # test_macro "trim without parameter":
+    #   expected:
+    #     table.text.trim(right)
+    #
+    #   actual:
+    #     transform table:
+    #       trim text
+        
     test_macro "trim left":
       expected:
         table.text.trim(left)
@@ -24,22 +34,13 @@ proc test_natural*() =
           trim beginning of text
 
 
-    # test "trim both":
-    #   # let expected = table.text.trim(both)
-    #
-    #   # let actual = block:
-    #     transform table:
-    #       trim table.text
-    #
-    #   # check expected == actual
-    #
-    # test "trim left":
-    #   let expected = table.text.trim(left)
-    #   # let actual = block:
-    #   transform table:
-    #     trim beginning of table.text
+    test_macro "trim right":
+      expected:
+        table.text.trim(right)
 
-
+      actual:
+        transform table:
+          trim ending of text
 
 
 when isMainModule:
