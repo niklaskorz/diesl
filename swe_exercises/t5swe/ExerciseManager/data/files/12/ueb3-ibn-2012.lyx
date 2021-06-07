@@ -1,0 +1,518 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass scrartcl
+\begin_preamble
+\usepackage[ngerman]{babel}
+\usepackage{xspace}
+\usepackage{caption}
+\usepackage[autolanguage]{numprint}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{ifthen}
+\usepackage{paralist}
+\usepackage{scrpage2}
+%\usepackage{libertine} 
+
+\newcommand{\uebnr}{3}
+\newcommand{\uebabgabe}{09.05.2012, 11:00 Uhr}
+
+%\newcommand{\uebdatum}{25.04.2012}
+ 
+\newcounter{uebnummer}
+\setcounter{uebnummer}{0}
+
+\newcommand{\aufgabe}[1]{\stepcounter{uebnummer}\section*{Aufgabe \arabic{uebnummer} \hfill(#1 \ifthenelse{\equal{#1}{1}}{Punkt}{Punkte})}}
+
+\pagestyle{scrheadings}
+
+\ifoot{\footnotesize{\uebnr{}. Übung IBN -- SoSe 2012}}
+\cfoot{}
+\ofoot{\thepage}
+
+%\newcommand{\befehl}[1]{"`\texttt{#1}"'\xspace}
+\setlength{\parindent}{0pt} 
+\end_preamble
+\options headinclude,footinclude,DIV14,smallheadings
+\use_default_options false
+\maintain_unincluded_children false
+\language ngerman
+\language_package default
+\inputencoding utf8
+\fontencoding T1
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures false
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 11
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 1
+\use_package mhchem 0
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Stichwortverzeichnis
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style german
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+Universität Heidelberg 
+\begin_inset space \hfill{}
+\end_inset
+
+Lehrstuhl für Parallele und Verteilte Systeme (PVS)
+\begin_inset Newline newline
+\end_inset
+
+ Sommersemester 2012 
+\begin_inset space \hfill{}
+\end_inset
+
+Artur Andrzejak
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+
+\series bold
+\size large
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+uebnr{}
+\end_layout
+
+\end_inset
+
+.
+ Übung zur Vorlesung 
+\begin_inset Quotes gld
+\end_inset
+
+Betriebssysteme und Netzwerke
+\begin_inset Quotes grd
+\end_inset
+
+ (IBN)
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+
+\end_layout
+
+\end_inset
+
+
+\series default
+\size default
+
+\begin_inset VSpace 2ex*
+\end_inset
+
+Abgabedatum: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+uebabgabe
+\end_layout
+
+\end_inset
+
+
+\series bold
+\size large
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+
+\end_layout
+
+\end_inset
+
+
+\series default
+\size default
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0ex"
+width "100col%"
+height "0.5pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{3}
+\end_layout
+
+\end_inset
+
+Linux verwendet intern den Systemaufruf 
+\emph on
+clone()
+\emph default
+, um neue Prozesse oder Threads zu erzeugen.
+\end_layout
+
+\begin_layout Description
+a.
+ Beschreiben Sie kurz die Parameter dieses Systemaufrufs.
+\end_layout
+
+\begin_layout Description
+b.
+ Der Parameter 
+\emph on
+int
+\emph default
+ 
+\emph on
+flags
+\emph default
+ erlaubt eine feine Abstufung, welche Ressourcen der Vaterprozess und Kindprozes
+s sich teilen.
+ Listen Sie auf und beschreiben Sie kurz die Bedeutung der einzelnen Optionen.
+ Bei welchem Wert von 
+\emph on
+flags
+\emph default
+ werden maximal viele Ressourcen gemeinsam verwendet (eine symbolische Angabe
+ reicht)?
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+a.
+ [1 Punkt] http://linux.about.com/library/cmd/blcmdl2_clone.htm,
+\end_layout
+
+\begin_layout Plain Layout
+int clone(int (*fn)(void *), void *child_stack, int flags, void *arg);
+\end_layout
+
+\begin_layout Plain Layout
+b.
+ [2 Punkte] Siehe die Auflistung unter dem Link oben; bei CLONE_PARENT |
+ CLONE_FS | CLONE_FILES | ...
+ | CLONE_THREAD hat man das maximale 
+\begin_inset Quotes gld
+\end_inset
+
+Sharing
+\begin_inset Quotes grd
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{6}
+\end_layout
+
+\end_inset
+
+Schreiben Sie unter C und POSIX folgendes Programm und testen Sie dieses.
+ Ein Prozess (Vater) erzeugt ein Kind-Prozess (Kind) und teilt diesem via
+ 
+\emph on
+Shared Memory
+\emph default
+ die Prozessnummer (
+\emph on
+pid1
+\emph default
+) des Kindes mit.
+ Das Kind vergleicht die übergebene Zahl 
+\emph on
+pid1
+\emph default
+ mit seiner tatsächlichen Prozessnummer (erlangt durch einen Systemaufruf),
+ und teilt dem Vater (auch via Shared Memory) mit, ob die übergebene Zahl
+ gestimmt hat (z.B.
+ als String 
+\begin_inset Quotes gld
+\end_inset
+
+OK
+\begin_inset Quotes grd
+\end_inset
+
+ oder 
+\begin_inset Quotes gld
+\end_inset
+
+FALSE
+\begin_inset Quotes grd
+\end_inset
+
+).
+ Können hier Probleme der Synchronisation auftreten, und falls ja, wie lösen
+ Sie diese? Hinweis: benutzen Sie u.A.
+ die Funktionen der POSIX-Familie 
+\emph on
+shm
+\emph default
+*.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{3}
+\end_layout
+
+\end_inset
+
+Shells wie Bash erlauben die Verwendung von benannten Pipes.
+ 
+\end_layout
+
+\begin_layout Description
+a.
+ Benennen Sie mindestens zwei 
+\emph on
+Nachteile
+\emph default
+ der benannten Pipes im Vergleich zu den anonymen Pipes.
+\end_layout
+
+\begin_layout Description
+b.
+ Schreiben Sie das Beispiel aus der Vorlesung 5 (Folien 4 bzw.
+ 15) so um, dass ein benanntes Pipe verwendet wird.
+\end_layout
+
+\begin_layout Description
+c.
+ Geben Sie ein eigenes Beispiel für die Verwendung von benannten Pipes (in
+ der Shell) an, bei dem die anonymen Pipes nicht ausreichen.
+ Sie müssen keinen Shell-Code angeben; allerdings soll das ein eigenes Beispiel
+ sein (insbesondere nicht im Internet auffindbar).
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{1}
+\end_layout
+
+\end_inset
+
+In der Vorlesung 5, Folie 29 wurde ein 
+\begin_inset Quotes gld
+\end_inset
+
+falscher
+\begin_inset Quotes grd
+\end_inset
+
+ Algorithmus für den wechselseitigen Ausschluss vorgestellt.
+ Geben Sie eine Beispielausführung an, bei der der Prozess B endlos auf
+ den Eintritt in die kritische Region wartet.
+ Welchen Wert hat die Variable 
+\emph on
+turn
+\emph default
+ und warum?
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{3}
+\end_layout
+
+\end_inset
+
+In der Vorlesung 6 wurde gezeigt, wie Semaphore benutzt werden können, um
+ den wechselseitigen Ausschluss zu gewährleisten.
+ Hier ist der zugehörige Pseudocode:
+\end_layout
+
+\begin_layout LyX-Code
+wait(mutex);
+\end_layout
+
+\begin_layout LyX-Code
+// kritische Region
+\end_layout
+
+\begin_layout LyX-Code
+signal(mutex);
+\end_layout
+
+\begin_layout LyX-Code
+// nicht-kritische Region
+\end_layout
+
+\begin_layout Standard
+Beschreiben Sie, was passieren würde, wenn der Programmierer einen der folgenden
+ Fehler begeht: 
+\end_layout
+
+\begin_layout Description
+a.
+ die Reihenfolge von 
+\emph on
+signal()
+\emph default
+ und 
+\emph on
+wait()
+\emph default
+ wird vertauscht;
+\end_layout
+
+\begin_layout Description
+b.
+ der Aufruf 
+\emph on
+signal()
+\emph default
+ wird durch den (erneuten) Aufruf 
+\emph on
+wait()
+\emph default
+ ersetzt;
+\end_layout
+
+\begin_layout Description
+c.
+ der Aufruf von 
+\emph on
+wait()
+\emph default
+ und/oder von 
+\emph on
+signal()
+\emph default
+ wird ausgelassen.
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\end_body
+\end_document

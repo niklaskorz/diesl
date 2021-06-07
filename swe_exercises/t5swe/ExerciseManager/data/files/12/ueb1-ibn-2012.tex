@@ -1,0 +1,122 @@
+\documentclass[a4paper,
+headinclude,
+footinclude,
+11pt,
+DIV14,
+smallheadings]{scrartcl}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{xspace}
+\usepackage{url}
+\usepackage{caption}
+\usepackage[autolanguage]{numprint}
+\usepackage{booktabs}
+\usepackage{tikz}
+%\usepackage{libertine} 
+\usepackage{ifthen}
+\usepackage{paralist}
+\usepackage{scrpage2}
+
+\newcommand{\uebnr}{1}
+\newcommand{\uebdatum}{18.04.2012}
+\newcommand{\uebabgabe}{25.04.2011, 11:00 Uhr}
+
+
+\setlength{\parindent}{0pt} 
+
+\newcounter{uebnummer}
+\setcounter{uebnummer}{0}
+
+\newcommand{\aufgabe}[1]{
+\stepcounter{uebnummer}
+\section*{Aufgabe \arabic{uebnummer} \hfill (#1 \ifthenelse{\equal{#1}{1}}{Punkt}{Punkte})}
+}
+
+\pagestyle{scrheadings}
+
+\ifoot{\footnotesize{\uebnr{}. Übung IBN -- SoSe 2012}}
+\cfoot{}
+\ofoot{\thepage}
+
+\begin{document}
+
+\newcommand{\befehl}[1]{"`\texttt{#1}"'\xspace}
+
+
+Universität Heidelberg \hfill Lehrstuhl für Parallele und Verteilte Systeme (PVS)\\
+Institut für Informatik\mbox{} \hfill Artur Andrzejak
+
+\begin{center}
+\begin{large}
+\bfseries
+\uebnr{}. Übung zur Vorlesung "`Betriebssysteme und Netzwerke"' \\
+\end{large}
+\vspace{2ex}
+
+Ausgabedatum: \uebdatum  \qquad Abgabedatum: \uebabgabe
+\end{center}
+\hrule
+
+\aufgabe{4}
+
+Nennen Sie 4 Betriebssysteme Ihrer Wahl und geben Sie zu jedem folgende Informationen an:
+\begin{compactitem}
+\item das Jahr der ersten Veröffentlichung,
+\item das Standarddateisystem,
+\item die unterstützten Prozessorarchitekturen (CPUs),
+\item ob das Betriebssystem einen monolithischen oder einen Mikrokernel besitzt,
+\item und ob das Betriebssystem POSIX-Systemaufrufe bereitstellt.
+\end{compactitem}
+
+\aufgabe{2}
+Beschreiben Sie in 2-3 Stichpunkten ein weiteres Beispiel für das Phänomen, dass ein Konzept der Computersysteme / Betriebssysteme oft verworfen wird, um Jahre später - ggf. in einem anderen Kontext - wiederaufzutauchen (siehe Vorlesung 1). Hinweis: mehr dazu finden Sie im Kapitel 1 ("`Einführung"') des Buches von Tanenbaum.
+
+\aufgabe{2}
+
+Was bedeutet der Begriff "`Spooling"' und welches Problem soll dieses Konzept lösen?
+
+\aufgabe{2}
+Definieren Sie den Begriff  "`Microcode"' (möglichst knapp, aber verständlich). Welche Vorteile und welche Nachteile hat dieser Ansatz (je 2-3 Stichpunkte)?  Nennen Sie mindestens zwei Familien von modernen Prozessoren, die dieses Konzept verwenden.
+
+
+%http://en.wikipedia.org/wiki/Microcode
+% Performance disadvantages were severe, and have let to RISC architectures. More details:
+% Analysis shows complex instructions are rarely used, hence the machine resources devoted to them are largely wasted.
+% Programming has largely moved away from assembly level, so it's no longer worthwhile to provide complex instructions for productivity reasons.
+% The machine resources devoted to rarely-used complex instructions are better used for expediting performance of simpler, commonly-used instructions.
+% Complex microcoded instructions requiring many, varying clock cycles are difficult to pipeline for increased performance.
+% Simpler instruction sets allow direct execution by hardware, avoiding the performance penalty of microcoded execution.
+
+
+\aufgabe{6}
+
+Starten Sie eine Unix-Shell auf einem Ihnen zu Verfügung stehenden System (Mac OS X: Terminal, Windows: Cygwin, Linux: Terminal/Console). 
+Mit dem Befehl \befehl{echo \$SHELL} können Sie feststellen, welche Shell gestartet wurde.
+Sollte die Ausgabe nicht \befehl{/bin/bash} sein, starten sie eine Bash-Shell durch Eingabe des Kommandos \befehl{bash}.
+
+Mit \befehl{set} bekommen Sie eine Übersicht über die in Ihrer Shell-Umgebung definierten Variablen.
+Mit der Pipe \befehl{|} können Sie mehrere Befehle verketten. Mit Hilfe von \befehl{man} kann man Hilfe zu einem Befehl erhalten. Informieren Sie sich mittels \befehl{man} über folgende Befehle: \befehl{grep}, \befehl{ls}, \befehl{more}, \befehl{cat}, \befehl{head} (Beispiel: \befehl{man grep}).
+
+\paragraph*{Teil 1 (2 Punkte)}
+Welche Ausgabe produziert Ihr System bei Eingabe folgender Befehle?
+\begin{compactitem}
+\item \texttt{set | grep PATH}
+\item \texttt{echo \$HOME}
+\item \texttt{seq 1 10  | head -4}
+\item \texttt{seq 1 50 | sort | head}
+\item \texttt{alias myfancycommand='date'} \\
+         \texttt{myfancycommand}
+\end{compactitem}
+Hinweis: Auf einem Mac ist statt \befehl{seq} der Befehl \befehl{jot} zu verwenden. Bsp. \befehl{seq 1 10} wird zu 
+\befehl{jot 10 1 10}.
+
+\paragraph*{Teil 2 (4 Punkte)}
+Geben Sie eine Befehlskette an, um die ersten 5 Dateien eines Verzeichnisses auf der Kommandozeile auszugeben.
+
+
+
+
+\end{document}
+

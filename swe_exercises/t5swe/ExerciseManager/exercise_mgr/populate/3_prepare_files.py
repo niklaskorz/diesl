@@ -13,7 +13,7 @@ def main():
         print("lyx is not installed or not accessible, aborting")
         sys.exit(1)
 
-    paths = [settings.files / str(i) for i in range(19, 21)]
+    paths = [settings.files / str(i) for i in [12, 19, 20]]
     for path in paths:
         files = path.glob("*.lyx")
         (path / "comment").mkdir(exist_ok=True)

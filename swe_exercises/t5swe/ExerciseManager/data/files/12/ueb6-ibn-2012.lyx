@@ -1,0 +1,619 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass scrartcl
+\begin_preamble
+\usepackage[ngerman]{babel}
+\usepackage{xspace}
+\usepackage{caption}
+\usepackage[autolanguage]{numprint}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{ifthen}
+\usepackage{paralist}
+\usepackage{scrpage2}
+%\usepackage{libertine} 
+\usepackage{listings}
+
+%%%% CHANGE HERE ONLY %%%%%%%%%%%%
+\newcommand{\uebnr}{6}
+\newcommand{\uebabgabe}{13.06.2012, 11:00 Uhr}
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\uebdatum}{25.04.2012}
+ 
+\newcounter{uebnummer}
+\setcounter{uebnummer}{0}
+
+\newcommand{\aufgabe}[1]{\stepcounter{uebnummer}\section*{Aufgabe \arabic{uebnummer} \hfill(#1 \ifthenelse{\equal{#1}{1}}{Punkt}{Punkte})}}
+
+\pagestyle{scrheadings}
+
+\ifoot{\footnotesize{\uebnr{}. Übung IBN -- SoSe 2012}}
+\cfoot{}
+\ofoot{\thepage}
+
+%\newcommand{\befehl}[1]{"`\texttt{#1}"'\xspace}
+\setlength{\parindent}{0pt} 
+
+\newcommand{\befehl}[1]{"`\texttt{#1}"'\xspace}
+\end_preamble
+\options headinclude,footinclude,DIV14,smallheadings
+\use_default_options false
+\maintain_unincluded_children false
+\language ngerman
+\language_package default
+\inputencoding utf8
+\fontencoding T1
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 11
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 1
+\use_package mhchem 0
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Stichwortverzeichnis
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style german
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+Universität Heidelberg 
+\begin_inset space \hfill{}
+\end_inset
+
+Lehrstuhl für Parallele und Verteilte Systeme (PVS)
+\begin_inset Newline newline
+\end_inset
+
+ Sommersemester 2012 
+\begin_inset space \hfill{}
+\end_inset
+
+Artur Andrzejak
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+
+\series bold
+\size large
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+uebnr{}
+\end_layout
+
+\end_inset
+
+.
+ Übung zur Vorlesung 
+\begin_inset Quotes gld
+\end_inset
+
+Betriebssysteme und Netzwerke
+\begin_inset Quotes grd
+\end_inset
+
+ (IBN)
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+
+\end_layout
+
+\end_inset
+
+
+\series default
+\size default
+
+\begin_inset VSpace 2ex*
+\end_inset
+
+Abgabedatum: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+uebabgabe
+\end_layout
+
+\end_inset
+
+
+\series bold
+\size large
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+
+\end_layout
+
+\end_inset
+
+
+\series default
+\size default
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0ex"
+width "100col%"
+height "0.5pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+Allgemeines
+\end_layout
+
+\begin_layout Standard
+Die Programmieraufgaben sind sowohl ausgedruckt als auch in Moodle als ZIP-Archi
+v abzugeben.
+ Bitte benennen Sie die Dateien folgendermaßen: 
+\emph on
+IBN–Tutor–Blatt XX–Gruppe-YY.zip
+\emph default
+.
+ Schreiben Sie außerdem Ihre Namen in Kommentarzeilen der Quelltexte.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{1}
+\end_layout
+
+\end_inset
+
+Beschreiben Sie kurz das Besitzer-Gruppe-Welt-Modell der Dateien-Zugriffsrechte
+ in UNIX/Linux, insbesondere die Interpretation der Bits bei den Verzeichnissen.
+ Können symbolische oder harte Links andere Zugriffsrechte als die Datei
+ selbst haben, und warum bzw.
+ warum nicht? 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{1}
+\end_layout
+
+\end_inset
+
+Wie viele Plattenoperationen (Lesen von I-Nodes oder Plattenblöcken) werden
+ benötigt, um den I-Node für die Datei /usr/var/lehre/ibn/ueb06-ibn2012.pdf
+ zu bekommen? Nehmen Sie an, dass der I-Node für das Wurzelverzeichnis im
+ Speicher liegt, sich jedoch keine weiteren Elemente entlang des Pfades
+ im Arbeitsspeicher befinden.
+ Nehmen Sie weiterhin an, dass alle Verzeichnisse in je einen Plattenblock
+ passen.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{1}
+\end_layout
+
+\end_inset
+
+Wenn in dem Dateisystem 
+\emph on
+ext2
+\emph default
+ ein I-Node von der Platte gelesen wird, während eine Datei 
+\emph on
+F
+\emph default
+ geöffnet wird, so wird dieser in eine I-Node-Tabelle im Speicher abgelegt.
+ Diese Tabelle hat einige Felder, die es auf der Platte nicht gibt.
+ Eines davon ist ein Zähler, der angibt, wie oft die Datei 
+\emph on
+F
+\emph default
+ geöffnet wurde.
+ Warum wird dieses Feld benötigt?
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{3}
+\end_layout
+
+\end_inset
+
+Betrachten Sie folgendes Szenario: Es gibt 
+\begin_inset Formula $n$
+\end_inset
+
+ Objekte und bei jedem von diesen kann entweder ein „böses“ Ereignis mit
+ Wahrscheinlichkeit 
+\begin_inset Formula $b$
+\end_inset
+
+ auftreten, oder ein „gutes“ Ereignis mit Wahrscheinlichkeit 
+\begin_inset Formula $g$
+\end_inset
+
+, d.h.
+ 
+\begin_inset Formula $b+g=1$
+\end_inset
+
+ (siehe Vorlesung 13, die 
+\begin_inset Quotes gld
+\end_inset
+
+Ethik-Algebra
+\begin_inset Quotes grd
+\end_inset
+
+).
+ Für ein 
+\begin_inset Formula $k$
+\end_inset
+
+ mit 
+\begin_inset Formula $0≤k≤n$
+\end_inset
+
+, wie groß ist die Wahrscheinlichkeit 
+\begin_inset Formula $p(k,n,b,g)$
+\end_inset
+
+, dass 
+\emph on
+genau
+\emph default
+ 
+\begin_inset Formula $k$
+\end_inset
+
+ böse Ereignisse auftreten? Begründen Sie Ihre Antwort.
+ Beweisen Sie anschließend, dass für feste 
+\begin_inset Formula $n$
+\end_inset
+
+ und 
+\begin_inset Formula $b$
+\end_inset
+
+ (und somit festes 
+\begin_inset Formula $g$
+\end_inset
+
+) die Summe 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p(1,n,b,g)+p(2,n,b,g)+…+p(n,n,b,g)
+\]
+
+\end_inset
+
+ genau 
+\begin_inset Formula $1–g^{n}$
+\end_inset
+
+ ergibt (d.h.
+ die „alternative Berechnung“ der Wahrscheinlichkeit, dass es mindestens
+ ein böses Ereignis gibt (
+\begin_inset Quotes gld
+\end_inset
+
+Ethik-Algebra /2
+\begin_inset Quotes grd
+\end_inset
+
+), ist korrekt).
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{1}
+\end_layout
+
+\end_inset
+
+Vergleichen Sie den Durchsatz eines RAID 5 Systems mit dem Durchsatz eines
+ RAID 1 Systems für die folgenden Operationen: 
+\end_layout
+
+\begin_layout Enumerate
+Lesen einzelner Datenblöcke 
+\end_layout
+
+\begin_layout Enumerate
+Lesen von mehreren aufeinanderfolgenden Datenblöcken.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{3+4}
+\end_layout
+
+\end_inset
+
+Wie in der Vorlesung gesehen, werden die einzelnen Scheiben einer Festplatte
+ in unterschiedliche Spuren unterteilt.
+ Die übereinander liegenden Spuren nennt man Zylinder.
+ Es sei angenommen, dass 12 Bit für die Adressierung der Zylinder zur Verfügung
+ stehen.
+ Unsere fiktive Festplatte soll 
+\begin_inset Formula $2^{12}=4096$
+\end_inset
+
+ Zylinder besitzen, welche von 0 bis 4095 nummeriert sind.
+ Der Lese-/Schreibkopf steht zurzeit bei Zylinder 234 und hat vorher eine
+ Operation bei Zylinder 125 ausgeführt.
+ Zur Bearbeitung der wartenden Anfragen muss der Lese-/Schreibkopf folgende
+ Zylinder anfahren (in Reihenfolge ihrer zeitlichen Ankunft): 86, 1470,
+ 913, 1774, 948, 1509, 1022, 1750, 130.
+ Berechnen Sie für jeden der folgenden Algorithmen in welcher Reihenfolge
+ die obigen Zylinder besucht werden und bestimmen Sie die Gesamtdistanz
+ der Kopfbewegung (in Zylindern): FCFS, SSTF, SCAN, C-SCAN, C-LOOK.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Zusatzaufgabe
+\series default
+ (4 Punkte): Schreiben Sie ein Programm in einer (Skript-)Sprache Ihrer
+ Wahl, um die 5 verschiedenen Algorithmen zu simulieren.
+ Das Programm bekommt folgende Eingabe: die Gesamtanzahl von Zylindern,
+ den zuvor besuchten Zylinder, den Zylinder auf dem der Kopf steht, den
+ Algorithmus und eine Liste der Anfragen.
+ Als Ergebnis soll das Programm die Gesamtdistanz und die Reihenfolge der
+ besuchten Zylinder ausgeben.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{2}
+\end_layout
+
+\end_inset
+
+Beschreiben Sie zwei Szenarien, bei denen blockierende Systemaufrufe zur
+ Ein-/Ausgabe sinnvoll sind, und zwei Szenarien, bei denen nicht-blockierende
+ Aufrufe sich besser eignen.
+ Welche Nachteile haben nicht-blockierende Aufrufe? 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{1}
+\end_layout
+
+\end_inset
+
+Nehmen Sie an, ein Computer könnte ein Wort im Speicher in 8
+\begin_inset space ~
+\end_inset
+
+ns lesen oder schreiben.
+ Es wird angenommen, dass beim Auftreten eines Interrupts alle 32 CPU-Register
+ sowie der Befehlszähler und das Programmstatuswort auf dem Stack abgelegt
+ werden.
+ Wie viele Interrupts pro Sekunde kann diese Maschine maximal verarbeiten?
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{1}
+\end_layout
+
+\end_inset
+
+Angenommen, es gibt ein Ressourcen-Deadlock in einem System.
+ Geben Sie ein Beispiel eines zugehörigen Ressourcen-Belegungsgraphen an,
+ bei dem die Menge der Prozesse, die an dem Deadlock beteiligt sind, auch
+ Prozesse enthalten, die nicht in der zyklischen Kette des Graphen sind.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+aufgabe{2}
+\end_layout
+
+\end_inset
+
+Betrachten Sie den Ressourcen-Belegungs-Graphen 
+\begin_inset Quotes gld
+\end_inset
+
+A
+\begin_inset Quotes grd
+\end_inset
+
+ (links) auf der Folie 
+\begin_inset Quotes gld
+\end_inset
+
+Variation - mehrere Instanzen einer Ressource
+\begin_inset Quotes grd
+\end_inset
+
+ der Vorlesung 15.
+ Geben Sie die Matrizen 
+\begin_inset Formula $C$
+\end_inset
+
+ und 
+\begin_inset Formula $R$
+\end_inset
+
+ als auch den Ressourcenvektor 
+\begin_inset Formula $E$
+\end_inset
+
+ und den Ressourcenrestvektor 
+\begin_inset Formula $A$
+\end_inset
+
+ für diesen Fall an.
+ Wenden Sie anschließend den Bankieralgorithmus (Folie 
+\begin_inset Quotes gld
+\end_inset
+
+Algorithmus - Bankieralgorithmus
+\begin_inset Quotes grd
+\end_inset
+
+) an.
+ Was passiert und wie interpretieren Sie das? 
+\end_layout
+
+\end_body
+\end_document

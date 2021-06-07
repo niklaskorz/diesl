@@ -4,11 +4,15 @@ import exercise_mgr.database.sqlite_wrapper as s
 from pathlib import Path
 from exercise_mgr.Settings import Settings
 
+source_dir = Path(__file__).parent
+path_topics = source_dir / "#IBN-Uebungsthemen (2010-2019).csv"
+path_topics_names = source_dir / "topic_names.txt"
+
 
 def split_source_file():
-    with open("#IBN-Uebungsthemen (2010-2019).csv", 'r', encoding='utf-8') as file:
+    with path_topics.open("r", encoding="utf-8") as file:
         lines = file.readlines()
-        csv_reader = csv.reader(lines[0:2], delimiter=';')
+        csv_reader = csv.reader(lines[0:2], delimiter=";")
         for n, row in enumerate(csv_reader):
             if n == 0:
                 # write parent topics
@@ -23,11 +27,11 @@ def split_source_file():
 
         count = 0
         for n in range(len(parent_topics)):
-            if parent_topics[n] is not '':
+            if parent_topics[n] is not "":
                 count += 1
-            subtopics[n] += "#"+str(count)
+            subtopics[n] += "#" + str(count)
         topic_names += "\n".join(subtopics)
-    with open("topic_names.txt", 'w+', encoding='utf-8') as file:
+    with path_topics_names.open("w+", encoding="utf-8") as file:
         file.write(topic_names)
 
 
@@ -36,9 +40,8 @@ def main(database):
     with conn:
         conn.execute("""DELETE FROM topics""")
         conn.execute("""DELETE FROM lectures""")
-        lecture = s.lecture_insert(conn, (None, 'ibn'))
-        topics = Path(__file__).parent / 'topic_names.txt'
-        with open(topics, "r", encoding='utf-8') as file:
+        lecture = s.lecture_insert(conn, (None, "ibn"))
+        with path_topics_names.open("r", encoding="utf-8") as file:
             lines = file.read().splitlines()
             topics = []
             for line in lines:
@@ -54,6 +57,6 @@ def main(database):
                 s.topic_insert(conn, t)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     split_source_file()
     main(Settings.database)
