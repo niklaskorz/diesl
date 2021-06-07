@@ -48,10 +48,10 @@ proc translateDirection(direction: NimNode): NimNode =
       return newIdentNode("right")
 
 
-proc transpileTrim(command: NimNode, params: seq[NimNode], table: NimNode): NimNode =
-  case params:
+proc transpileTrim(command, table: NimNode): NimNode =
+  case command:
     # trim col -> just a function call no macro needed
-    of [@direction, Ident(strVal: "of"), @column]:
+    of Command[Ident(strVal: "trim"), @direction, Ident(strVal: "of"), @column]:
       let columnAccess = newDotExpr(table, column)
 
       return newCall(
@@ -84,11 +84,11 @@ proc transpileCommand(command, table: NimNode): NimNode =
   var command = command.flatten()
 
   case command:
-    of Command[Ident(strVal: "trim"), all @params]:
-      return transpileTrim(command, params, table)
-    of Command[Ident(strVal: "replace"), all @params]:
+    of Command[Ident(strVal: "trim"), .._]:
+      return transpileTrim(command, table)
+    of Command[Ident(strVal: "replace"), .._]:
       return transpileReplace(command, table)
-    of Command[Ident(strVal: "remove"), all @params]:
+    of Command[Ident(strVal: "remove"), .._]:
       return transpileRemove(command, table)
     else:
       return command
