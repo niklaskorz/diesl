@@ -17,13 +17,13 @@ proc test_natural*() =
 
     # TODO: test that there is no ast transformation in this case
     # since it is not needed 
-    # test_macro "trim without parameter":
-    #   expected:
-    #     table.text.trim(right)
-    #
-    #   actual:
-    #     transform table:
-    #       trim text
+    test_macro "trim without parameter":
+      expected:
+        table.text.trim()
+
+      actual:
+        transform table:
+          trim table.text
         
     test_macro "trim left":
       expected:

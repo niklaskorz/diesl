@@ -3,7 +3,6 @@ import sequtils, sugar
 
 import macros
 
-import db
 import language
 
 import fusion/matching
@@ -26,7 +25,12 @@ proc flatten(node: NimNode) : NimNode =
       result = newTree(nnkCommand, command)
 
       for param in parameters:
-        copyChildrenTo(param.flatten(), result)
+        let param = param.flatten()
+        if param.kind == nnkCommand:
+          copyChildrenTo(param, result)
+        else:
+          result.add(param)
+
 
 #     of nnkCommand:
 #       result.add(
@@ -44,11 +48,10 @@ proc translateDirection(direction: NimNode): NimNode =
       return newIdentNode("right")
 
 
-
 proc transpileTrim(command: NimNode, params: seq[NimNode], table: NimNode): NimNode =
   case params:
+    # trim col -> just a function call no macro needed
     of [@direction, Ident(strVal: "of"), @column]:
-      echo direction
       let columnAccess = newDotExpr(table, column)
 
       return newCall(
@@ -59,17 +62,14 @@ proc transpileTrim(command: NimNode, params: seq[NimNode], table: NimNode): NimN
         translateDirection(direction)
       )
     else:
-      echo "no match"
+      return command
   return command
 
 proc transpileCommand(command, table: NimNode): NimNode =
   var command = command.flatten()
-  # echo command.treeRepr
 
-  echo command.toStrLit()
   case command:
     of Command[Ident(strVal: "trim"), all @params]:
-      echo "trim"
       return transpileTrim(command, params, table)
     else:
       return command
@@ -87,4 +87,5 @@ proc transpileTransform(table: NimNode, commands: NimNode): NimNode =
 # macro transform*(table, column, commands: untyped): untyped =
 macro transform*(table, commands: untyped): untyped = 
   transpileTransform(table, commands)
+
 
