@@ -3,12 +3,11 @@ from typing import Tuple, List
 
 def split_topic(topic: str) -> Tuple[List[str], List[str]]:
     topics_split = topic.split(",")
-    topics_split[0] = topics_split[0].rstrip()
     exercises = []
     topic_ids = []
     for el in topics_split:
         if "Ü" in el:
-            exercises.append(el)
+            exercises.append(el.strip())
         else:
-            topic_ids.append(el)
+            topic_ids.append(el.strip())
     return exercises, topic_ids
