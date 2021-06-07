@@ -6,7 +6,7 @@ def split_topic(topic: str) -> Tuple[List[str], List[str]]:
     topics_split[0] = topics_split[0].rstrip()
     exercises = []
     topic_ids = []
-    for el in topics_split[:-1]:
+    for el in topics_split:
         if "Ü" in el:
             exercises.append(el)
         else:
