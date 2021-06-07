@@ -73,6 +73,13 @@ proc transpileReplace(command, table: NimNode): NimNode =
     else:
       return command
 
+proc transpileRemove(command, table: NimNode): NimNode = 
+  case command:
+    of Command[Ident(strVal: "remove"), @target, Ident(strVal: "from"), @column]:
+      return newCall(
+        newDotExpr(column, newIdentNode("remove")), target)
+
+
 proc transpileCommand(command, table: NimNode): NimNode =
   var command = command.flatten()
 
@@ -81,6 +88,8 @@ proc transpileCommand(command, table: NimNode): NimNode =
       return transpileTrim(command, params, table)
     of Command[Ident(strVal: "replace"), all @params]:
       return transpileReplace(command, table)
+    of Command[Ident(strVal: "remove"), all @params]:
+      return transpileRemove(command, table)
     else:
       return command
 

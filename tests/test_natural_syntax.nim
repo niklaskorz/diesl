@@ -52,5 +52,16 @@ proc test_natural*() =
         table.text.replace("ba", "to")
 
 
+    # TODO: remove multiple substrings
+    # remove "ba", "bam" and "baz" from text
+    test_macro "remove":
+      actual:
+        transform table:
+          remove "ba" from table.text
+
+      expected:
+        table.text.remove("ba")
+    
+
 when isMainModule:
   test_natural()
