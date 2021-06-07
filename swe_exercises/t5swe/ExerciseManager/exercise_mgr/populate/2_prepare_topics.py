@@ -2,6 +2,8 @@ from pathlib import Path
 import json
 import re
 
+from .split_topic import split_topic
+
 
 source_dir = Path(__file__).parent
 path_topics = source_dir / "topics.csv"
@@ -37,16 +39,8 @@ def topics_to_json():
         topics = file.readlines()
         a = {}
         for topic in topics:
-            topics_split = topic.split(",")
-            topics_split[0] = topics_split[0].rstrip()
-            b = []
-            c = []
-            for el in topics_split[:-1]:
-                if "Ü" in el:
-                    b.append(el)
-                else:
-                    c.append(el)
-            a[topics_split[0]] = [b, c]
+            exercises, topic_ids = split_topic(topic)
+            a[exercises[0]] = [exercises, topic_ids]
     with path_topics_json.open("w+", encoding="utf8") as outfile:
         json.dump(
             a,
