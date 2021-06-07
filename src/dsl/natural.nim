@@ -65,12 +65,22 @@ proc transpileTrim(command: NimNode, params: seq[NimNode], table: NimNode): NimN
       return command
   return command
 
+proc transpileReplace(command, table: NimNode): NimNode =
+  case command:
+    of [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement, Ident(strVal: "in"), @column]:
+      return newCall(
+        newDotExpr(column, newIdentNode("replace")), target, replacement)
+    else:
+      return command
+
 proc transpileCommand(command, table: NimNode): NimNode =
   var command = command.flatten()
 
   case command:
     of Command[Ident(strVal: "trim"), all @params]:
       return transpileTrim(command, params, table)
+    of Command[Ident(strVal: "replace"), all @params]:
+      return transpileReplace(command, table)
     else:
       return command
 

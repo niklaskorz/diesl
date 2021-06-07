@@ -42,6 +42,15 @@ proc test_natural*() =
         transform table:
           trim ending of text
 
+    
+    test_macro "replace":
+      actual:
+        transform table:
+          replace "ba" with "to" in table.text
+      
+      expected:
+        table.text.replace("ba", "to")
+
 
 when isMainModule:
   test_natural()
