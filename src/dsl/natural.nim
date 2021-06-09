@@ -9,7 +9,6 @@ import fusion/matching
 {.experimental: "caseStmtMacros".}
 
 
-
 macro expandMacros(body: untyped): NimNode =
   template inner(x: untyped): untyped = x
 
@@ -19,8 +18,14 @@ macro expandMacros(body: untyped): NimNode =
 
 proc flatten(node: NimNode) : NimNode =
   case node:
-    of Infix[@command, @param1, @param2]:
-      return newTree(nnkCommand, param1.flatten(), command, param2.flatten())
+    of Infix[@param1, @command, @param2]:
+      result = newTree(nnkCommand, command, param1.flatten(), param2.flatten())
+    of Infix[@param1, @command, @param2, all @rest]:
+      result = newTree(nnkCommand, command, param1, param2)
+
+      for child in rest:
+        result.add(child.flatten())
+
     of Command[@command, all @parameters]:
       result = newTree(nnkCommand, command)
 
@@ -30,14 +35,16 @@ proc flatten(node: NimNode) : NimNode =
           copyChildrenTo(param, result)
         else:
           result.add(param)
+    of StmtList[all @commands]:
+      result = newStmtList()
 
+      for command in commands:
+        result.add(command.flatten())
 
-#     of nnkCommand:
-#       result.add(
-# node.children.map(x => x.flatten()).concat()
-#       )
     else:
-      return node
+      result = node
+
+
 
 
 proc translateDirection(direction: NimNode): NimNode =
@@ -70,6 +77,20 @@ proc transpileReplace(command, table: NimNode): NimNode =
     of [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement, Ident(strVal: "in"), @column]:
       return newCall(
         newDotExpr(column, newIdentNode("replace")), target, replacement)
+    of [Ident(strVal: "replace"), Ident(strVal: "in"), @column, StmtList[all @substitutions]]:
+
+      var table = newTree(nnkTableConstr)
+
+      for substitution in substitutions:
+        case substitution:
+          of Command[@target, Ident(strVal: "with"), @replacement]:
+            table.add(newColonExpr(target, replacement))
+          else:
+            echo "could not match substitution ", substitution.toStrLit
+      table = newTree(nnkPrefix, newIdentNode("@"), table)
+
+      return newCall(newDotExpr(column, newIdentNode("replaceAll")), table)
+
     else:
       return command
 
@@ -105,6 +126,12 @@ proc transpileTransform(table: NimNode, commands: NimNode): NimNode =
 
 # macro transform*(table, column, commands: untyped): untyped =
 macro transform*(table, commands: untyped): untyped = 
-  transpileTransform(table, commands)
+  return transpileTransform(table, commands)
 
 
+
+# transform "table":
+#   replace in "text":
+#     "foo" with "bar"
+#     "baz" with "bat"
+#

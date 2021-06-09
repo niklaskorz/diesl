@@ -62,6 +62,18 @@ proc test_natural*() =
       expected:
         table.text.remove("ba")
     
+    test_macro "replace multiple substrings":
+      actual:
+        transform table:
+          replace in table.text:
+            "ba" with "to"
+            "fo" with "ta"
+
+      expected:
+        table.text.replaceAll(@{"ba": "to", "fo": "ta"})
+
 
 when isMainModule:
   test_natural()
+
+
