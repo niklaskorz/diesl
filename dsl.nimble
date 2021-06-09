@@ -11,6 +11,7 @@ bin           = @["db"]
 # Dependencies
 
 requires "nim >= 1.4.4"
+requires "fusion >= 1.0"
 
 
 task test_ci, "runs tests and generates a report":

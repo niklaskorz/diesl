@@ -1,4 +1,5 @@
 
+import db
 import sequtils, sugar
 
 import macros
@@ -9,43 +10,28 @@ import fusion/matching
 {.experimental: "caseStmtMacros".}
 
 
-macro expandMacros(body: untyped): NimNode =
-  template inner(x: untyped): untyped = x
-
-  var foo: NimNode = getAst(inner(body)) 
-  result = foo
-  echo result.toStrLit
-
-proc flatten(node: NimNode) : NimNode =
+proc doFlatten(node: NimNode): seq[NimNode] = 
   case node:
-    of Infix[@param1, @command, @param2]:
-      result = newTree(nnkCommand, command, param1.flatten(), param2.flatten())
-    of Infix[@param1, @command, @param2, all @rest]:
-      result = newTree(nnkCommand, command, param1, param2)
+    of Infix[@param1, @command, all @params]:
+      params.insert(param1, 0)
+      params = params.map(doFlatten).concat()
 
-      for child in rest:
-        result.add(child.flatten())
+      return concat(@[command], params)
 
-    of Command[@command, all @parameters]:
-      result = newTree(nnkCommand, command)
+    of Command[@command, all @params]:
+      params = params.map(doFlatten).concat()
 
-      for param in parameters:
-        let param = param.flatten()
-        if param.kind == nnkCommand:
-          copyChildrenTo(param, result)
-        else:
-          result.add(param)
+      return concat(@[command], params)
+
     of StmtList[all @commands]:
-      result = newStmtList()
-
-      for command in commands:
-        result.add(command.flatten())
+      return commands.map(doFlatten).concat()
 
     else:
-      result = node
+      return @[node]
 
 
-
+proc flatten(node: NimNode) : NimNode =
+  return newTree(nnkCommand, doFlatten(node))
 
 proc translateDirection(direction: NimNode): NimNode =
   case direction.strVal:
@@ -77,22 +63,26 @@ proc transpileReplace(command, table: NimNode): NimNode =
     of [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement, Ident(strVal: "in"), @column]:
       return newCall(
         newDotExpr(column, newIdentNode("replace")), target, replacement)
-    of [Ident(strVal: "replace"), Ident(strVal: "in"), @column, StmtList[all @substitutions]]:
+    of [Ident(strVal: "replace"), Ident(strVal: "in"), @column, all @substitutions]:
 
       var table = newTree(nnkTableConstr)
 
-      for substitution in substitutions:
-        case substitution:
-          of Command[@target, Ident(strVal: "with"), @replacement]:
+      while substitutions.len() > 0:
+        case substitutions:
+          of [@target, Ident(strVal: "with"), @replacement, all @rest]:
+            substitutions = rest
             table.add(newColonExpr(target, replacement))
           else:
-            echo "could not match substitution ", substitution.toStrLit
+            echo "could not match substitution"
+
       table = newTree(nnkPrefix, newIdentNode("@"), table)
 
       return newCall(newDotExpr(column, newIdentNode("replaceAll")), table)
 
     else:
+      echo "transpile command did not match"
       return command
+
 
 proc transpileRemove(command, table: NimNode): NimNode = 
   case command:
@@ -126,12 +116,8 @@ proc transpileTransform(table: NimNode, commands: NimNode): NimNode =
 
 # macro transform*(table, column, commands: untyped): untyped =
 macro transform*(table, commands: untyped): untyped = 
-  return transpileTransform(table, commands)
+  result = transpileTransform(table, commands)
 
 
+let table = newDBTable( newStringColumn(name = "text", data = @["  foo", "  bar  ", "baz  "]))
 
-# transform "table":
-#   replace in "text":
-#     "foo" with "bar"
-#     "baz" with "bat"
-#

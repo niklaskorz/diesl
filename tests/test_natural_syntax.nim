@@ -42,6 +42,23 @@ proc test_natural*() =
         transform table:
           trim ending of text
 
+    test_macro "remove":
+      actual:
+        transform table:
+          remove "ba" from table.text
+
+      expected:
+        table.text.remove("ba")
+
+
+    # test_macro "remove multiple targets":
+    #   actual:
+    #     transform table:
+    #       remove "ba", "oo" and "z" from table.text
+    #
+    #   expected:
+    #     table.text.remove("ba").remove("oo").remove("z")
+    
     
     test_macro "replace":
       actual:
@@ -52,16 +69,6 @@ proc test_natural*() =
         table.text.replace("ba", "to")
 
 
-    # TODO: remove multiple substrings
-    # remove "ba", "bam" and "baz" from text
-    test_macro "remove":
-      actual:
-        transform table:
-          remove "ba" from table.text
-
-      expected:
-        table.text.remove("ba")
-    
     test_macro "replace multiple substrings":
       actual:
         transform table:
@@ -71,6 +78,7 @@ proc test_natural*() =
 
       expected:
         table.text.replaceAll(@{"ba": "to", "fo": "ta"})
+
 
 
 when isMainModule:
