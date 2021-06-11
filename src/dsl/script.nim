@@ -1,7 +1,8 @@
+include script/preamble
 import os
 import nimscripter
 
-type StdPathNotFoundException* = object of Exception
+type StdPathNotFoundException* = object of Defect
 
 proc getStdPath*(): string =
   # User defined path to standard library

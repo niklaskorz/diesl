@@ -10,8 +10,8 @@ let resultFile = openFileStream("result.xml", fmWrite)
 let outputFormatter = newJUnitOutputFormatter(resultFile)
 addOutputFormatter(outputFormatter)
 
-test_db()
-test_string()
+#test_db()
+#test_string()
 test_script()
 
 outputFormatter.close()
