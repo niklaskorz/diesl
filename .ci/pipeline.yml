@@ -11,6 +11,7 @@ stages:
 unit tests:
     stage: test
     script:
+        - nimble install
         - nimble test_ci
     artifacts:
         reports:
