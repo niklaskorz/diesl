@@ -49,3 +49,6 @@ exportCode:
     for column in columns:
       result.data[column.name] = column
       result.schema[column.name] = typeString
+
+proc doThing*(): StringColumn {.exportToScript.} =
+  return StringColumn(name: "test", valueType: typeString, data: @["hello", "there"])

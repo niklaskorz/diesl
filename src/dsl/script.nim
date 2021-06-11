@@ -1,6 +1,7 @@
-include script/preamble
-import os
+import script/preamble
+export preamble
 import nimscripter
+import os
 
 type StdPathNotFoundException* = object of Defect
 

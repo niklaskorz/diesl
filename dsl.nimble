@@ -16,7 +16,7 @@ requires "https://gitlab.com/pvs-hd/ot/backend.git#6ad92e7a236147910f9435a8fc05d
 
 
 task test_ci, "runs tests and generates a report":
-  exec "nim c -r tests/run_tests.nim"
+  exec "nim c -r -d:scripted tests/run_tests.nim"
 
 task docgen, "generates the html documentation":
   exec("nim doc --project --git.url:https://gitlab.com/pvs-hd/ot/diesl --outdir:htmldocs src/dsl.nim")

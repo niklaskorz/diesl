@@ -1,7 +1,7 @@
 import unittest
 import dsl/script
-import options
 import nimscripter
+import options
 
 proc test_script*() =
   suite "script execution":
@@ -15,6 +15,17 @@ let y = x + 2
       let intr = runScript("""
 import strutils
 import sequtils
+""")
+      check intr.isSome
+    test "call NimScript function exported to Nim":
+      let intr = runScript("""
+proc someNumber(): int {.exportToNim.} = 420
+""")
+      check intr.isSome
+      check intr.get.invoke("someNumberExported", "", int) == 420
+    test "call Nim function exported to NimScript":
+      let intr = runScript("""
+echo doThing()
 """)
       check intr.isSome
 
