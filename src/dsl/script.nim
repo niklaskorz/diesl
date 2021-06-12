@@ -1,6 +1,7 @@
 import script/preamble
 export preamble
 import nimscripter
+import compiler/nimeval
 import os
 
 type StdPathNotFoundException* = object of Defect
@@ -15,14 +16,16 @@ proc getStdPath*(): string =
   if stdPath == "":
     stdPath = getCurrentDir() / "stdlib"
 
-  # Fallback to stdlib of current Nim compiler
+  # Fallback to built-in find function
   if not dirExists(stdPath):
+    # Incompatible with choosenim
+    # Returns empty string if no path was found
+    stdPath = findNimStdLib()
+
+  # Fallback to stdlib of choosenim
+  if stdPath == "":
     let home = getHomeDir()
     stdPath = home / ".choosenim" / "toolchains" / ("nim-" & NimVersion) / "lib"
-
-  # Fallback to nim lib in docker image
-  if not dirExists(stdPath):
-    stdPath = "/nim/lib"
 
   if not dirExists(stdPath):
     raise StdPathNotFoundException.newException("No standard library found, please set NIM_STDLIB environment variable")

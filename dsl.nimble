@@ -11,6 +11,7 @@ bin           = @["dsl"]
 # Dependencies
 
 requires "nim >= 1.4.4"
+requires "compiler"
 requires "https://github.com/niklaskorz/nimscripter.git#16610e820a4679c9e48a510a83ff5a1b1fafdbeb"
 requires "https://gitlab.com/pvs-hd/ot/backend.git#6ad92e7a236147910f9435a8fc05dcd2df7d979b"
 
