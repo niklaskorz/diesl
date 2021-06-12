@@ -80,6 +80,14 @@ proc test_natural*() =
         table.text.replaceAll(@{"ba": "to", "fo": "ta"})
 
 
+    test_macro "substring":
+      actual:
+        transform table:
+          take 2 to 4 from table.text
+
+      expected:
+        table.text[1..3]
+
 
 when isMainModule:
   test_natural()
