@@ -51,13 +51,13 @@ proc test_natural*() =
         table.text.remove("ba")
 
 
-    # test_macro "remove multiple targets":
-    #   actual:
-    #     transform table:
-    #       remove "ba", "oo" and "z" from table.text
-    #
-    #   expected:
-    #     table.text.remove("ba").remove("oo").remove("z")
+    test_macro "remove multiple targets":
+      actual:
+        transform table:
+          remove "ba", "oo" and "z" from table.text
+
+      expected:
+        table.text.remove("ba").remove("oo").remove("z")
     
     
     test_macro "replace":

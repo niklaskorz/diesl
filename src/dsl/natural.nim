@@ -1,5 +1,4 @@
 
-import db
 import sequtils, sugar
 
 import macros
@@ -102,6 +101,20 @@ proc transpileRemove(command, table: NimNode): NimNode =
     of Command[Ident(strVal: "remove"), @target, Ident(strVal: "from"), @column]:
       result = quote do:
         `column`.remove(`target`)
+    of Command[Ident(strVal: "remove"), until @targets is Ident(strVal: "from"), Ident(strVal: "from"), @column]:
+      if targets.len == 0:
+        return command
+
+      # remove optional "and" in the second last position
+      # cannot go out of bounds because of previous match
+      if targets[^2].matches(Ident(strVal: "and")):
+        targets.delete(targets.len - 2)
+
+      result = newCall(newDotExpr(column, newIdentNode("remove")), targets[0])
+
+      for target in targets[1..^1]:
+        result = newCall(newDotExpr(result, newIdentNode("remove")), target)
+
     else:
       result = command
 
@@ -146,9 +159,4 @@ proc transpileTransform(table: NimNode, commands: NimNode): NimNode =
 # macro transform*(table, column, commands: untyped): untyped =
 macro transform*(table, commands: untyped): untyped = 
   result = transpileTransform(table, commands)
-
-
-# let table = newDBTable( newStringColumn(name = "text", data = @["  foo", "  bar  ", "baz  "]))
-
-
 
