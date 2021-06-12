@@ -31,7 +31,7 @@ proc test_natural*() =
 
       actual:
         transform table:
-          trim beginning of text
+          trim beginning of table.text
 
 
     test_macro "trim right":
@@ -40,7 +40,7 @@ proc test_natural*() =
 
       actual:
         transform table:
-          trim ending of text
+          trim ending of table.text
 
     test_macro "remove":
       actual:

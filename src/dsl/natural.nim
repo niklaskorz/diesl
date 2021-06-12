@@ -30,9 +30,23 @@ proc doFlatten(node: NimNode): seq[NimNode] =
       return @[node]
 
 
+proc newTableConstructor(pairs: seq[(NimNode, NimNode)]): NimNode =
+  ## Create table constructor of the given pairs
+  ## @{a: b, c: d}
+
+  result = nnkTableConstr.newTree
+
+  for (key, value) in pairs:
+    result.add(newColonExpr(key, value))
+
+  result = nnkPrefix.newTree(newIdentNode("@"), result)
+
+
 proc flatten(node: NimNode) : NimNode =
   return newTree(nnkCommand, doFlatten(node))
 
+# TODO: make this a constant
+# const beginning = left
 proc translateDirection(direction: NimNode): NimNode =
   case direction.strVal:
     of "beginning":
@@ -43,52 +57,54 @@ proc translateDirection(direction: NimNode): NimNode =
 
 proc transpileTrim(command, table: NimNode): NimNode =
   case command:
-    # trim col -> just a function call no macro needed
     of Command[Ident(strVal: "trim"), @direction, Ident(strVal: "of"), @column]:
-      let columnAccess = newDotExpr(table, column)
+      let textDirection = translateDirection(direction)
 
-      return newCall(
-        newDotExpr(
-          columnAccess,
-          newIdentNode("trim"),
-        ),
-        translateDirection(direction)
-      )
+      result = quote do:
+        `column`.trim(`textDirection`)
+
+    # trim col -> just a function call no macro needed
     else:
-      return command
-  return command
+      result = command
+
 
 proc transpileReplace(command, table: NimNode): NimNode =
   case command:
     of [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement, Ident(strVal: "in"), @column]:
-      return newCall(
-        newDotExpr(column, newIdentNode("replace")), target, replacement)
-    of [Ident(strVal: "replace"), Ident(strVal: "in"), @column, all @substitutions]:
+      result = quote do:
+        `column`.replace(`target`, `replacement`)
 
-      var table = newTree(nnkTableConstr)
+    of [Ident(strVal: "replace"), Ident(strVal: "in"), @column, all @replacements]:
 
-      while substitutions.len() > 0:
-        case substitutions:
+      var replacementPairs = newSeq[(NimNode, NimNode)]()
+
+      while replacements.len() > 0:
+        case replacements:
           of [@target, Ident(strVal: "with"), @replacement, all @rest]:
-            substitutions = rest
-            table.add(newColonExpr(target, replacement))
+            replacements = rest
+
+            replacementPairs.add((target, replacement))
           else:
-            echo "could not match substitution"
+            echo "could not match substitution ", command.toStrLit
 
-      table = newTree(nnkPrefix, newIdentNode("@"), table)
+      let table = newTableConstructor(replacementPairs)
 
-      return newCall(newDotExpr(column, newIdentNode("replaceAll")), table)
+      result = quote do:
+        `column`.replaceAll(`table`)
 
     else:
       echo "transpile command did not match"
-      return command
+      result = command
 
 
 proc transpileRemove(command, table: NimNode): NimNode = 
   case command:
     of Command[Ident(strVal: "remove"), @target, Ident(strVal: "from"), @column]:
-      return newCall(
-        newDotExpr(column, newIdentNode("remove")), target)
+      result = quote do:
+        `column`.remove(`target`)
+    else:
+      result = command
+
 
 proc transpileTake(command, table: NimNode): NimNode =
   case command:
@@ -132,5 +148,7 @@ macro transform*(table, commands: untyped): untyped =
   result = transpileTransform(table, commands)
 
 
-let table = newDBTable( newStringColumn(name = "text", data = @["  foo", "  bar  ", "baz  "]))
+# let table = newDBTable( newStringColumn(name = "text", data = @["  foo", "  bar  ", "baz  "]))
+
+
 
