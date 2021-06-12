@@ -12,8 +12,8 @@ bin           = @["dsl"]
 
 requires "nim >= 1.4.4"
 requires "compiler"
-requires "https://github.com/niklaskorz/nimscripter.git#16610e820a4679c9e48a510a83ff5a1b1fafdbeb"
-requires "https://gitlab.com/pvs-hd/ot/backend.git#6ad92e7a236147910f9435a8fc05dcd2df7d979b"
+requires "https://github.com/niklaskorz/nimscripter.git#774cd482936c1fc4d393518f669e57d81e096815"
+requires "https://gitlab.com/pvs-hd/ot/backend.git#282eb6c2c244e7edfb75365b90b8237fc50f5cfd"
 
 
 task test_ci, "runs tests and generates a report":
