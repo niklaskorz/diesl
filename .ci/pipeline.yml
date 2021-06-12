@@ -9,6 +9,7 @@ stages:
 test:
     stage: test
     script:
+        - nimble install --depsOnly
         - coco  --cov="src" --compiler=--hints:off
     artifacts:
         paths:
