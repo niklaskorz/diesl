@@ -2,7 +2,7 @@ import unittest
 import dsl/script
 import nimscripter
 import options
-import backend
+import backend/[data, table]
 import db_sqlite
 
 proc test_script*() =
@@ -21,13 +21,20 @@ import sequtils
       check intr.isSome
     test "script with access to database":
       let dbPath = "demo.db"
-      initDatabase(dbPath)
       let db = open(dbPath, "", "", "")
+      db.exec(sql"DROP TABLE IF EXISTS students")
+      db.exec(sql"CREATE TABLE students ( name TEXT )")
+      db.exec(sql"INSERT INTO students (name) VALUES (?), (?)",
+          "  Peter  Parker", " John Good ")
       defer: db.close()
       let intr = db.runScript("""
-echo db.sqlite_master.name.trim(left)
+db.students.name = db.students.name.trim(left)
 """)
       check intr.isSome
+      check db.getTable("students").content == @[
+        @["Peter  Parker"],
+        @["John Good "]
+      ]
 
 when isMainModule:
   test_script()

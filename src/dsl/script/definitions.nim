@@ -67,6 +67,14 @@ proc getColumn(table: DbTable, name: string): DbColumn =
   var pos: BiggestInt = 0
   ret.getFromBuffer(DbColumn, pos)
 
+proc n_saveColumn(args: string) = discard
+proc saveColumn(table: DbTable, name: string, value: DbColumn) =
+  var args = ""
+  table.addToBuffer(args)
+  name.addToBuffer(args)
+  value.addToBuffer(args)
+  n_saveColumn(args)
+
 proc n_trim(args: string): string = discard
 proc trim(column: DbColumn, direction: TextDirection = both): DbColumn =
   var args = ""
@@ -156,6 +164,9 @@ template `.`(db: DbHandle, tableName: untyped): DbTable =
 template `.`(table: DbTable, columnName: untyped): DbColumn =
   table.getColumn(astToStr(columnName))
 
+template `.=`(table: DbTable, columnName: untyped, columnValue: DbColumn) =
+  table.saveColumn(astToStr(columnName), columnValue)
+
 let db = DbHandle()
 """
 
@@ -188,6 +199,17 @@ proc initWithContext*(context: ScriptContext): InitFn =
       var ret = ""
       ctx.convert(column).addToBuffer(ret)
       vm.setResult(ret)
+    )
+    intr.implementRoutine("*", scriptName, "n_saveColumn", proc(vm: VmArgs) =
+      let args = vm.getString(0)
+      var pos: BiggestInt = 0
+      let table = ctx.convert(args.getFromBuffer(DbTable, pos))
+      let name = args.getFromBuffer(string, pos)
+      let value = ctx.convert(args.getFromBuffer(DbColumn, pos))
+      # Temporary way of storage until backend module has an according function
+      let query = sql("UPDATE " & table.name & " SET " & name & " = ? WHERE rowid = ?")
+      for i in 1..value.data.len:
+        ctx.db.exec(query, value.data[i-1], i)
     )
     intr.implementRoutine("*", scriptName, "n_trim", proc(vm: VmArgs) =
       let args = vm.getString(0)
