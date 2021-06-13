@@ -25,17 +25,7 @@ import sequtils
       let db = open(dbPath, "", "", "")
       defer: db.close()
       let intr = db.runScript("""
-echo db.sqlite_master.name
-  .trim(left)
-  .trim(right)
-  .trim(both)
-  .replace("ba", "to")
-  .replaceAll(@{"ba": "to", "fo": "ta"})
-  .remove("ba")
-  .add("XXX", left)
-  .toLower()
-  .toUpper()
-  .substring(2..4)
+echo db.sqlite_master.name.trim(left)
 """)
       check intr.isSome
 

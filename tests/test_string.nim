@@ -2,66 +2,71 @@
 import unittest
 import dsl
 import dsl/[db, language]
+import backend/table
 
 
-let dbTable = newDBTable(
-  newStringColumn(name = "text", data = @["  foo", "  bar  ", "baz  "])
+let dbTable = Table(
+  name: "testTable",
+  creator: "",
+  columnNames: @["text"],
+  columnTypes: @["text"],
+  content: @[@["  foo"], @["  bar  "], @["baz  "]]
 )
 
 proc test_string*() =
   suite "public string api":
     test "trim left":
       let actual = dbTable.text.trim(left)
-      let expected = newStringColumn(name = "text", data = @["foo", "bar  ", "baz  "])
+      let expected = TableColumn(data: @["foo", "bar  ", "baz  "])
 
       check actual == expected
 
 
     test "trim right":
       let actual = dbTable.text.trim(right)
-      let expected = newStringColumn(name = "text", data = @["  foo", "  bar", "baz"])
+      let expected = TableColumn(data: @["  foo", "  bar", "baz"])
 
       check actual == expected
 
 
     test "trim both":
       let actual = dbTable.text.trim(both)
-      let expected = newStringColumn(name = "text", data = @["foo", "bar", "baz"])
+      let expected = TableColumn(data: @["foo", "bar", "baz"])
 
       check actual == expected
 
 
     test "replace substring":
       let actual = dbTable.text.replace("ba", "to")
-      let expected = newStringColumn(name = "text", data = @["  foo", "  tor  ", "toz  "])
+      let expected = TableColumn(data: @["  foo", "  tor  ", "toz  "])
 
       check actual == expected
 
 
     test "replace substring replaces every occurence per default":
-      let actual = newStringColumn(name = "text", data = @["foo foo"]).replace("foo", "bar")
-      let expected = newStringColumn(name = "text", data = @["bar bar"])
+      let actual = TableColumn(data: @["foo foo"]).replace("foo", "bar")
+      let expected = TableColumn(data: @["bar bar"])
 
       check actual == expected
 
 
     test "replace multiple substrings":
       let actual = dbTable.text.replaceAll(@{"ba": "to", "fo": "ta"})
-      let expected = newStringColumn(name = "text", data = @["  tao", "  tor  ", "toz  "])
+      let expected = TableColumn(data: @["  tao", "  tor  ", "toz  "])
 
       check actual == expected
 
 
     test "remove substring":
       let actual = dbTable.text.remove("ba")
-      let expected = newStringColumn(name = "text", data = @["  foo", "  r  ", "z  "])
+      let expected = TableColumn(data: @["  foo", "  r  ", "z  "])
 
       check actual == expected
 
 
     test "add left":
       let actual = dbTable.text.add("XXX", left)
-      let expected = newStringColumn(name = "text", data = @["XXX  foo", "XXX  bar  ", "XXXbaz  "])
+      let expected = TableColumn(data: @["XXX  foo", "XXX  bar  ", "XXXbaz  "])
 
       check actual == expected
 
@@ -75,7 +80,7 @@ proc test_string*() =
 
     test "add right":
       let actual = dbTable.text.add("XXX", right)
-      let expected = newStringColumn(name = "text", data = @["  fooXXX", "  bar  XXX", "baz  XXX"])
+      let expected = TableColumn(data: @["  fooXXX", "  bar  XXX", "baz  XXX"])
 
       check actual == expected
 
@@ -89,48 +94,65 @@ proc test_string*() =
 
     test "add both":
       let actual = dbTable.text.add("XXX", both)
-      let expected = newStringColumn(name = "text", data = @["XXX  fooXXX", "XXX  bar  XXX", "XXXbaz  XXX"])
+      let expected = TableColumn(data: @["XXX  fooXXX", "XXX  bar  XXX",
+          "XXXbaz  XXX"])
 
       check actual == expected
 
 
     test "to lower case":
-      let table = newDBTable(
-          newStringColumn(name = "text", data = @["goOdBYe", "Hello"])
+      let table = Table(
+        name: "testTable",
+        creator: "",
+        columnNames: @["text"],
+        columnTypes: @["text"],
+        content: @[@["goOdBYe"], @["Hello"]]
       )
-      
+
       let actual = table.text.toLower()
-      let expected = newStringColumn(name = "text", data = @["goodbye", "hello"])
+      let expected = TableColumn(data: @["goodbye", "hello"])
 
       check actual == expected
 
 
     test "to upper case":
       # TODO: one table for all tests
-      let table = newDBTable(
-          newStringColumn(name = "text", data = @["goOdBYe", "Hello"])
+      let table = Table(
+        name: "testTable",
+        creator: "",
+        columnNames: @["text"],
+        columnTypes: @["text"],
+        content: @[@["goOdBYe"], @["Hello"]]
       )
-      
+
       let actual = table.text.toUpper()
-      let expected = newStringColumn(name = "text", data = @["GOODBYE", "HELLO"])
+      let expected = TableColumn(data: @["GOODBYE", "HELLO"])
 
       check actual == expected
 
 
     test "substring":
-      let table = newDBTable(
-        newStringColumn(name = "text", data = @["ABCDEF", "123456789"])
+      let table = Table(
+        name: "testTable",
+        creator: "",
+        columnNames: @["text"],
+        columnTypes: @["text"],
+        content: @[@["ABCDEF"], @["123456789"]]
       )
 
       let actual = table.text.substring(2..4)
-      let expected = newStringColumn(name = "text", data = @["CDE", "345"])
+      let expected = TableColumn(data: @["CDE", "345"])
 
       check actual == expected
 
 
     test "substring using []":
-      let table = newDBTable(
-        newStringColumn(name = "text", data = @["ABCDEF", "123456789"])
+      let table = Table(
+        name: "testTable",
+        creator: "",
+        columnNames: @["text"],
+        columnTypes: @["text"],
+        content: @[@["ABCDEF"], @["123456789"]]
       )
 
       let actual = table.text[2..4]

@@ -11,18 +11,16 @@ exportCode:
   type
     DbHandle = object of RootObj
     DbTable = object of RootObj
-      pName: string
       pColumnNames: seq[string]
       pColumnTypes: seq[string]
       pHandle: int
     DbColumn = object of RootObj
-      pName: string
-      pIndex: int
-      pTableHandle: int
+      pHandle: int
 
-type ScriptContext* = object of RootObj
+type ScriptContext* = ref object of RootObj
   db: DbConn
   tables: seq[Table]
+  columns: seq[TableColumn]
 
 proc newScriptContext*(db: DbConn): ScriptContext =
   ScriptContext(db: db, tables: @[])
@@ -31,13 +29,24 @@ proc storeTable(ctx: var ScriptContext, table: Table): int =
   ctx.tables.add(table)
   ctx.tables.len - 1
 
+proc convert(ctx: ScriptContext, table: DbTable): Table =
+  ctx.tables[table.pHandle]
+
+proc convert(ctx: var ScriptContext, table: Table): DbTable =
+  let handle = ctx.storeTable(table)
+  DbTable(pColumnNames: table.columnNames, pColumnTypes: table.columnTypes,
+      pHandle: handle)
+
+proc storeColumn(ctx: var ScriptContext, column: TableColumn): int =
+  ctx.columns.add(column)
+  ctx.columns.len - 1
+
 proc convert(ctx: ScriptContext, column: DbColumn): TableColumn =
-  let table = ctx.tables[column.pTableHandle]
-  TableColumn(name: column.pName, index: column.pIndex, table: table)
+  ctx.columns[column.pHandle]
 
 proc convert(ctx: var ScriptContext, column: TableColumn): DbColumn =
-  let handle = ctx.storeTable(column.table)
-  DbColumn(pName: column.name, pIndex: column.index, pTableHandle: handle)
+  let handle = ctx.storeColumn(column)
+  DbColumn(pHandle: handle)
 
 let header = """
 proc n_getTable(args: string): string = discard
@@ -49,15 +58,14 @@ proc getTable(db: DbHandle, name: string): DbTable =
   var pos: BiggestInt = 0
   ret.getFromBuffer(DbTable, pos)
 
+proc n_getColumn(args: string): string = discard
 proc getColumn(table: DbTable, name: string): DbColumn =
-  let index = table.pColumnNames.find(name)
-  if index == -1:
-    raise ValueError.newException("No column with name " & name & " in table " & table.pName)
-  DbColumn(
-    pName: name,
-    pIndex: index,
-    pTableHandle: table.pHandle
-  )
+  var args = ""
+  table.addToBuffer(args)
+  name.addToBuffer(args)
+  let ret = n_getColumn(args)
+  var pos: BiggestInt = 0
+  ret.getFromBuffer(DbColumn, pos)
 
 proc n_trim(args: string): string = discard
 proc trim(column: DbColumn, direction: TextDirection = both): DbColumn =
@@ -165,11 +173,20 @@ proc initWithContext*(context: ScriptContext): InitFn =
       let table = ctx.db.getTable(name)
       var ret = ""
       DbTable(
-        pName: table.name,
         pColumnNames: table.columnNames,
         pColumnTypes: table.columnTypes,
         pHandle: ctx.storeTable(table),
       ).addToBuffer(ret)
+      vm.setResult(ret)
+    )
+    intr.implementRoutine("*", scriptName, "n_getColumn", proc(vm: VmArgs) =
+      let args = vm.getString(0)
+      var pos: BiggestInt = 0
+      let table = ctx.convert(args.getFromBuffer(DbTable, pos))
+      let name = args.getFromBuffer(string, pos)
+      let column = table.getColumn(name)
+      var ret = ""
+      ctx.convert(column).addToBuffer(ret)
       vm.setResult(ret)
     )
     intr.implementRoutine("*", scriptName, "n_trim", proc(vm: VmArgs) =
