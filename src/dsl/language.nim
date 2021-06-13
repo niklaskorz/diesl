@@ -1,10 +1,11 @@
 import db
 import sugar
 import strutils
+import script/shared
 
-type TextDirection* = enum left, right, both
+export shared
 
-proc trim*(column: StringColumn, direction: TextDirection = both): StringColumn =
+proc trim*(column: TableColumn, direction: TextDirection = both): TableColumn =
   ## Removes whitespaces from the beginning and/or end of the entries in `column`.
   ##
   ## `direction` specifies where the whitespaces are removed from.
@@ -23,7 +24,7 @@ proc trim*(column: StringColumn, direction: TextDirection = both): StringColumn 
 
 
 # TODO: error handling
-proc substring*(column: StringColumn, range: HSlice) : StringColumn =
+proc substring*(column: TableColumn, range: HSlice): TableColumn =
   ## Selects a substring according to the given `range`.
   ##
   ## Note that the range is inclusive.
@@ -32,11 +33,11 @@ proc substring*(column: StringColumn, range: HSlice) : StringColumn =
 
   return column.map(str => str[range])
 
-proc `[]`*(column: StringColumn, range: HSlice): StringColumn =
-  column.subString(range)
+proc `[]`*(column: TableColumn, range: HSlice): TableColumn =
+  column.substring(range)
 
 # TODO: add option to replace first and all occurences
-proc replace*(column: StringColumn, target, replacement: string) : StringColumn =
+proc replace*(column: TableColumn, target, replacement: string): TableColumn =
   ## Replaces every occurence of `target` with `replacement` in the entries of `column`.
 
   return column.map(str => str.replace(target, replacement))
@@ -44,7 +45,8 @@ proc replace*(column: StringColumn, target, replacement: string) : StringColumn 
 
 # TODO: this should really take varargs but some weird nim bug (or feature?) prevents that
 # the @ is neccessary and really not intuetive
-proc replaceAll*(column: StringColumn, replacements: seq[(string, string)]) : StringColumn =
+proc replaceAll*(column: TableColumn, replacements: seq[(string,
+    string)]): TableColumn =
   ## Replaces every occurence of the keys in `replacements` with the provided values.
   ##
   ## Usage:
@@ -53,14 +55,15 @@ proc replaceAll*(column: StringColumn, replacements: seq[(string, string)]) : St
   return column.map(str => str.multiReplace(replacements))
 
 
-proc remove*(column: StringColumn, target: string) : StringColumn =
+proc remove*(column: TableColumn, target: string): TableColumn =
   ## Removes every occurence of `target` from the entries in column.
   return column.replace(target, "")
 
 
 # TODO: the both option is semantically not nice
 # it should be hidden here and a wrapper surround*(column, with: string) should be provided
-proc add*(column: StringColumn, addition: string, direction: TextDirection): StringColumn =
+proc add*(column: TableColumn, addition: string,
+    direction: TextDirection): TableColumn =
   ## Places the `addition` at the beginning/end of every entry in `column` or surrounds it with it.
   ##
   ## `direction` specifies where the `addition` is be added:
@@ -80,18 +83,18 @@ proc add*(column: StringColumn, addition: string, direction: TextDirection): Str
       return column.map(str => addition & str & addition)
 
 
-proc `+`*(column: StringColumn, addition: string): StringColumn  =
+proc `+`*(column: TableColumn, addition: string): TableColumn =
   add(column, addition, right)
 
-proc `+`*(addition: string, column: StringColumn) : StringColumn =
+proc `+`*(addition: string, column: TableColumn): TableColumn =
   add(column, addition, left)
 
 
-proc toLower*(column: StringColumn) : StringColumn =
+proc toLower*(column: TableColumn): TableColumn =
   ## Replaces all symbols with their lower case counter part (provided they have one)
   return column.map(toLower)
 
 
-proc toUpper*(column: StringColumn) : StringColumn =
+proc toUpper*(column: TableColumn): TableColumn =
   ## Replaces all symbols with their upper case counter part (provided they have one)
   return column.map(toUpper)

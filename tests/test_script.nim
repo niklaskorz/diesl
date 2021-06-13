@@ -24,7 +24,19 @@ import sequtils
       initDatabase(dbPath)
       let db = open(dbPath, "", "", "")
       defer: db.close()
-      let intr = db.runScript("echo db.sqlite_master")
+      let intr = db.runScript("""
+echo db.sqlite_master.name
+  .trim(left)
+  .trim(right)
+  .trim(both)
+  .replace("ba", "to")
+  .replaceAll(@{"ba": "to", "fo": "ta"})
+  .remove("ba")
+  .add("XXX", left)
+  .toLower()
+  .toUpper()
+  .substring(2..4)
+""")
       check intr.isSome
 
 when isMainModule:

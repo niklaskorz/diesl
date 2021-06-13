@@ -1,50 +1,45 @@
 import sequtils
 import sugar
-import tables
+import db_sqlite
+import backend/[data, table]
+
+type
+  TableColumn* = object of RootObj
+    name*: string
+    index*: int
+    table*: Table
+
+proc getColumn*(table: Table, name: string): TableColumn =
+  let index = table.columnNames.find(name)
+  if index == -1:
+    raise ValueError.newException("No column with name " & name & " in table " & table.name)
+  TableColumn(
+    name: name,
+    index: index,
+    table: table
+  )
+
+proc map*(table: Table, f: (seq[string]) -> seq[string]): Table =
+  var mutTable = table
+  mutTable.content = table.content.map(f)
+  mutTable
+
+proc map*(column: TableColumn, f: (string) -> string): TableColumn =
+  let table = column.table.map(proc (row: seq[string]): seq[string] =
+    var mutRow = row
+    mutRow[column.index] = f(row[column.index])
+    mutRow
+  )
+  TableColumn(
+    name: column.name,
+    index: column.index,
+    table: table
+  )
 
 {.experimental: "dotOperators".}
 
-type
-  DBType = enum typeString typeInt typeBool
+template `.`*(db: DbConn, tableName: untyped): Table =
+  db.getTable(astToStr(tableName))
 
-  DBColumn[T] = object of RootObj
-    name: string
-    valueType: DBType
-    data: seq[T]
-
-  StringColumn* = DBColumn[string]
-  # IntColumn = DBColumn[int]
-  # FloatColumn = DBColumn[float]
-  # BoolColumn = DBColumn[bool]
-
-  DBSchema = Table[string, DBType]
-
-  DBTable* = object
-    schema: DBSchema
-    data: Table[string, StringColumn]
-
-
-template `.`*(table: DBTable, name: untyped): StringColumn =
-  let columnName = astToStr(name)
-  assert table.schema[columnName] == typeString
-
-  table.data[columnName]
-
-
-proc newStringColumn*(name: string, data: seq[string]): StringColumn =
-  return StringColumn(name: name, data: data, valueType: typeString)
-
-
-proc map*(column: StringColumn, f: (string) -> string): StringColumn =
-  newStringColumn(column.name, column.data.map(f))
-
-
-proc newDBTable*(columns: varargs[StringColumn]): DBTable =
-  result = DBTable(data: initTable[string, StringColumn](), schema: initTable[
-          string, DBType]())
-
-  for column in columns:
-    result.data[column.name] = column
-    result.schema[column.name] = typeString
-
-
+template `.`*(table: Table, columnName: untyped): TableColumn =
+  table.getColumn(astToStr(columnName))
