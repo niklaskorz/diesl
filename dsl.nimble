@@ -17,8 +17,8 @@ requires "https://gitlab.com/pvs-hd/ot/backend.git#129520726f8b3f0cb70a2c4084d8f
 
 
 task test_ci, "runs tests and generates a report":
-  exec "nim c -r tests/run_tests.nim"
+  exec "nimble c -r tests/run_tests.nim"
 
 task docgen, "generates the html documentation":
-  exec("nim doc --project --git.url:https://gitlab.com/pvs-hd/ot/diesl --outdir:htmldocs src/dsl.nim")
+  exec("nimble doc --project --git.url:https://gitlab.com/pvs-hd/ot/diesl --outdir:htmldocs src/dsl.nim")
   mvFile("htmldocs/dsl.html", "htmldocs/index.html")
