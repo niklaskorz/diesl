@@ -4,9 +4,20 @@ default:
 
 stages:
     - test
+    - docs
     - publish-coverage
 
-test:
+
+unit tests:
+    stage: test
+    script:
+        - nimble test_ci
+    artifacts:
+        reports:
+            junit: result.xml
+
+
+test coverage:
     stage: test
     script:
         - nimble install --depsOnly
@@ -14,12 +25,28 @@ test:
     artifacts:
         paths:
             - coverage/
+    rules:
+        - if: '$CI_COMMIT_BRANCH == "master"'
+        - if: '$CI_COMMIT_BRANCH == "develop"'
+
+build docs:
+    stage: docs
+    script:
+        - nimble docgen
+    artifacts:
+        paths:
+            - htmldocs/
 
 pages:
     stage: publish-coverage
     script:
-        - cp -r coverage/ public/
+        - mkdir public
+        - mv coverage/ public/coverage
+        - mv htmldocs/ public/documentation
     artifacts:
         paths:
             - public/
 
+    rules:
+        - if: '$CI_COMMIT_BRANCH == "master"'
+        - if: '$CI_COMMIT_BRANCH == "develop"'

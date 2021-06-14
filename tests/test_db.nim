@@ -4,27 +4,25 @@ import unittest
 import dsl/db
 import sugar
 import strutils
+import backend/table
 
 
-proc test_db*() = 
+proc test_db*() =
   suite "test db mock":
-
-    var dbTable = newDBTable(
-        newStringColumn(name = "text", data = @["foo bar", "baz bar"])
-    )
-
     test "can map over string columns":
+      let dbTable = Table(
+        name: "testTable",
+        creator: "",
+        columnNames: @["text"],
+        columnTypes: @["text"],
+        content: @[@["foo bar"], @["baz bar"]]
+      )
+
       let actual = dbTable.text.map(str => str.split(" ")[0])
-      let expected = newStringColumn(name = "text", data = @["foo", "baz"])
+      let expected = TableColumn(data: @["foo", "baz"])
 
       check actual == expected
 
 
-    test "can assign via dot access":
-      dbTable.text = dbTable.text.map(str => str.split(" ")[0])
-
-      check dbTable.text == newStringColumn(name = "text", data = @["foo", "baz"])
-
-
-
-test_db()
+when isMainModule:
+  test_db()

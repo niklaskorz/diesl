@@ -3,12 +3,16 @@ import unittest
 import dsl
 
 import dsl/[language, natural, db]
+import backend/table
 
 import utils/test_macro
 
-
-let table = newDBTable(
-  newStringColumn(name = "text", data = @["  foo", "  bar  ", "baz  "])
+let dbTable = Table(
+  name: "testTable",
+  creator: "",
+  columnNames: @["text"],
+  columnTypes: @["text"],
+  content: @[@["  foo"], @["  bar  "], @["baz  "]]
 )
 
 
@@ -19,74 +23,74 @@ proc test_natural*() =
     # since it is not needed 
     test_macro "trim without parameter":
       expected:
-        table.text.trim()
+        dbTable.text.trim()
 
       actual:
-        transform table:
-          trim table.text
+        transform dbTable:
+          trim dbTable.text
         
     test_macro "trim left":
       expected:
-        table.text.trim(left)
+        dbTable.text.trim(left)
 
       actual:
-        transform table:
-          trim beginning of table.text
+        transform dbTable:
+          trim beginning of dbTable.text
 
 
     test_macro "trim right":
       expected:
-        table.text.trim(right)
+        dbTable.text.trim(right)
 
       actual:
-        transform table:
-          trim ending of table.text
+        transform dbTable:
+          trim ending of dbTable.text
 
     test_macro "remove":
       actual:
-        transform table:
-          remove "ba" from table.text
+        transform dbTable:
+          remove "ba" from dbTable.text
 
       expected:
-        table.text.remove("ba")
+        dbTable.text.remove("ba")
 
 
     test_macro "remove multiple targets":
       actual:
-        transform table:
-          remove "ba", "oo" and "z" from table.text
+        transform dbTable:
+          remove "ba", "oo" and "z" from dbTable.text
 
       expected:
-        table.text.remove("ba").remove("oo").remove("z")
+        dbTable.text.remove("ba").remove("oo").remove("z")
     
     
     test_macro "replace":
       actual:
-        transform table:
-          replace "ba" with "to" in table.text
+        transform dbTable:
+          replace "ba" with "to" in dbTable.text
       
       expected:
-        table.text.replace("ba", "to")
+        dbTable.text.replace("ba", "to")
 
 
     test_macro "replace multiple substrings":
       actual:
-        transform table:
-          replace in table.text:
+        transform dbTable:
+          replace in dbTable.text:
             "ba" with "to"
             "fo" with "ta"
 
       expected:
-        table.text.replaceAll(@{"ba": "to", "fo": "ta"})
+        dbTable.text.replaceAll(@{"ba": "to", "fo": "ta"})
 
 
     test_macro "substring":
       actual:
-        transform table:
-          take 2 to 4 from table.text
+        transform dbTable:
+          take 2 to 4 from dbTable.text
 
       expected:
-        table.text[1..3]
+        dbTable.text[1..3]
 
 
 when isMainModule:
