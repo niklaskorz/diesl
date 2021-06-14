@@ -10,6 +10,7 @@ srcDir        = "src"
 # Dependencies
 
 requires "nim >= 1.4.4"
+requires "fusion >= 1.0"
 requires "compiler"
 requires "https://github.com/niklaskorz/nimscripter.git#774cd482936c1fc4d393518f669e57d81e096815"
 requires "https://gitlab.com/pvs-hd/ot/backend.git#129520726f8b3f0cb70a2c4084d8f990c40590e5"

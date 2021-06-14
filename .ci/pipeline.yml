@@ -20,8 +20,8 @@ unit tests:
 test coverage:
     stage: test
     script:
-        - nimble install
-        - coco --cov="src" --compiler=--hints:off
+        - nimble install --depsOnly
+        - coco  --cov="src" --compiler=--hints:off
     artifacts:
         paths:
             - coverage/
