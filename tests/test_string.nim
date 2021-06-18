@@ -17,56 +17,56 @@ proc test_string*() =
   suite "public string api":
     test "trim left":
       let actual = dbTable.text.trim(left)
-      let expected = TableColumn(data: @["foo", "bar  ", "baz  "])
+      let expected = TableColumn(schemaType: stText, data:  @["foo", "bar  ", "baz  "])
 
       check actual == expected
 
 
     test "trim right":
       let actual = dbTable.text.trim(right)
-      let expected = TableColumn(data: @["  foo", "  bar", "baz"])
+      let expected = TableColumn(schemaType: stText, data:  @["  foo", "  bar", "baz"])
 
       check actual == expected
 
 
     test "trim both":
       let actual = dbTable.text.trim(both)
-      let expected = TableColumn(data: @["foo", "bar", "baz"])
+      let expected = TableColumn(schemaType: stText, data:  @["foo", "bar", "baz"])
 
       check actual == expected
 
 
     test "replace substring":
       let actual = dbTable.text.replace("ba", "to")
-      let expected = TableColumn(data: @["  foo", "  tor  ", "toz  "])
+      let expected = TableColumn(schemaType: stText, data:  @["  foo", "  tor  ", "toz  "])
 
       check actual == expected
 
 
     test "replace substring replaces every occurence per default":
-      let actual = TableColumn(data: @["foo foo"]).replace("foo", "bar")
-      let expected = TableColumn(data: @["bar bar"])
+      let actual = TableColumn(schemaType: stText, data:  @["foo foo"]).replace("foo", "bar")
+      let expected = TableColumn(schemaType: stText, data:  @["bar bar"])
 
       check actual == expected
 
 
     test "replace multiple substrings":
       let actual = dbTable.text.replaceAll(@{"ba": "to", "fo": "ta"})
-      let expected = TableColumn(data: @["  tao", "  tor  ", "toz  "])
+      let expected = TableColumn(schemaType: stText, data:  @["  tao", "  tor  ", "toz  "])
 
       check actual == expected
 
 
     test "remove substring":
       let actual = dbTable.text.remove("ba")
-      let expected = TableColumn(data: @["  foo", "  r  ", "z  "])
+      let expected = TableColumn(schemaType: stText, data:  @["  foo", "  r  ", "z  "])
 
       check actual == expected
 
 
     test "add left":
       let actual = dbTable.text.add("XXX", left)
-      let expected = TableColumn(data: @["XXX  foo", "XXX  bar  ", "XXXbaz  "])
+      let expected = TableColumn(schemaType: stText, data:  @["XXX  foo", "XXX  bar  ", "XXXbaz  "])
 
       check actual == expected
 
@@ -80,7 +80,7 @@ proc test_string*() =
 
     test "add right":
       let actual = dbTable.text.add("XXX", right)
-      let expected = TableColumn(data: @["  fooXXX", "  bar  XXX", "baz  XXX"])
+      let expected = TableColumn(schemaType: stText, data:  @["  fooXXX", "  bar  XXX", "baz  XXX"])
 
       check actual == expected
 
@@ -94,7 +94,7 @@ proc test_string*() =
 
     test "add both":
       let actual = dbTable.text.add("XXX", both)
-      let expected = TableColumn(data: @["XXX  fooXXX", "XXX  bar  XXX",
+      let expected = TableColumn(schemaType: stText, data:  @["XXX  fooXXX", "XXX  bar  XXX",
           "XXXbaz  XXX"])
 
       check actual == expected
@@ -110,7 +110,7 @@ proc test_string*() =
       )
 
       let actual = table.text.toLower()
-      let expected = TableColumn(data: @["goodbye", "hello"])
+      let expected = TableColumn(schemaType: stText, data:  @["goodbye", "hello"])
 
       check actual == expected
 
@@ -126,7 +126,7 @@ proc test_string*() =
       )
 
       let actual = table.text.toUpper()
-      let expected = TableColumn(data: @["GOODBYE", "HELLO"])
+      let expected = TableColumn(schemaType: stText, data:  @["GOODBYE", "HELLO"])
 
       check actual == expected
 
@@ -141,7 +141,7 @@ proc test_string*() =
       )
 
       let actual = table.text.substring(2..4)
-      let expected = TableColumn(data: @["CDE", "345"])
+      let expected = TableColumn(schemaType: stText, data:  @["CDE", "345"])
 
       check actual == expected
 
