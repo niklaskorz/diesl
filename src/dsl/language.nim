@@ -20,7 +20,7 @@ proc trim*(column: TableColumn, direction: TextDirection = both): TableColumn =
   let leading = direction == both or direction == left
   let trailing = direction == both or direction == right
 
-  return column.map(str => str.strip(leading = leading, trailing = trailing))
+  return column.map((str: string) => str.strip(leading = leading, trailing = trailing))
 
 
 # TODO: error handling
@@ -31,7 +31,7 @@ proc substring*(column: TableColumn, range: HSlice): TableColumn =
   ##
   ## `column.substring(2..4)` selects the 2nd, 3rd and 4th character from every entry
 
-  return column.map(str => str[range])
+  return column.map((str: string) => str[range])
 
 proc `[]`*(column: TableColumn, range: HSlice): TableColumn =
   column.substring(range)
@@ -40,7 +40,7 @@ proc `[]`*(column: TableColumn, range: HSlice): TableColumn =
 proc replace*(column: TableColumn, target, replacement: string): TableColumn =
   ## Replaces every occurence of `target` with `replacement` in the entries of `column`.
 
-  return column.map(str => str.replace(target, replacement))
+  return column.map((str: string) => str.replace(target, replacement))
 
 
 # TODO: this should really take varargs but some weird nim bug (or feature?) prevents that
@@ -52,7 +52,7 @@ proc replaceAll*(column: TableColumn, replacements: seq[(string,
   ## Usage:
   ##
   ## `column.replaceAll(@{"will be replaced": "by this", "and also this": "by that"})`
-  return column.map(str => str.multiReplace(replacements))
+  return column.map((str: string) => str.multiReplace(replacements))
 
 
 proc remove*(column: TableColumn, target: string): TableColumn =
@@ -76,11 +76,11 @@ proc add*(column: TableColumn, addition: string,
 
   case direction:
     of left:
-      return column.map(str => addition & str)
+      return column.map((str: string) => addition & str)
     of right:
-      return column.map(str => str & addition)
+      return column.map((str: string) => str & addition)
     of both:
-      return column.map(str => addition & str & addition)
+      return column.map((str: string) => addition & str & addition)
 
 
 proc `+`*(column: TableColumn, addition: string): TableColumn =
