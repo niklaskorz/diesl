@@ -2,9 +2,11 @@ import compiler/[nimeval, llstream, ast]
 import os
 import script
 import sugar
+import operations
 
 
 when isMainModule:
+
     let stdPath = getStdPath()
     var searchPaths = collect(newSeq):
       for dir in walkDirRec(stdPath, {pcDir}):
@@ -16,19 +18,21 @@ when isMainModule:
 import operations
 import sequtils
 
-var opSeq = newSeq[DieslOperation]()
-let trim = DieslOperation(column: "foo", kind: dotTrim)
-let replace = DieslOperation(column: "bar", kind: dotReplace, target: "foo", replacement: "bar")
+echo "generating script representation..."
 
-opSeq.add(trim)
-opSeq.add(replace)
-echo "hello world"
+var table = DieslScript()
 
-let operation_string* = opSeq.toString()
+table.text = table.text
+                .trim()
+                .replace("foo", "bar")
+
+let exported_table* = table.toJsonString()
     """))
 
-    let symbol = intr.selectUniqueSymbol("operation_string")
+    let symbol = intr.selectUniqueSymbol("exported_table")
     let value = intr.getGlobalValue(symbol)
-    let operation_string = value.getStr()
-    echo operation_string
+    echo "-------------------------------------------"
+    let dieslScript = value.getStr().scriptFromJson()
+
+    echo dieslScript
     intr.destroyInterpreter()
