@@ -24,8 +24,9 @@ opSeq.add(trim)
 opSeq.add(replace)
 echo "hello world"
 
-let operation_string = opSeq.toString()
+let operation_string* = opSeq.toString()
     """))
+
     let symbol = intr.selectUniqueSymbol("operation_string")
     let value = intr.getGlobalValue(symbol)
     let operation_string = value.getStr()
