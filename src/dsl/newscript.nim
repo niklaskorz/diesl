@@ -3,10 +3,11 @@ import os
 import script
 import sugar
 import operations
+import streams
+import eminim
 
 
 when isMainModule:
-
     let stdPath = getStdPath()
     var searchPaths = collect(newSeq):
       for dir in walkDirRec(stdPath, {pcDir}):
@@ -20,19 +21,21 @@ import sequtils
 
 echo "generating script representation..."
 
-var table = DieslScript()
+let db = Diesl()
 
-table.text = table.text
-                .trim()
-                .replace("foo", "bar")
+db.students.name = db.students.name
+  .trim()
+  .replace("foo", "bar")
+  .replace(db.students.firstName, "<redacted>")
 
-let exported_table* = table.toJsonString()
+
+let exportOperations* = db.exportOperations()
     """))
 
-    let symbol = intr.selectUniqueSymbol("exported_table")
+    let symbol = intr.selectUniqueSymbol("exportOperations")
     let value = intr.getGlobalValue(symbol)
     echo "-------------------------------------------"
-    let dieslScript = value.getStr().scriptFromJson()
+    let exportedOperations = value.getStr.newStringStream.jsonTo(seq[DieslOperation])
+    echo exportedOperations.toPrettyJsonString
 
-    echo dieslScript
     intr.destroyInterpreter()

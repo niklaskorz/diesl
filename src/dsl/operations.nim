@@ -1,7 +1,8 @@
 import json
 import strutils
 
-type DieslOperationType* = enum
+type
+  DieslOperationType* = enum
     dotStore
     dotLoad
     dotStringLiteral
@@ -9,23 +10,30 @@ type DieslOperationType* = enum
     dotTrim
     dotReplace
 
-type DieslOperation* = ref object
+  DieslOperation* = ref object
     case kind*: DieslOperationType
       of dotStore:
-        storeTable: string
-        storeColumn: string
-        storeValue: DieslOperation
+        storeTable*: string
+        storeColumn*: string
+        storeValue*: DieslOperation
       of dotLoad:
-        loadTable: string
-        loadColumn: string
+        loadTable*: string
+        loadColumn*: string
       of dotStringLiteral:
-        stringValue: string
+        stringValue*: string
       of dotReplace:
-        replaceValue: DieslOperation
-        replaceTarget: DieslOperation
-        replaceReplacement: DieslOperation
+        replaceValue*: DieslOperation
+        replaceTarget*: DieslOperation
+        replaceReplacement*: DieslOperation
       of dotTrim:
-        trimValue: DieslOperation
+        trimValue*: DieslOperation
+
+  Diesl* = ref object
+    pOperations: seq[DieslOperation]
+
+  DieslTable* = object
+    pDb: Diesl
+    pName: string
 
 proc toOperation(operation: DieslOperation): DieslOperation = operation
 
@@ -43,15 +51,10 @@ proc replace*[A, B](value: DieslOperation, target: A, replacement: B): DieslOper
     replaceReplacement: replacement.toOperation
   )
 
-type
-  Diesl = ref object
-    pOperations: seq[DieslOperation]
-  DieslTable = object
-    pDb: Diesl
-    pName: string
-
 proc load(db: Diesl, table: string): DieslTable =
   DieslTable(pDb: db, pName: table)
+
+proc exportOperations*(db: Diesl): string = $(%(db.pOperations))
 
 template `.`*(db: Diesl, table: untyped): DieslTable =
   load(db, astToStr(table))
