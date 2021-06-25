@@ -1,108 +1,78 @@
 import json
-import sequtils, sugar
 import strutils
 
 type DieslOperationType* = enum
-    dotTrim, dotReplace
+    dotStore
+    dotLoad
+    dotStringLiteral
+    # String operations
+    dotTrim
+    dotReplace
 
-type DieslOperation* = object
+type DieslOperation* = ref object
     case kind*: DieslOperationType
+      of dotStore:
+        storeTable: string
+        storeColumn: string
+        storeValue: DieslOperation
+      of dotLoad:
+        loadTable: string
+        loadColumn: string
+      of dotStringLiteral:
+        stringValue: string
       of dotReplace:
-        target*, replacement*: string
-      else:
-        discard
+        replaceValue: DieslOperation
+        replaceTarget: DieslOperation
+        replaceReplacement: DieslOperation
+      of dotTrim:
+        trimValue: DieslOperation
 
+proc toOperation(operation: DieslOperation): DieslOperation = operation
 
-# like add but immutable
-proc addToSeq[T](s: seq[T], element: T): seq[T] =
-  s.concat(@[element])
+proc toOperation(value: string): DieslOperation =
+  DieslOperation(kind: dotStringLiteral, stringValue: value)
 
+proc trim*(value: DieslOperation): DieslOperation =
+  DieslOperation(kind: dotTrim, trimValue: value)
 
-type ColumnTransformation* = object
-  srcColumn*: string
-  targetColumn*: string
-  operations*: seq[DieslOperation]
-
-
-template `$`*(operation: DieslOperation): string = 
-  case operation.kind:
-    of dotTrim:
-      "trim"
-    of dotReplace:
-      "replace " & operation.target & " -> " & operation.replacement
-
-
-template `$`*(script: ColumnTransformation): string = 
-  "transformation on " & script.srcColumn & " stored into " & script.targetColumn & ":\n----\n" & script.operations.join("\n")
-
-
-proc add*(script: ColumnTransformation, operation: DieslOperation): ColumnTransformation = 
-  let operations = script.operations.addToSeq(operation)
-  result = ColumnTransformation(srcColumn: script.srcColumn, operations: operations)
-  
-
-proc trim*(script: ColumnTransformation): ColumnTransformation = 
-  script.add(DieslOperation(kind: dotTrim))
-
-
-proc replace*(script: ColumnTransformation, target, replacement: string): ColumnTransformation = 
-  script.add(DieslOperation(kind: dotReplace, target: target, replacement: replacement))
-
-
-type DieslScript* = object
-  transformations*: seq[ColumnTransformation]
-
-
-template `$`*(script: DieslScript): string =
-  script.transformations.join("\n")
-
-proc add*(script: var DieslScript, transformation: ColumnTransformation) = 
-  script.transformations.add(transformation)
-
-
-template `.`*(script: DieslScript, column: untyped): ColumnTransformation = 
-  ColumnTransformation(srcColumn: astToStr(column), targetColumn: "", operations: @[])
-
-
-template `.=`*(script: var DieslScript, column: untyped, transformation: ColumnTransformation): untyped = 
-  
-  script.add(
-    ColumnTransformation(srcColumn: transformation.srcColumn, targetColumn: astToStr(column), operations: transformation.operations)
+proc replace*[A, B](value: DieslOperation, target: A, replacement: B): DieslOperation =
+  DieslOperation(
+    kind: dotReplace,
+    replaceValue: value,
+    replaceTarget: target.toOperation,
+    replaceReplacement: replacement.toOperation
   )
 
+type
+  Diesl = ref object
+    pOperations: seq[DieslOperation]
+  DieslTable = object
+    pDb: Diesl
+    pName: string
 
-proc toJsonString*(script: DieslScript): string = $(%script)
+proc load(db: Diesl, table: string): DieslTable =
+  DieslTable(pDb: db, pName: table)
 
-proc operationFromJson(json: JsonNode): DieslOperation =
-  let kind = json["kind"].str
-  echo "kind ", kind
-  case json["kind"].str:
-    of "dotReplace":
-      return DieslOperation(kind: dotReplace, target: json["target"].str, replacement: json["replacement"].str)
-    of "dotTrim":
-      return DieslOperation(kind: dotTrim)
-    else:
-      echo "oh no"
-  
+template `.`*(db: Diesl, table: untyped): DieslTable =
+  load(db, astToStr(table))
 
-proc transformationFromJson(json: JsonNode) : ColumnTransformation =
-  return ColumnTransformation(
-    srcColumn: json["srcColumn"].str,
-    targetColumn: json["targetColumn"].str,
-    operations: json["operations"].elems.map(operationFromJson)
-  )
-  
+proc load(table: DieslTable, column: string): DieslOperation =
+  DieslOperation(kind: dotLoad, loadTable: table.pName, loadColumn: astToStr(column))
 
-proc scriptFromJson*(json: string): DieslScript =
-  let parsed = parseJson(json)
+template `.`*(table: DieslTable, column: untyped): DieslOperation =
+  load(table, astToStr(column))
 
-  result = DieslScript(transformations: parsed["transformations"].elems.map(transformationFromJson))
+proc store(table: DieslTable, column: string, value: DieslOperation): DieslOperation =
+  DieslOperation(kind: dotStore, storeTable: table.pName, storeColumn: column, storeValue: value)
 
-  
+template `.=`*(table: DieslTable, column: untyped, value: DieslOperation): untyped =
+  table.pDb.pOperations.add(store(table, astToStr(column), value))
+
+proc toJsonString*(value: any): string = $(%value)
+
+proc toPrettyJsonString*(value: any): string = (%value).pretty
 
 when isMainModule:
-  var table = DieslScript()
-
-  table.text = table.text.trim().replace("foo", "bar")
-
-  echo table
+  let db = Diesl()
+  db.students.name = db.students.name.trim().replace("foo", "bar").replace(db.students.firstName, "<redacted>")
+  echo db.pOperations.toPrettyJsonString
