@@ -5,7 +5,7 @@ export script
 when isMainModule:
   import dsl/backends/sqlite
   let exportedOperations = runScript("""
-db.students.name = "Mr. / Mrs." & db.students.firstName[2..5] & db.students.lastName
+db.students.name = "Mr. / Mrs. " & db.students.firstName[2..5] & " " & db.students.lastName
 
 db.students.name = db.students.name
   .trim(right)

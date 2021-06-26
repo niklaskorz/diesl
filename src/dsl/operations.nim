@@ -87,7 +87,8 @@ proc replace*(value: DieslOperation, target: DieslOperation,
     replaceReplacement: replacement
   )
 
-proc replaceAll*(value: DieslOperation, replacements: seq[(DieslOperation, DieslOperation)]): DieslOperation =
+proc replaceAll*(value: DieslOperation, replacements: seq[(DieslOperation,
+    DieslOperation)]): DieslOperation =
   DieslOperation(
     kind: dotReplaceAll,
     replaceAllValue: value,
@@ -98,7 +99,8 @@ proc replaceAll*(value: DieslOperation, replacements: seq[(DieslOperation, Diesl
 proc remove*(value: DieslOperation, target: DieslOperation): DieslOperation =
   value.replace(target, "".toOperation)
 
-proc stringConcat(valueA: DieslOperation, valueB: DieslOperation): DieslOperation =
+proc stringConcat(valueA: DieslOperation,
+    valueB: DieslOperation): DieslOperation =
   DieslOperation(
     kind: dotStringConcat,
     stringConcatValueA: valueA,
@@ -143,6 +145,8 @@ proc toPrettyJsonString*(value: any): string = (%value).pretty
 
 when isMainModule:
   let db = Diesl()
-  db.students.name = db.students.name.trim().replace("foo".toOperation, "bar".toOperation).replace(
-      db.students.firstName, "<redacted>".toOperation)
+  db.students.name = db.students.name.trim().replace("foo".toOperation,
+      "bar".toOperation).replace(
+
+db.students.firstName, "<redacted>".toOperation)
   echo db.pOperations.toPrettyJsonString
