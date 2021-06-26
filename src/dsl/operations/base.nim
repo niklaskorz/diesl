@@ -89,7 +89,3 @@ proc store(table: DieslTable, column: string,
 template `.=`*(table: DieslTable, column: untyped,
     value: DieslOperation): untyped =
   table.pDb.pOperations.add(store(table, astToStr(column), value))
-
-proc toJsonString(value: any): string = $(%value)
-
-proc toPrettyJsonString(value: any): string = (%value).pretty
