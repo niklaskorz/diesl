@@ -4,13 +4,13 @@ import sugar
 import operations
 import operations/parseexport
 
-type StdPathNotFoundException* = object of Defect
+type StdPathNotFoundError* = object of Defect
 
 proc getStdPath*(): string =
   # User defined path to standard library
   var stdPath = os.getEnv("NIM_STDLIB")
   if stdPath != "" and not dirExists(stdPath):
-    raise StdPathNotFoundException.newException(
+    raise StdPathNotFoundError.newException(
         "No standard library found at path " & stdPath)
 
   # Fallback to current directory version of stdlib
@@ -29,7 +29,7 @@ proc getStdPath*(): string =
     stdPath = home / ".choosenim" / "toolchains" / ("nim-" & NimVersion) / "lib"
 
   if not dirExists(stdPath):
-    raise StdPathNotFoundException.newException("No standard library found, please set NIM_STDLIB environment variable")
+    raise StdPathNotFoundError.newException("No standard library found, please set NIM_STDLIB environment variable")
 
   return stdPath
 
