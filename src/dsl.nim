@@ -1,5 +1,15 @@
-import dsl/[db, language, script]
+import dsl/script
 
-export db
-export language
 export script
+
+when isMainModule:
+  import dsl/backends/sqlite
+  let exportedOperations = runScript("""
+db.students.name = "Mr. / Mrs." & db.students.firstName & db.students.lastName
+
+db.students.name = db.students.name
+  .trim(right)
+  .replace("foo", "bar")
+  .replace(db.students.firstName, db.students.secondName)
+""")
+  echo exportedOperations.toSqlite

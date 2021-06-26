@@ -68,8 +68,8 @@ proc toOperation(operation: DieslOperation): DieslOperation = operation
 proc toOperation(value: string): DieslOperation =
   DieslOperation(kind: dotStringLiteral, stringValue: value)
 
-proc trim*(value: DieslOperation): DieslOperation =
-  DieslOperation(kind: dotTrim, trimValue: value)
+proc trim*(value: DieslOperation, direction: TextDirection = both): DieslOperation =
+  DieslOperation(kind: dotTrim, trimValue: value, trimDirection: direction)
 
 proc substring(value: DieslOperation, range: Slice[int]): DieslOperation =
   DieslOperation(kind: dotSubstring, substringValue: value,
