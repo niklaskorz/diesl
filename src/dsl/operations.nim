@@ -98,17 +98,13 @@ proc replaceAll*(value: DieslOperation, replacements: seq[(DieslOperation, Diesl
 proc remove*(value: DieslOperation, target: DieslOperation): DieslOperation =
   value.replace(target, "".toOperation)
 
-template stringConcat(valueA: untyped, valueB: untyped): DieslOperation =
+proc stringConcat(valueA: DieslOperation, valueB: DieslOperation): DieslOperation =
   DieslOperation(
     kind: dotStringConcat,
-    stringConcatValueA: valueA.toOperation,
-    stringConcatValueB: valueB.toOperation
+    stringConcatValueA: valueA,
+    stringConcatValueB: valueB
   )
 
-proc `&`*(valueA: DieslOperation, valueB: string): DieslOperation = stringConcat(
-    valueA, valueB)
-proc `&`*(valueA: string, valueB: DieslOperation): DieslOperation = stringConcat(
-    valueA, valueB)
 proc `&`*(valueA: DieslOperation, valueB: DieslOperation): DieslOperation = stringConcat(
     valueA, valueB)
 
