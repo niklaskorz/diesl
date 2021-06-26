@@ -17,8 +17,8 @@ for word in forbiddenWords:
   db.students.name = db.students.name.remove(word)
 
 db.students.name = db.students.name.replaceAll(@{
-  "a": "b",
-  "c": "d"
+  db.students.firstName: "b",
+  db.students.secondName: "d"
 })
 """)
   echo exportedOperations.toSqlite
