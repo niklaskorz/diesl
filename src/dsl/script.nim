@@ -1,8 +1,9 @@
-import script/definitions
-import nimscripter
-import compiler/nimeval
+import compiler/[nimeval, llstream, ast]
 import os
-import db_sqlite
+import sugar
+import operations
+import streams
+import eminim
 
 type StdPathNotFoundException* = object of Defect
 
@@ -33,18 +34,36 @@ proc getStdPath*(): string =
 
   return stdPath
 
+let scriptStart = """
+import operations
+let db = Diesl()
+"""
+let scriptEnd = """
+let exportedOperations* = db.exportOperations()
+"""
 
-proc runScript*(script: string): Option[Interpreter] =
+proc runScript*(script: string): seq[DieslOperation] =
   let stdPath = getStdPath()
-  return loadScript(script, isFile = false, stdPath = stdPath)
+  var searchPaths = collect(newSeq):
+    for dir in walkDirRec(stdPath, {pcDir}):
+      dir
+  searchPaths.insert(stdPath, 0)
+  searchPaths.add(getCurrentDir() / "src" / "dsl")
+  let intr = createInterpreter("script.nims", searchPaths)
+  defer: intr.destroyInterpreter()
+  intr.evalScript(llStreamOpen(scriptStart & script & scriptEnd))
+  let symbol = intr.selectUniqueSymbol("exportedOperations")
+  let value = intr.getGlobalValue(symbol).getStr()
+  let exportedOperations = value.newStringStream().jsonTo(seq[DieslOperation])
+  return exportedOperations
 
+when isMainModule:
+  let exportedOperations = runScript("""
+db.students.name = "Mr. / Mrs." & db.students.firstName & db.students.lastName
 
-proc runScript*(db: DbConn, script: string): Option[Interpreter] =
-  let stdPath = getStdPath()
-  let ctx = newScriptContext(db)
-  return loadScript(
-    script,
-    isFile = false,
-    stdPath = stdPath,
-    init = some(ctx.initWithContext)
-  )
+db.students.name = db.students.name
+  .trim()
+  .replace("foo", "bar")
+  .replace(db.students.firstName, "<redacted>")
+""")
+  echo exportedOperations.toPrettyJsonString
