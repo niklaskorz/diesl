@@ -23,6 +23,8 @@ echo "generating script representation..."
 
 let db = Diesl()
 
+db.students.name = "Mr. / Mrs." & db.students.firstName & db.students.lastName
+
 db.students.name = db.students.name
   .trim()
   .replace("foo", "bar")
