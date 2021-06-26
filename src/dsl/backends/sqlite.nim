@@ -1,11 +1,12 @@
 import strformat
+import strutils
 import db_sqlite
 import ../operations
 
 proc toSqlite*(op: DieslOperation): string =
   case op.kind:
     of dotStore:
-      fmt"UPDATE {op.storeTable} SET {op.storeColumn} = {op.storeValue.toSqlite}"
+      fmt"UPDATE {op.storeTable} SET {op.storeColumn} = {op.storeValue.toSqlite};"
     of dotLoad:
       fmt"{op.loadTable}.{op.loadColumn}"
     of dotStringLiteral:
@@ -37,6 +38,8 @@ proc toSqlite*(op: DieslOperation): string =
       fmt"UPPER({op.toUpperValue.toSqlite})"
 
 proc toSqlite*(operations: seq[DieslOperation]): string =
-  result = ""
+  var statements: seq[string]
   for operation in operations:
-    result.add(operation.toSqlite() & "\n")
+    assert operation.kind == dotStore
+    statements.add(operation.toSqlite)
+  return statements.join("\n")
