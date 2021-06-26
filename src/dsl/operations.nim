@@ -72,12 +72,14 @@ proc trim*(value: DieslOperation): DieslOperation =
   DieslOperation(kind: dotTrim, trimValue: value)
 
 proc substring(value: DieslOperation, range: Slice[int]): DieslOperation =
-  DieslOperation(kind: dotSubstring, substringValue: value, substringRange: range)
+  DieslOperation(kind: dotSubstring, substringValue: value,
+      substringRange: range)
 
 proc `[]`*(value: DieslOperation, range: Slice[int]): DieslOperation =
   value.substring(range)
 
-proc replace*[A, B](value: DieslOperation, target: A, replacement: B): DieslOperation =
+proc replace*[A, B](value: DieslOperation, target: A,
+    replacement: B): DieslOperation =
   DieslOperation(
     kind: dotReplace,
     replaceValue: value,
@@ -85,11 +87,13 @@ proc replace*[A, B](value: DieslOperation, target: A, replacement: B): DieslOper
     replaceReplacement: replacement.toOperation
   )
 
-proc replaceAll*(value: DieslOperation, replacements: seq[tuple[target: DieslOperation, replacement: DieslOperation]]): DieslOperation =
+proc replaceAll*(value: DieslOperation, replacements: seq[tuple[
+    target: DieslOperation, replacement: DieslOperation]]): DieslOperation =
   DieslOperation(
     kind: dotReplaceAll,
     replaceAllValue: value,
-    replaceAllReplacements: replacements.map((pair) => DieslReplacementPair(target: pair.target, replacement: pair.replacement))
+    replaceAllReplacements: replacements.map((pair) => DieslReplacementPair(
+        target: pair.target, replacement: pair.replacement))
   )
 
 proc remove*[T](value: DieslOperation, target: T): DieslOperation =
@@ -102,9 +106,12 @@ template stringConcat(valueA: untyped, valueB: untyped): DieslOperation =
     stringConcatValueB: valueB.toOperation
   )
 
-proc `&`*(valueA: DieslOperation, valueB: string): DieslOperation = stringConcat(valueA, valueB)
-proc `&`*(valueA: string, valueB: DieslOperation): DieslOperation = stringConcat(valueA, valueB)
-proc `&`*(valueA: DieslOperation, valueB: DieslOperation): DieslOperation = stringConcat(valueA, valueB)
+proc `&`*(valueA: DieslOperation, valueB: string): DieslOperation = stringConcat(
+    valueA, valueB)
+proc `&`*(valueA: string, valueB: DieslOperation): DieslOperation = stringConcat(
+    valueA, valueB)
+proc `&`*(valueA: DieslOperation, valueB: DieslOperation): DieslOperation = stringConcat(
+    valueA, valueB)
 
 proc toLower*(value: DieslOperation): DieslOperation =
   DieslOperation(kind: dotToLower, toLowerValue: value)
@@ -126,10 +133,13 @@ proc load(table: DieslTable, column: string): DieslOperation =
 template `.`*(table: DieslTable, column: untyped): DieslOperation =
   load(table, astToStr(column))
 
-proc store(table: DieslTable, column: string, value: DieslOperation): DieslOperation =
-  DieslOperation(kind: dotStore, storeTable: table.pName, storeColumn: column, storeValue: value)
+proc store(table: DieslTable, column: string,
+    value: DieslOperation): DieslOperation =
+  DieslOperation(kind: dotStore, storeTable: table.pName, storeColumn: column,
+      storeValue: value)
 
-template `.=`*(table: DieslTable, column: untyped, value: DieslOperation): untyped =
+template `.=`*(table: DieslTable, column: untyped,
+    value: DieslOperation): untyped =
   table.pDb.pOperations.add(store(table, astToStr(column), value))
 
 proc toJsonString*(value: any): string = $(%value)
@@ -138,5 +148,6 @@ proc toPrettyJsonString*(value: any): string = (%value).pretty
 
 when isMainModule:
   let db = Diesl()
-  db.students.name = db.students.name.trim().replace("foo", "bar").replace(db.students.firstName, "<redacted>")
+  db.students.name = db.students.name.trim().replace("foo", "bar").replace(
+      db.students.firstName, "<redacted>")
   echo db.pOperations.toPrettyJsonString

@@ -9,7 +9,7 @@ import fusion/matching
 {.experimental: "caseStmtMacros".}
 
 
-proc doFlatten(node: NimNode): seq[NimNode] = 
+proc doFlatten(node: NimNode): seq[NimNode] =
   case node:
     of Infix[@param1, @command, all @params]:
       params.insert(param1, 0)
@@ -41,7 +41,7 @@ proc newTableConstructor(pairs: seq[(NimNode, NimNode)]): NimNode =
   result = nnkPrefix.newTree(newIdentNode("@"), result)
 
 
-proc flatten(node: NimNode) : NimNode =
+proc flatten(node: NimNode): NimNode =
   return newTree(nnkCommand, doFlatten(node))
 
 # TODO: make this a constant
@@ -69,11 +69,13 @@ proc transpileTrim(command, table: NimNode): NimNode =
 
 proc transpileReplace(command, table: NimNode): NimNode =
   case command:
-    of [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement, Ident(strVal: "in"), @column]:
+    of [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement,
+        Ident(strVal: "in"), @column]:
       result = quote do:
         `column`.replace(`target`, `replacement`)
 
-    of [Ident(strVal: "replace"), Ident(strVal: "in"), @column, all @replacements]:
+    of [Ident(strVal: "replace"), Ident(strVal: "in"), @column,
+        all @replacements]:
 
       var replacementPairs = newSeq[(NimNode, NimNode)]()
 
@@ -96,12 +98,13 @@ proc transpileReplace(command, table: NimNode): NimNode =
       result = command
 
 
-proc transpileRemove(command, table: NimNode): NimNode = 
+proc transpileRemove(command, table: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "remove"), @target, Ident(strVal: "from"), @column]:
       result = quote do:
         `column`.remove(`target`)
-    of Command[Ident(strVal: "remove"), until @targets is Ident(strVal: "from"), Ident(strVal: "from"), @column]:
+    of Command[Ident(strVal: "remove"), until @targets is Ident(strVal: "from"),
+        Ident(strVal: "from"), @column]:
       if targets.len == 0:
         return command
 
@@ -121,7 +124,8 @@ proc transpileRemove(command, table: NimNode): NimNode =
 
 proc transpileTake(command, table: NimNode): NimNode =
   case command:
-    of Command[Ident(strVal: "take"), @matchedLower, Ident(strVal: "to"), @matchedHigher, Ident(strVal: "from"), @column]:
+    of Command[Ident(strVal: "take"), @matchedLower, Ident(strVal: "to"),
+        @matchedHigher, Ident(strVal: "from"), @column]:
       let lower = newLit(matchedLower.intVal - 1)
       let higher = newLit(matchedHigher.intVal - 1)
 
@@ -157,6 +161,6 @@ proc transpileTransform(table: NimNode, commands: NimNode): NimNode =
 
 
 # macro transform*(table, column, commands: untyped): untyped =
-macro transform*(table, commands: untyped): untyped = 
+macro transform*(table, commands: untyped): untyped =
   result = transpileTransform(table, commands)
 

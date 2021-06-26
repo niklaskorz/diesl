@@ -20,7 +20,8 @@ proc trim*(column: TableColumn, direction: TextDirection = both): TableColumn =
   let leading = direction == both or direction == left
   let trailing = direction == both or direction == right
 
-  return column.map((str: string) => str.strip(leading = leading, trailing = trailing))
+  return column.map((str: string) => str.strip(leading = leading,
+      trailing = trailing))
 
 
 # TODO: error handling

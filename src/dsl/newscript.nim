@@ -10,8 +10,8 @@ import eminim
 when isMainModule:
     let stdPath = getStdPath()
     var searchPaths = collect(newSeq):
-      for dir in walkDirRec(stdPath, {pcDir}):
-          dir
+        for dir in walkDirRec(stdPath, {pcDir}):
+            dir
     searchPaths.insert(stdPath, 0)
     searchPaths.add("./src/dsl")
     let intr = createInterpreter("script.nims", searchPaths)
