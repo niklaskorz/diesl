@@ -36,6 +36,8 @@ proc getStdPath*(): string =
 
 let scriptStart = """
 import operations
+import operations/conversion
+
 let db = Diesl()
 """
 let scriptEnd = """

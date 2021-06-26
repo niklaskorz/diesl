@@ -63,12 +63,10 @@ type
     pDb: Diesl
     pName: string
 
-proc toOperation(operation: DieslOperation): DieslOperation = operation
+proc toOperation*(operation: DieslOperation): DieslOperation = operation
 
-proc toOperation(value: string): DieslOperation =
+proc toOperation*(value: string): DieslOperation =
   DieslOperation(kind: dotStringLiteral, stringValue: value)
-
-proc op*(value: string): DieslOperation = value.toOperation
 
 proc trim*(value: DieslOperation, direction: TextDirection = both): DieslOperation =
   DieslOperation(kind: dotTrim, trimValue: value, trimDirection: direction)
@@ -80,26 +78,25 @@ proc substring(value: DieslOperation, range: Slice[int]): DieslOperation =
 proc `[]`*(value: DieslOperation, range: Slice[int]): DieslOperation =
   value.substring(range)
 
-proc replace*[A, B](value: DieslOperation, target: A,
-    replacement: B): DieslOperation =
+proc replace*(value: DieslOperation, target: DieslOperation,
+    replacement: DieslOperation): DieslOperation =
   DieslOperation(
     kind: dotReplace,
     replaceValue: value,
-    replaceTarget: target.toOperation,
-    replaceReplacement: replacement.toOperation
+    replaceTarget: target,
+    replaceReplacement: replacement
   )
 
-proc replaceAll*(value: DieslOperation, replacements: seq[tuple[
-    target: DieslOperation, replacement: DieslOperation]]): DieslOperation =
+proc replaceAll*(value: DieslOperation, replacements: seq[(DieslOperation, DieslOperation)]): DieslOperation =
   DieslOperation(
     kind: dotReplaceAll,
     replaceAllValue: value,
     replaceAllReplacements: replacements.map((pair) => DieslReplacementPair(
-        target: pair.target, replacement: pair.replacement))
+        target: pair[0], replacement: pair[1]))
   )
 
-proc remove*[T](value: DieslOperation, target: T): DieslOperation =
-  value.replace(target, "")
+proc remove*(value: DieslOperation, target: DieslOperation): DieslOperation =
+  value.replace(target, "".toOperation)
 
 template stringConcat(valueA: untyped, valueB: untyped): DieslOperation =
   DieslOperation(
@@ -150,6 +147,6 @@ proc toPrettyJsonString*(value: any): string = (%value).pretty
 
 when isMainModule:
   let db = Diesl()
-  db.students.name = db.students.name.trim().replace("foo", "bar").replace(
-      db.students.firstName, "<redacted>")
+  db.students.name = db.students.name.trim().replace("foo".toOperation, "bar".toOperation).replace(
+      db.students.firstName, "<redacted>".toOperation)
   echo db.pOperations.toPrettyJsonString
