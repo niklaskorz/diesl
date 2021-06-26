@@ -1,6 +1,7 @@
-import ../operations
 import sequtils
 import sugar
+import base
+import strings
 
 converter toDieslOperation*(value: string): DieslOperation =
   value.toOperation

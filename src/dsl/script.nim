@@ -2,8 +2,7 @@ import compiler/[nimeval, llstream, ast]
 import os
 import sugar
 import operations
-import streams
-import eminim
+import operations/parseexport
 
 type StdPathNotFoundException* = object of Defect
 
@@ -56,10 +55,11 @@ proc runScript*(script: string): seq[DieslOperation] =
   intr.evalScript(llStreamOpen(scriptStart & script & scriptEnd))
   let symbol = intr.selectUniqueSymbol("exportedOperations")
   let value = intr.getGlobalValue(symbol).getStr()
-  let exportedOperations = value.newStringStream().jsonTo(seq[DieslOperation])
+  let exportedOperations = parseExportedOperations(value)
   return exportedOperations
 
 when isMainModule:
+  import json
   let exportedOperations = runScript("""
 db.students.name = "Mr. / Mrs." & db.students.firstName & db.students.lastName
 
@@ -68,4 +68,4 @@ db.students.name = db.students.name
   .replace("foo", "bar")
   .replace(db.students.firstName, "<redacted>")
 """)
-  echo exportedOperations.toPrettyJsonString
+  echo pretty(%exportedOperations)
