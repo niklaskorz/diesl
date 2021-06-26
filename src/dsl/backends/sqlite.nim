@@ -24,14 +24,17 @@ proc toSqlite*(op: DieslOperation): string =
       fmt"SUBSTR({op.substringValue.toSqlite}, {op.substringRange.a}, {op.substringRange.b})"
     of dotReplace:
       fmt"REPLACE({op.replaceValue.toSqlite}, {op.replaceTarget.toSqlite}, {op.replaceReplacement.toSqlite})"
+    of dotReplaceAll:
+      var value = op.replaceAllValue.toSqlite
+      for pair in op.replaceAllReplacements:
+        value = fmt"REPLACE({value}, {pair.target.toSqlite}, {pair.replacement.toSqlite})"
+      value
     of dotStringConcat:
       fmt"{op.stringConcatValueA.toSqlite} || {op.stringConcatValueB.toSqlite}"
     of dotToLower:
       fmt"LOWER({op.toLowerValue.toSqlite})"
     of dotToUpper:
       fmt"UPPER({op.toUpperValue.toSqlite})"
-    else:
-      fmt"<{op.kind}>"
 
 proc toSqlite*(operations: seq[DieslOperation]): string =
   result = ""

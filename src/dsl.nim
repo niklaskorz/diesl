@@ -15,5 +15,10 @@ db.students.name = db.students.name
 let forbiddenWords = @["first", "second", "third"]
 for word in forbiddenWords:
   db.students.name = db.students.name.remove(word)
+
+db.students.name = db.students.name.replaceAll(@{
+  op"a": op"b",
+  op"c": op"d"
+})
 """)
   echo exportedOperations.toSqlite
