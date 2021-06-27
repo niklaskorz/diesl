@@ -5,17 +5,19 @@ import operations
 import operations/parseexport
 
 type StdPathNotFoundError* = object of Defect
+type DieslPathNotFoundError* = object of Defect
 
 proc getStdPath*(): string =
   # User defined path to standard library
   var stdPath = os.getEnv("NIM_STDLIB")
-  if stdPath != "" and not dirExists(stdPath):
+  if stdPath != "":
+    if dirExists(stdPath):
+      return
     raise StdPathNotFoundError.newException(
         "No standard library found at path " & stdPath)
 
   # Fallback to current directory version of stdlib
-  if stdPath == "":
-    stdPath = getCurrentDir() / "stdlib"
+  stdPath = getCurrentDir() / "stdlib"
 
   # Fallback to built-in find function
   if not dirExists(stdPath):
@@ -33,6 +35,27 @@ proc getStdPath*(): string =
 
   return stdPath
 
+proc getDieslPath*(): string =
+  # User defined path to DieSL library
+  var dieslPath = os.getEnv("NIM_DIESL")
+  if dieslPath != "":
+    if dirExists(dieslPath):
+      return dieslPath
+    raise DieslPathNotFoundError.newException(
+        "No DieSL library found at path " & dieslPath)
+
+  # Fallback to build path of DieSL
+  dieslPath = currentSourcePath.parentDir()
+
+  # Fallback to current directory version of stdlib
+  if not dirExists(dieslPath):
+    dieslPath = getCurrentDir() / "dsl"
+
+  if not dirExists(dieslPath):
+    raise DieslPathNotFoundError.newException("No DieSL library found, please set NIM_DIESL environment variable")
+
+  return dieslPath
+
 let scriptStart = """
 import operations
 import operations/conversion
@@ -45,11 +68,12 @@ let exportedOperations* = db.exportOperations()
 
 proc runScript*(script: string): seq[DieslOperation] =
   let stdPath = getStdPath()
+  let dieslPath = getDieslPath()
   var searchPaths = collect(newSeq):
     for dir in walkDirRec(stdPath, {pcDir}):
       dir
   searchPaths.insert(stdPath, 0)
-  searchPaths.add(getCurrentDir() / "src" / "dsl")
+  searchPaths.add(dieslPath)
   let intr = createInterpreter("script.nims", searchPaths)
   defer: intr.destroyInterpreter()
   intr.evalScript(llStreamOpen(scriptStart & script & scriptEnd))
