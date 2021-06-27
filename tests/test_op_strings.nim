@@ -52,5 +52,32 @@ proc test_strings*() =
       check replacement.replacement.stringValue == "new"
 
 
+    test "remove":
+      let db = Diesl()
+      db.table.to = db.table.frm.remove(lit"$MY-SOCIAL-SECURITY-NUMBER")
+
+      let ops = db.exportOperations()
+      let storeOp = ops[0]
+
+      let removalOp = storeOp.storeValue
+      check removalOp.kind == dotReplace
+
+      check removalOp.replaceTarget.kind == dotStringLiteral
+      check removalOp.replaceTarget.stringValue == "$MY-SOCIAL-SECURITY-NUMBER"
+
+      check removalOp.replaceReplacement.kind == dotStringLiteral
+      check removalOp.replaceReplacement.stringValue == ""
+
+
+    test "concatenation":
+      let db = Diesl()
+      db.table.cnct = db.table.lhs & db.table.rhs
+
+      let ops = db.exportOperations()
+      let storeOp = ops[0]
+
+      let concatOp = storeOp.storeValue
+      check concatOp.kind == dotStringConcat
+
 when isMainModule:
   test_strings()
