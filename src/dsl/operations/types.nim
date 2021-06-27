@@ -5,6 +5,7 @@ type
     dotStore
     dotLoad
     dotStringLiteral
+    dotIntegerLiteral
     # String operations
     dotTrim
     dotSubstring
@@ -17,6 +18,7 @@ type
   DieslDataType* = enum
     ddtUnknown
     ddtString
+    ddtInteger
 
   DieslTableSchema* = object
     columns*: Table[string, DieslDataType]
@@ -42,6 +44,8 @@ type
         loadColumn*: string
       of dotStringLiteral:
         stringValue*: string
+      of dotIntegerLiteral:
+        integerValue*: int
       # String operations
       of dotTrim:
         trimValue*: DieslOperation

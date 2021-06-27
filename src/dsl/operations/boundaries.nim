@@ -7,7 +7,7 @@ proc collectTableAccesses(op: DieslOperation): HashSet[string] =
       op.storeValue.collectTableAccesses
     of dotLoad:
       [op.loadTable].toHashSet
-    of dotStringLiteral:
+    of dotStringLiteral, dotIntegerLiteral:
       initHashSet[string]()
     # String operations
     of dotTrim:

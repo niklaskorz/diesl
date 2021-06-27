@@ -18,12 +18,11 @@ type
 
 proc toOperation*(operation: DieslOperation): DieslOperation = operation
 
-proc assertDataType*(op: DieslOperation, dataTypes: set[DieslDataType]) =
-  if op.dataType == ddtUnknown:
-    return
-  if op.dataType notin dataTypes:
+proc assertDataType*(op: DieslOperation, dataTypes: set[DieslDataType]): DieslOperation =
+  if op.dataType != ddtUnknown and op.dataType notin dataTypes:
     raise DieslDataTypeMismatchError.newException("Operation has type " &
         $op.dataType & ", expected one of " & $dataTypes)
+  return op
 
 proc load(diesl: Diesl, table: string): DieslTable =
   if diesl.dbSchema.tables.len() > 0 and not diesl.dbSchema.tables.contains(table):
@@ -63,7 +62,7 @@ proc store(table: DieslTable, column: string,
     if not columns.contains(column):
       raise DieslColumnNotFoundError.newException("column not found: " & table.pName & "." & column)
     dataType = columns[column]
-    value.assertDataType({dataType})
+    discard value.assertDataType({dataType})
   result = DieslOperation(dataType: dataType, kind: dotStore, storeTable: table.pName, storeColumn: column,
       storeValue: value)
   result.checkTableBoundaries()

@@ -1,7 +1,8 @@
-import operations/[base, strings]
+import operations/[base, strings, integers]
 
 export base
 export strings
+export integers
 
 when isMainModule:
   import operations/conversion

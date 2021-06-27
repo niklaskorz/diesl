@@ -6,10 +6,10 @@ proc toOperation*(value: string): DieslOperation =
   DieslOperation(dataType: ddtString, kind: dotStringLiteral, stringValue: value)
 
 proc trim*(value: DieslOperation, direction: TextDirection = both): DieslOperation =
-  DieslOperation(dataType: ddtString, kind: dotTrim, trimValue: value, trimDirection: direction)
+  DieslOperation(dataType: ddtString, kind: dotTrim, trimValue: value.assertDataType({ddtString}), trimDirection: direction)
 
 proc substring(value: DieslOperation, range: Slice[int]): DieslOperation =
-  DieslOperation(dataType: ddtString, kind: dotSubstring, substringValue: value,
+  DieslOperation(dataType: ddtString, kind: dotSubstring, substringValue: value.assertDataType({ddtString}),
       substringRange: range)
 
 proc `[]`*(value: DieslOperation, range: Slice[int]): DieslOperation =
@@ -20,9 +20,9 @@ proc replace*(value: DieslOperation, target: DieslOperation,
   DieslOperation(
     dataType: ddtString,
     kind: dotReplace,
-    replaceValue: value,
-    replaceTarget: target,
-    replaceReplacement: replacement
+    replaceValue: value.assertDataType({ddtString}),
+    replaceTarget: target.assertDataType({ddtString}),
+    replaceReplacement: replacement.assertDataType({ddtString})
   )
 
 proc replaceAll*(value: DieslOperation, replacements: seq[(DieslOperation,
@@ -30,28 +30,28 @@ proc replaceAll*(value: DieslOperation, replacements: seq[(DieslOperation,
   DieslOperation(
     dataType: ddtString,
     kind: dotReplaceAll,
-    replaceAllValue: value,
+    replaceAllValue: value.assertDataType({ddtString}),
     replaceAllReplacements: replacements.map((pair) => DieslReplacementPair(
-        target: pair[0], replacement: pair[1]))
+        target: pair[0].assertDataType({ddtString}), replacement: pair[1].assertDataType({ddtString})))
   )
 
 proc remove*(value: DieslOperation, target: DieslOperation): DieslOperation =
-  value.replace(target, "".toOperation)
+  value.replace(target.assertDataType({ddtString}), "".toOperation)
 
 proc stringConcat(valueA: DieslOperation,
     valueB: DieslOperation): DieslOperation =
   DieslOperation(
     dataType: ddtString,
     kind: dotStringConcat,
-    stringConcatValueA: valueA,
-    stringConcatValueB: valueB
+    stringConcatValueA: valueA.assertDataType({ddtString}),
+    stringConcatValueB: valueB.assertDataType({ddtString})
   )
 
 proc `&`*(valueA: DieslOperation, valueB: DieslOperation): DieslOperation = stringConcat(
     valueA, valueB)
 
 proc toLower*(value: DieslOperation): DieslOperation =
-  DieslOperation(dataType: ddtString, kind: dotToLower, toLowerValue: value)
+  DieslOperation(dataType: ddtString, kind: dotToLower, toLowerValue: value.assertDataType({ddtString}))
 
 proc toUpper*(value: DieslOperation): DieslOperation =
-  DieslOperation(dataType: ddtString, kind: dotToUpper, toUpperValue: value)
+  DieslOperation(dataType: ddtString, kind: dotToUpper, toUpperValue: value.assertDataType({ddtString}))
