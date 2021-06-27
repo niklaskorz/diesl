@@ -19,9 +19,10 @@ type
 proc toOperation*(operation: DieslOperation): DieslOperation = operation
 
 proc assertDataType*(op: DieslOperation, dataTypes: set[DieslDataType]): DieslOperation =
-  if op.dataType != ddtUnknown and op.dataType notin dataTypes:
+  let dataType = op.toDataType()
+  if dataType != ddtUnknown and dataType notin dataTypes:
     raise DieslDataTypeMismatchError.newException("Operation has type " &
-        $op.dataType & ", expected one of " & $dataTypes)
+        $dataType & ", expected one of " & $dataTypes)
   return op
 
 proc load(diesl: Diesl, table: string): DieslTable =
@@ -48,7 +49,7 @@ proc load(table: DieslTable, column: string): DieslOperation =
     if not columns.contains(column):
       raise DieslColumnNotFoundError.newException("column not found: " & table.pName & "." & column)
     dataType = columns[column]
-  DieslOperation(dataType: dataType, kind: dotLoad, loadTable: table.pName, loadColumn: column)
+  DieslOperation(kind: dotLoad, loadTable: table.pName, loadColumn: column, loadType: dataType)
 
 template `.`*(table: DieslTable, column: untyped): DieslOperation =
   load(table, astToStr(column))
@@ -63,8 +64,8 @@ proc store(table: DieslTable, column: string,
       raise DieslColumnNotFoundError.newException("column not found: " & table.pName & "." & column)
     dataType = columns[column]
     discard value.assertDataType({dataType})
-  result = DieslOperation(dataType: dataType, kind: dotStore, storeTable: table.pName, storeColumn: column,
-      storeValue: value)
+  result = DieslOperation(kind: dotStore, storeTable: table.pName, storeColumn: column,
+      storeValue: value, storeType: dataType)
   result.checkTableBoundaries()
 
 template `.=`*(table: DieslTable, column: untyped,
