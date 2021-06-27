@@ -77,7 +77,7 @@ proc runScript*(script: string): seq[DieslOperation] =
   let intr = createInterpreter("script.nims", searchPaths)
   defer: intr.destroyInterpreter()
   intr.implementRoutine("dsl", "base", "getColumnType", proc (args: VmArgs) =
-    args.setResult(int(ddtString))
+    args.setResult(ord(ddtString))
   )
   intr.evalScript(llStreamOpen(scriptStart & script & scriptEnd))
   let symbol = intr.selectUniqueSymbol("exportedOperations")
