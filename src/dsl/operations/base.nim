@@ -1,35 +1,47 @@
+import tables
 import json
 import types
 import boundaries
+import errors
 
 export types
+export errors
 
 type
   Diesl* = ref object
+    dbSchema*: DieslDatabaseSchema
     pOperations: seq[DieslOperation]
 
   DieslTable* = object
-    pDb: Diesl
+    pDiesl: Diesl
     pName: string
 
 proc toOperation*(operation: DieslOperation): DieslOperation = operation
 
-proc load(db: Diesl, table: string): DieslTable =
-  DieslTable(pDb: db, pName: table)
+proc load(diesl: Diesl, table: string): DieslTable =
+  if diesl.dbSchema.tables.len() > 0 and not diesl.dbSchema.tables.contains(table):
+    raise TableNotFoundError.newException("table not found: " & table)
+  DieslTable(pDiesl: diesl, pName: table)
 
-proc exportOperations*(db: Diesl, prettyJson: bool = false): string =
+proc exportOperations*(diesl: Diesl): seq[DieslOperation] = diesl.pOperations
+
+proc exportOperationsJson*(diesl: Diesl, prettyJson: bool = false): string =
   if prettyJson:
-    pretty(%(db.pOperations))
+    pretty(%(diesl.pOperations))
   else:
-    $(%(db.pOperations))
+    $(%(diesl.pOperations))
 
-template `.`*(db: Diesl, table: untyped): DieslTable =
-  load(db, astToStr(table))
-
-proc getColumnType(table: string, column: string): DieslDataType = ddtAny
+template `.`*(diesl: Diesl, table: untyped): DieslTable =
+  load(diesl, astToStr(table))
 
 proc load(table: DieslTable, column: string): DieslOperation =
-  let loadType = getColumnType(table.pName, column)
+  let schema = table.pDiesl.dbSchema
+  var loadType = ddtUnknown
+  if schema.tables.len() > 0:
+    let columns = schema.tables[table.pName].columns
+    if not columns.contains(column):
+      raise ColumnNotFoundError.newException("column not found: " & table.pName & "." & column)
+    loadType = columns[column]
   DieslOperation(kind: dotLoad, loadTable: table.pName, loadColumn: column, loadType: loadType)
 
 template `.`*(table: DieslTable, column: untyped): DieslOperation =
@@ -43,4 +55,4 @@ proc store(table: DieslTable, column: string,
 
 template `.=`*(table: DieslTable, column: untyped,
     value: DieslOperation): untyped =
-  table.pDb.pOperations.add(store(table, astToStr(column), value))
+  table.pDiesl.pOperations.add(store(table, astToStr(column), value))

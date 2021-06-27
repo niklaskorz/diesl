@@ -1,3 +1,5 @@
+import tables
+
 type
   DieslOperationType* = enum
     dotStore
@@ -13,8 +15,14 @@ type
     dotToUpper
 
   DieslDataType* = enum
-    ddtAny
+    ddtUnknown
     ddtString
+
+  DieslTableSchema* = object
+    columns*: Table[string, DieslDataType]
+
+  DieslDatabaseSchema* = object
+    tables*: Table[string, DieslTableSchema]
 
   TextDirection* = enum left, right, both
 

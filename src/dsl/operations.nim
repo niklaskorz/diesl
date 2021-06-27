@@ -11,4 +11,4 @@ when isMainModule:
     .trim()
     .replace("foo", "bar")
     .replace(db.students.firstName, "<redacted>")
-  echo db.exportOperations(true)
+  echo db.exportOperationsJson(true)

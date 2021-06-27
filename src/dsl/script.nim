@@ -1,8 +1,10 @@
-import compiler/[nimeval, llstream, ast, vm, vmdef]
+import compiler/[nimeval, llstream, ast]
 import os
 import sugar
+import strformat
+import tables
 import operations
-import operations/parseexport
+import operations/[parseexport, nimify]
 
 type StdPathNotFoundError* = object of Defect
 type DieslPathNotFoundError* = object of Defect
@@ -56,17 +58,7 @@ proc getDieslPath*(): string =
 
   return dieslPath
 
-let scriptStart = """
-import operations
-import operations/conversion
-
-let db = Diesl()
-"""
-let scriptEnd = """
-let exportedOperations* = db.exportOperations()
-"""
-
-proc runScript*(script: string): seq[DieslOperation] =
+proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] =
   let stdPath = getStdPath()
   let dieslPath = getDieslPath()
   var searchPaths = collect(newSeq):
@@ -76,23 +68,38 @@ proc runScript*(script: string): seq[DieslOperation] =
   searchPaths.add(dieslPath)
   let intr = createInterpreter("script.nims", searchPaths)
   defer: intr.destroyInterpreter()
-  intr.implementRoutine("dsl", "base", "getColumnType", proc (args: VmArgs) =
-    args.setResult(ord(ddtString))
-  )
+  let scriptStart = fmt"""
+import tables
+import operations
+import operations/conversion
+
+let dbSchema = {schema.toNimCode()}
+let db = Diesl(dbSchema: dbSchema)
+"""
+  let scriptEnd = """
+let exportedOperations* = db.exportOperationsJson()
+"""
   intr.evalScript(llStreamOpen(scriptStart & script & scriptEnd))
   let symbol = intr.selectUniqueSymbol("exportedOperations")
   let value = intr.getGlobalValue(symbol).getStr()
-  let exportedOperations = parseExportedOperations(value)
+  let exportedOperations = parseExportedOperationsJson(value)
   return exportedOperations
 
 when isMainModule:
   import json
-  let exportedOperations = runScript("""
+  let script = """
 db.students.name = "Mr. / Mrs." & db.students.firstName & db.students.lastName
 
 db.students.name = db.students.name
   .trim()
   .replace("foo", "bar")
   .replace(db.students.firstName, "<redacted>")
-""")
+"""
+  let exportedOperations = runScript(script, DieslDatabaseSchema(tables: {
+    "students": DieslTableSchema(columns: {
+      "name": ddtString,
+      "firstName": ddtString,
+      "lastName": ddtString
+    }.toTable),
+  }.toTable))
   echo pretty(%exportedOperations)
