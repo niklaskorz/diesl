@@ -1,5 +1,5 @@
 type
   DieslError* = object of CatchableError
-  TableNotFoundError* = object of DieslError
-  ColumnNotFoundError* = object of DieslError
-  TypeMismatchError* = object of DieslError
+  DieslTableNotFoundError* = object of DieslError
+  DieslColumnNotFoundError* = object of DieslError
+  DieslDataTypeMismatchError* = object of DieslError

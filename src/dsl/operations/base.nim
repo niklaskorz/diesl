@@ -18,9 +18,16 @@ type
 
 proc toOperation*(operation: DieslOperation): DieslOperation = operation
 
+proc assertDataType*(op: DieslOperation, dataTypes: set[DieslDataType]) =
+  if op.dataType == ddtUnknown:
+    return
+  if op.dataType notin dataTypes:
+    raise DieslDataTypeMismatchError.newException("Operation has type " &
+        $op.dataType & ", expected one of " & $dataTypes)
+
 proc load(diesl: Diesl, table: string): DieslTable =
   if diesl.dbSchema.tables.len() > 0 and not diesl.dbSchema.tables.contains(table):
-    raise TableNotFoundError.newException("table not found: " & table)
+    raise DieslTableNotFoundError.newException("table not found: " & table)
   DieslTable(pDiesl: diesl, pName: table)
 
 proc exportOperations*(diesl: Diesl): seq[DieslOperation] = diesl.pOperations
@@ -36,20 +43,28 @@ template `.`*(diesl: Diesl, table: untyped): DieslTable =
 
 proc load(table: DieslTable, column: string): DieslOperation =
   let schema = table.pDiesl.dbSchema
-  var loadType = ddtUnknown
+  var dataType = ddtUnknown
   if schema.tables.len() > 0:
     let columns = schema.tables[table.pName].columns
     if not columns.contains(column):
-      raise ColumnNotFoundError.newException("column not found: " & table.pName & "." & column)
-    loadType = columns[column]
-  DieslOperation(kind: dotLoad, loadTable: table.pName, loadColumn: column, loadType: loadType)
+      raise DieslColumnNotFoundError.newException("column not found: " & table.pName & "." & column)
+    dataType = columns[column]
+  DieslOperation(dataType: dataType, kind: dotLoad, loadTable: table.pName, loadColumn: column)
 
 template `.`*(table: DieslTable, column: untyped): DieslOperation =
   load(table, astToStr(column))
 
 proc store(table: DieslTable, column: string,
     value: DieslOperation): DieslOperation =
-  result = DieslOperation(kind: dotStore, storeTable: table.pName, storeColumn: column,
+  let schema = table.pDiesl.dbSchema
+  var dataType = ddtUnknown
+  if schema.tables.len() > 0:
+    let columns = schema.tables[table.pName].columns
+    if not columns.contains(column):
+      raise DieslColumnNotFoundError.newException("column not found: " & table.pName & "." & column)
+    dataType = columns[column]
+    value.assertDataType({dataType})
+  result = DieslOperation(dataType: dataType, kind: dotStore, storeTable: table.pName, storeColumn: column,
       storeValue: value)
   result.checkTableBoundaries()
 

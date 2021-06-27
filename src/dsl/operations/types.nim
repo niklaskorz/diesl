@@ -31,6 +31,7 @@ type
     replacement*: DieslOperation
 
   DieslOperation* = ref object
+    dataType*: DieslDataType
     case kind*: DieslOperationType
       of dotStore:
         storeTable*: string
@@ -39,7 +40,6 @@ type
       of dotLoad:
         loadTable*: string
         loadColumn*: string
-        loadType*: DieslDataType
       of dotStringLiteral:
         stringValue*: string
       # String operations

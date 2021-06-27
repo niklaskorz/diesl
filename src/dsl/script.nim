@@ -2,7 +2,6 @@ import compiler/[nimeval, llstream, ast]
 import os
 import sugar
 import strformat
-import tables
 import operations
 import operations/[parseexport, nimify]
 
@@ -87,6 +86,7 @@ let exportedOperations* = db.exportOperationsJson()
 
 when isMainModule:
   import json
+  import tables
   let script = """
 db.students.name = "Mr. / Mrs." & db.students.firstName & db.students.lastName
 

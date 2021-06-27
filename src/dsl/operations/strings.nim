@@ -3,13 +3,13 @@ import sugar
 import sequtils
 
 proc toOperation*(value: string): DieslOperation =
-  DieslOperation(kind: dotStringLiteral, stringValue: value)
+  DieslOperation(dataType: ddtString, kind: dotStringLiteral, stringValue: value)
 
 proc trim*(value: DieslOperation, direction: TextDirection = both): DieslOperation =
-  DieslOperation(kind: dotTrim, trimValue: value, trimDirection: direction)
+  DieslOperation(dataType: ddtString, kind: dotTrim, trimValue: value, trimDirection: direction)
 
 proc substring(value: DieslOperation, range: Slice[int]): DieslOperation =
-  DieslOperation(kind: dotSubstring, substringValue: value,
+  DieslOperation(dataType: ddtString, kind: dotSubstring, substringValue: value,
       substringRange: range)
 
 proc `[]`*(value: DieslOperation, range: Slice[int]): DieslOperation =
@@ -18,6 +18,7 @@ proc `[]`*(value: DieslOperation, range: Slice[int]): DieslOperation =
 proc replace*(value: DieslOperation, target: DieslOperation,
     replacement: DieslOperation): DieslOperation =
   DieslOperation(
+    dataType: ddtString,
     kind: dotReplace,
     replaceValue: value,
     replaceTarget: target,
@@ -27,6 +28,7 @@ proc replace*(value: DieslOperation, target: DieslOperation,
 proc replaceAll*(value: DieslOperation, replacements: seq[(DieslOperation,
     DieslOperation)]): DieslOperation =
   DieslOperation(
+    dataType: ddtString,
     kind: dotReplaceAll,
     replaceAllValue: value,
     replaceAllReplacements: replacements.map((pair) => DieslReplacementPair(
@@ -39,6 +41,7 @@ proc remove*(value: DieslOperation, target: DieslOperation): DieslOperation =
 proc stringConcat(valueA: DieslOperation,
     valueB: DieslOperation): DieslOperation =
   DieslOperation(
+    dataType: ddtString,
     kind: dotStringConcat,
     stringConcatValueA: valueA,
     stringConcatValueB: valueB
@@ -48,7 +51,7 @@ proc `&`*(valueA: DieslOperation, valueB: DieslOperation): DieslOperation = stri
     valueA, valueB)
 
 proc toLower*(value: DieslOperation): DieslOperation =
-  DieslOperation(kind: dotToLower, toLowerValue: value)
+  DieslOperation(dataType: ddtString, kind: dotToLower, toLowerValue: value)
 
 proc toUpper*(value: DieslOperation): DieslOperation =
-  DieslOperation(kind: dotToUpper, toUpperValue: value)
+  DieslOperation(dataType: ddtString, kind: dotToUpper, toUpperValue: value)
