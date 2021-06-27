@@ -13,7 +13,6 @@ requires "nim >= 1.4.4"
 requires "fusion >= 1.0"
 requires "compiler"
 requires "eminim >= 2.8"
-requires "https://gitlab.com/pvs-hd/ot/backend.git#129520726f8b3f0cb70a2c4084d8f990c40590e5"
 
 
 task test_ci, "runs tests and generates a report":
