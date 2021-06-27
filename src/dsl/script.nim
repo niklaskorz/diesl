@@ -57,7 +57,7 @@ proc getDieslPath*(): string =
 
   return dieslPath
 
-proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] =
+proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
   let stdPath = getStdPath()
   let dieslPath = getDieslPath()
   var searchPaths = collect(newSeq):
