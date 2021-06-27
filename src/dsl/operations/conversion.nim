@@ -2,8 +2,12 @@ import sequtils
 import sugar
 import base
 import strings
+import integers
 
 converter toDieslOperation*(value: string): DieslOperation =
+  value.toOperation
+
+converter toDieslOperation*(value: int): DieslOperation =
   value.toOperation
 
 converter toDieslOperationPair*[A, B](value: (A, B)): (DieslOperation,
