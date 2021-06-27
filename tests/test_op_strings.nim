@@ -31,5 +31,26 @@ proc test_strings*() =
       check replacementOp.replaceReplacement.kind == dotStringLiteral
       check replacementOp.replaceReplacement.stringValue == "new"
 
+
+    test "replaceAll":
+      let db = Diesl()
+      db.table.to = db.table.frm.replaceAll(@[
+        ("old".toOperation, "new".toOperation)
+      ])
+
+      let ops = db.exportOperations()
+      let storeOp = ops[0]
+
+      let replacementOp = storeOp.storeValue
+      check replacementOp.kind == dotReplaceAll
+
+      let replacement = replacementOp.replaceAllReplacements[0]
+      check replacement.target.kind == dotStringLiteral
+      check replacement.target.stringValue == "old"
+
+      check replacement.replacement.kind == dotStringLiteral
+      check replacement.replacement.stringValue == "new"
+
+
 when isMainModule:
   test_strings()
