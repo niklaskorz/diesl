@@ -1,4 +1,4 @@
-import compiler/[nimeval, llstream, ast]
+import compiler/[nimeval, llstream, ast, vm, vmdef]
 import os
 import sugar
 import operations
@@ -76,6 +76,9 @@ proc runScript*(script: string): seq[DieslOperation] =
   searchPaths.add(dieslPath)
   let intr = createInterpreter("script.nims", searchPaths)
   defer: intr.destroyInterpreter()
+  intr.implementRoutine("dsl", "base", "getColumnType", proc (args: VmArgs) =
+    args.setResult(int(ddtString))
+  )
   intr.evalScript(llStreamOpen(scriptStart & script & scriptEnd))
   let symbol = intr.selectUniqueSymbol("exportedOperations")
   let value = intr.getGlobalValue(symbol).getStr()

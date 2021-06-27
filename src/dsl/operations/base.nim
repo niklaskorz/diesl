@@ -26,8 +26,11 @@ proc exportOperations*(db: Diesl, prettyJson: bool = false): string =
 template `.`*(db: Diesl, table: untyped): DieslTable =
   load(db, astToStr(table))
 
+proc getColumnType(table: string, column: string): DieslDataType = ddtAny
+
 proc load(table: DieslTable, column: string): DieslOperation =
-  DieslOperation(kind: dotLoad, loadTable: table.pName, loadColumn: column)
+  let loadType = getColumnType(table.pName, column)
+  DieslOperation(kind: dotLoad, loadTable: table.pName, loadColumn: column, loadType: loadType)
 
 template `.`*(table: DieslTable, column: untyped): DieslOperation =
   load(table, astToStr(column))

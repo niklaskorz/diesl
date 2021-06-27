@@ -12,6 +12,10 @@ type
     dotToLower
     dotToUpper
 
+  DieslDataType* = enum
+    ddtAny
+    ddtString
+
   TextDirection* = enum left, right, both
 
   DieslReplacementPair* = object
@@ -27,6 +31,7 @@ type
       of dotLoad:
         loadTable*: string
         loadColumn*: string
+        loadType*: DieslDataType
       of dotStringLiteral:
         stringValue*: string
       # String operations
