@@ -5,6 +5,9 @@ import sequtils
 proc toOperation*(value: string): DieslOperation =
   DieslOperation(kind: dotStringLiteral, stringValue: value)
 
+proc lit*(value: string): DieslOperation =
+  toOperation(value)
+
 proc trim*(value: DieslOperation, direction: TextDirection = both): DieslOperation =
   DieslOperation(kind: dotTrim, trimValue: value, trimDirection: direction)
 
