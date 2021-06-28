@@ -20,7 +20,7 @@ proc toOperation*(operation: DieslOperation): DieslOperation = operation
 
 proc assertDataType*(op: DieslOperation, dataTypes: set[DieslDataType]): DieslOperation =
   let dataType = op.toDataType()
-  if dataType != ddtUnknown and dataType notin dataTypes:
+  if dataType != ddtUnknown and dataType notin dataTypes and ddtUnknown notin dataTypes:
     raise DieslDataTypeMismatchError.newException("Operation has type " &
         $dataType & ", expected one of " & $dataTypes)
   return op
@@ -60,8 +60,13 @@ template `.`*(table: DieslTable, column: untyped): DieslOperation =
 proc store(table: DieslTable, column: string,
     value: DieslOperation): DieslOperation =
   let dataType = table.getColumnType(column)
-  result = DieslOperation(kind: dotStore, storeTable: table.pName, storeColumn: column,
-      storeValue: value, storeType: dataType)
+  result = DieslOperation(
+    kind: dotStore,
+    storeTable: table.pName,
+    storeColumn: column,
+    storeValue: value.assertDataType({dataType}),
+    storeType: dataType
+  )
   result.checkTableBoundaries()
 
 template `.=`*(table: DieslTable, column: untyped,
