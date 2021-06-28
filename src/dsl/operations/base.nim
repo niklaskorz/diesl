@@ -41,14 +41,17 @@ proc exportOperationsJson*(diesl: Diesl, prettyJson: bool = false): string =
 template `.`*(diesl: Diesl, table: untyped): DieslTable =
   load(diesl, astToStr(table))
 
-proc load(table: DieslTable, column: string): DieslOperation =
+proc getColumnType(table: DieslTable, column: string): DieslDataType =
   let schema = table.pDiesl.dbSchema
-  var dataType = ddtUnknown
-  if schema.tables.len() > 0:
-    let columns = schema.tables[table.pName].columns
-    if not columns.contains(column):
+  if schema.tables.len() == 0:
+    return ddtUnknown
+  let columns = schema.tables[table.pName].columns
+  if not columns.contains(column):
       raise DieslColumnNotFoundError.newException("column not found: " & table.pName & "." & column)
-    dataType = columns[column]
+  return columns[column]
+
+proc load(table: DieslTable, column: string): DieslOperation =
+  let dataType = table.getColumnType(column)
   DieslOperation(kind: dotLoad, loadTable: table.pName, loadColumn: column, loadType: dataType)
 
 template `.`*(table: DieslTable, column: untyped): DieslOperation =
@@ -56,14 +59,7 @@ template `.`*(table: DieslTable, column: untyped): DieslOperation =
 
 proc store(table: DieslTable, column: string,
     value: DieslOperation): DieslOperation =
-  let schema = table.pDiesl.dbSchema
-  var dataType = ddtUnknown
-  if schema.tables.len() > 0:
-    let columns = schema.tables[table.pName].columns
-    if not columns.contains(column):
-      raise DieslColumnNotFoundError.newException("column not found: " & table.pName & "." & column)
-    dataType = columns[column]
-    discard value.assertDataType({dataType})
+  let dataType = table.getColumnType(column)
   result = DieslOperation(kind: dotStore, storeTable: table.pName, storeColumn: column,
       storeValue: value, storeType: dataType)
   result.checkTableBoundaries()
