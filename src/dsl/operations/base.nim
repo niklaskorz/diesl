@@ -25,11 +25,6 @@ proc assertDataType*(op: DieslOperation, dataTypes: set[DieslDataType]): DieslOp
         $dataType & ", expected one of " & $dataTypes)
   return op
 
-proc load(diesl: Diesl, table: string): DieslTable =
-  if diesl.dbSchema.tables.len() > 0 and not diesl.dbSchema.tables.contains(table):
-    raise DieslTableNotFoundError.newException("table not found: " & table)
-  DieslTable(pDiesl: diesl, pName: table)
-
 proc exportOperations*(diesl: Diesl): seq[DieslOperation] = diesl.pOperations
 
 proc exportOperationsJson*(diesl: Diesl, prettyJson: bool = false): string =
@@ -37,6 +32,11 @@ proc exportOperationsJson*(diesl: Diesl, prettyJson: bool = false): string =
     pretty(%(diesl.pOperations))
   else:
     $(%(diesl.pOperations))
+
+proc load(diesl: Diesl, table: string): DieslTable =
+  if diesl.dbSchema.tables.len() > 0 and not diesl.dbSchema.tables.contains(table):
+    raise DieslTableNotFoundError.newException("table not found: " & table)
+  DieslTable(pDiesl: diesl, pName: table)
 
 template `.`*(diesl: Diesl, table: untyped): DieslTable =
   load(diesl, astToStr(table))
