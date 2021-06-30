@@ -2,7 +2,7 @@ import unittest
 
 import dsl/operations/[base, strings]
 
-proc test_op_base*() = 
+proc test_base*() = 
   suite "check base operations":
     test "assertDataType - positive":
       let input = lit"Hello World"
@@ -15,4 +15,4 @@ proc test_op_base*() =
 
 
 when isMainModule:
-  test_op_base()
+  test_base()
