@@ -33,7 +33,7 @@ proc toSqlite*(op: DieslOperation): string =
         value = fmt"REPLACE({value}, {pair.target.toSqlite}, {pair.replacement.toSqlite})"
       value
     of dotStringConcat:
-      fmt"{op.stringConcatValueA.toSqlite} || {op.stringConcatValueB.toSqlite}"
+      fmt"{op.stringConcatValueA.toSqlite} || {op.stringConcatValueB.toSqlite}"
     of dotToLower:
       fmt"LOWER({op.toLowerValue.toSqlite})"
     of dotToUpper:
