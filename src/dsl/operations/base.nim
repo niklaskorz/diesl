@@ -34,7 +34,7 @@ proc exportOperationsJson*(diesl: Diesl, prettyJson: bool = false): string =
     $(%(diesl.pOperations))
 
 proc load(diesl: Diesl, table: string): DieslTable =
-  if diesl.dbSchema.tables.len() > 0 and not diesl.dbSchema.tables.contains(table):
+  if not diesl.dbSchema.tables.len() > 0 or table notin diesl.dbSchema.tables:
     raise DieslTableNotFoundError.newException("table not found: " & table)
   DieslTable(pDiesl: diesl, pName: table)
 

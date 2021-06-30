@@ -3,8 +3,10 @@ import dsl/operations/[base, strings]
 
 proc test_strings*() =
   suite "check string operations":
-    test "substring":
+    setup:
       let db = Diesl()
+    
+    test "substring":
       db.table.to = db.table.frm[0..5]
 
       let ops = db.exportOperations()
@@ -16,7 +18,6 @@ proc test_strings*() =
 
 
     test "replace":
-      let db = Diesl()
       db.table.to = db.table.frm.replace("old".toOperation, "new".toOperation)
 
       let ops = db.exportOperations()
@@ -33,7 +34,6 @@ proc test_strings*() =
 
 
     test "replaceAll":
-      let db = Diesl()
       db.table.to = db.table.frm.replaceAll(@[
         ("old".toOperation, "new".toOperation)
       ])
@@ -53,7 +53,6 @@ proc test_strings*() =
 
 
     test "remove":
-      let db = Diesl()
       db.table.to = db.table.frm.remove(lit"$MY-SOCIAL-SECURITY-NUMBER")
 
       let ops = db.exportOperations()
@@ -70,7 +69,6 @@ proc test_strings*() =
 
 
     test "concatenation":
-      let db = Diesl()
       db.table.cnct = db.table.lhs & db.table.rhs
 
       let ops = db.exportOperations()
