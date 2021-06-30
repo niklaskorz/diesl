@@ -12,6 +12,9 @@ proc test_boundaries*() =
           "input1": ddtString,
           "input2": ddtString,
           "output": ddtString,
+        }.toTable),
+        "table2": DieslTableSchema(columns: {
+          "input": ddtString,
         }.toTable)
       }.toTable))
 
@@ -33,10 +36,9 @@ proc test_boundaries*() =
       check true
 
     test "checkTableBoundaries - negative":
-      # table2 was not declared, oh boi we goin down!
-      db.table.output = db.table2.input
+      # checkTableBoundaries is called from the store procedure
       expect (IllegalTableAccessError):
-        boundaries.checkTableBoundaries(db.table.output)
+        db.table.output = db.table2.input
 
 when isMainModule:
   test_boundaries()
