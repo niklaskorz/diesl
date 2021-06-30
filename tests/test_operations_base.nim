@@ -10,7 +10,7 @@ proc test_op_base*() =
       check input == output
 
     test "assertDataType - negative":
-      expect (DieslDataTypeMismatchError):
+      expect DieslDataTypeMismatchError:
         discard base.assertDataType(lit"Hello World", {})
 
 
