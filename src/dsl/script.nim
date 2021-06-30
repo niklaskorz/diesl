@@ -2,7 +2,6 @@ import compiler/[nimeval, llstream, ast]
 import os
 import sugar
 import strformat
-import tables
 import operations
 import operations/[parseexport, nimify]
 
@@ -58,7 +57,7 @@ proc getDieslPath*(): string =
 
   return dieslPath
 
-proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] =
+proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
   let stdPath = getStdPath()
   let dieslPath = getDieslPath()
   var searchPaths = collect(newSeq):
@@ -87,6 +86,7 @@ let exportedOperations* = db.exportOperationsJson()
 
 when isMainModule:
   import json
+  import tables
   let script = """
 db.students.name = "Mr. / Mrs." & db.students.firstName & db.students.lastName
 

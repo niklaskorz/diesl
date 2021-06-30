@@ -11,6 +11,8 @@ proc toSqlite*(op: DieslOperation): string =
       fmt"{op.loadTable}.{op.loadColumn}"
     of dotStringLiteral:
       dbQuote(op.stringValue)
+    of dotIntegerLiteral:
+      $op.integerValue
     # String operations
     of dotTrim:
       let trimFunction = case op.trimDirection:

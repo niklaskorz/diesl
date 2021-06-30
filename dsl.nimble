@@ -1,8 +1,8 @@
 # Package
 
 version       = "0.1.0"
-author        = "Artur Hochhalter, Benjamin Sparks, Niklas Korz, Samuel Melm"
-description   = "The diesl language"
+author        = "Benjamin Sparks, Niklas Korz, Samuel Melm"
+description   = "The DieSL language"
 license       = "MIT"
 srcDir        = "src"
 
@@ -13,7 +13,6 @@ requires "nim >= 1.4.4"
 requires "fusion >= 1.0"
 requires "compiler"
 requires "eminim >= 2.8"
-requires "https://gitlab.com/pvs-hd/ot/backend.git#129520726f8b3f0cb70a2c4084d8f990c40590e5"
 
 
 task test_ci, "runs tests and generates a report":
