@@ -1,6 +1,6 @@
 import unittest
 import dsl/script
-import nimscripter
+# import nimscripter
 import options
 import backend/[data, table]
 import db_sqlite
@@ -12,13 +12,13 @@ proc test_script*() =
 let x = 5
 let y = x + 2
 """)
-      check intr.isSome
+    check intr.len != 0
     test "standard library imports":
       let intr = runScript("""
 import strutils
 import sequtils
 """)
-      check intr.isSome
+    check intr.len != 0
     test "script with access to database":
       let dbPath = "demo.db"
       let db = open(dbPath, "", "", "")
@@ -27,10 +27,10 @@ import sequtils
       db.exec(sql"INSERT INTO students (name) VALUES (?), (?)",
           "  Peter  Parker", " John Good ")
       defer: db.close()
-      let intr = db.runScript("""
+      let intr = runScript("""
 db.students.name = db.students.name.trim(left)
 """)
-      check intr.isSome
+      check intr.len != 0
       check db.getTable("students").content == @[
         @["Peter  Parker"],
         @["John Good "]
