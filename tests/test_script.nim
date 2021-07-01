@@ -12,13 +12,15 @@ proc test_script*() =
 let x = 5
 let y = x + 2
 """)
-    check intr.len != 0
+      check intr.len != 0
+    
     test "standard library imports":
       let intr = runScript("""
 import strutils
 import sequtils
 """)
-    check intr.len != 0
+      check intr.len != 0
+      
     test "script with access to database":
       let dbPath = "demo.db"
       let db = open(dbPath, "", "", "")
