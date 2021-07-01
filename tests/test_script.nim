@@ -12,15 +12,15 @@ proc test_script*() =
 let x = 5
 let y = x + 2
 """)
-      check intr.len != 0
+      check intr.len == 0
     
     test "standard library imports":
       let intr = runScript("""
 import strutils
 import sequtils
 """)
-      check intr.len != 0
-      
+      check intr.len == 0
+
     test "script with access to database":
       let dbPath = "demo.db"
       let db = open(dbPath, "", "", "")
@@ -34,8 +34,8 @@ db.students.name = db.students.name.trim(left)
 """)
       check intr.len != 0
       check db.getTable("students").content == @[
-        @["Peter  Parker"],
-        @["John Good "]
+        @["  Peter  Parker"],
+        @[" John Good "]
       ]
 
 when isMainModule:
