@@ -6,6 +6,7 @@ import operations
 import operations/[parseexport, nimify]
 
 type StdPathNotFoundError* = object of Defect
+type FusionPathNotFoundError* = object of Defect
 type DieslPathNotFoundError* = object of Defect
 
 proc getStdPath*(): string =
@@ -36,6 +37,28 @@ proc getStdPath*(): string =
 
   return stdPath
 
+proc getFusionPath*(): string =
+  # User defined path to fusion library
+  var fusionPath = os.getEnv("NIM_FUSION")
+  if fusionPath != "":
+    if dirExists(fusionPath):
+      return
+    raise FusionPathNotFoundError.newException(
+        "No fusion library found at path " & fusionPath)
+
+  # Fallback to current directory version of fusion
+  fusionPath = getCurrentDir() / "fusion"
+
+  # Fallback to nimble pkg
+  if not dirExists(fusionPath):
+    let home = getHomeDir()
+    fusionPath = home / ".nimble" / "pkgs" / "fusion-1.0"
+
+  if not dirExists(fusionPath):
+    raise FusionPathNotFoundError.newException("No fusion library found, please set NIM_FUSION environment variable")
+
+  return fusionPath
+
 proc getDieslPath*(): string =
   # User defined path to DieSL library
   var dieslPath = os.getEnv("NIM_DIESL")
@@ -59,11 +82,13 @@ proc getDieslPath*(): string =
 
 proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
   let stdPath = getStdPath()
+  let fusionPath = getFusionPath()
   let dieslPath = getDieslPath()
   var searchPaths = collect(newSeq):
     for dir in walkDirRec(stdPath, {pcDir}):
       dir
   searchPaths.insert(stdPath, 0)
+  searchPaths.add(fusionPath)
   searchPaths.add(dieslPath)
   let intr = createInterpreter("script.nims", searchPaths)
   defer: intr.destroyInterpreter()
@@ -71,6 +96,7 @@ proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchem
 import tables
 import operations
 import operations/conversion
+import natural
 
 let dbSchema = {schema.toNimCode()}
 let db = Diesl(dbSchema: dbSchema)
