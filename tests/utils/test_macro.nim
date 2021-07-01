@@ -20,15 +20,15 @@ macro test_macro*(desc, input: untyped): untyped =
         error("could not match in test_macro")
 
   var testCase = newStmtList()
-  
-  let 
+
+  let
     actualIdent = newIdentNode("actual")
     expectedIdent = newIdentNode("expected")
 
   testCase.add(
-    newTree(nnkLetSection, 
-      newTree(nnkIdentDefs, actualIdent, newEmptyNode(), actual),
-      newTree(nnkIdentDefs, expectedIdent, newEmptyNode(), expected),
+    newTree(nnkLetSection,
+      newTree(nnkIdentDefs, actualIdent, newEmptyNode(), newCall(newIdentNode("pretty"), newTree(nnkPrefix, newIdentNode("%"), actual))),
+      newTree(nnkIdentDefs, expectedIdent, newEmptyNode(), newCall(newIdentNode("pretty"), newTree(nnkPrefix, newIdentNode("%"), expected))),
     ),
     newTree(nnkCommand, newIdentNode("check"), newTree(nnkInfix, newIdentNode("=="), expectedIdent, actualIdent))
   )

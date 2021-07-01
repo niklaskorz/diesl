@@ -1,9 +1,6 @@
 
-import sequtils, sugar
-
+import sequtils
 import macros
-
-import language
 
 import fusion/matching
 {.experimental: "caseStmtMacros".}
@@ -130,7 +127,7 @@ proc transpileTake(command, table: NimNode): NimNode =
       let higher = newLit(matchedHigher.intVal - 1)
 
       result = quote do:
-        `column`[`lower`..`higher`]
+        `column`[int(`lower`)..int(`higher`)]
     else:
       result = command
 

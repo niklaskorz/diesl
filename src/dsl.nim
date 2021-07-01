@@ -1,7 +1,9 @@
 import dsl/script
+import dsl/natural
 import dsl/backends/sqlite
 
 export script
+export natural
 export sqlite
 
 when isMainModule:
