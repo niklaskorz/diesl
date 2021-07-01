@@ -1,13 +1,15 @@
-import compiler/[nimeval, llstream, ast]
+import compiler/[nimeval, llstream, ast, lineinfos]
 import os
 import sugar
 import strformat
 import operations
 import operations/[parseexport, nimify]
 
-type StdPathNotFoundError* = object of Defect
-type FusionPathNotFoundError* = object of Defect
-type DieslPathNotFoundError* = object of Defect
+type StdPathNotFoundError* = object of CatchableError
+type FusionPathNotFoundError* = object of CatchableError
+type DieslPathNotFoundError* = object of CatchableError
+type ScriptExecutionError* = object of CatchableError
+  info*: TLineInfo
 
 proc getStdPath*(): string =
   # User defined path to standard library
@@ -91,6 +93,10 @@ proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchem
   searchPaths.add(fusionPath)
   searchPaths.add(dieslPath)
   let intr = createInterpreter("script.nims", searchPaths)
+  intr.registerErrorHook(proc (config, info, msg, severity: auto) {.gcsafe.} =
+    if severity == Error and config.errorCounter >= config.errorMax:
+      raise (ref ScriptExecutionError)(info: info, msg: msg)
+  )
   defer: intr.destroyInterpreter()
   let scriptStart = fmt"""
 import tables

@@ -22,6 +22,11 @@ import sequtils
 db.students.name = db.students.name.trim(left)
 """)
       check exportedOperations.len != 0
+    test "script with a syntax error":
+      expect ScriptExecutionError:
+        discard runScript("""
+db.students.name = db.students.name.trim(left
+""")
 
 when isMainModule:
   test_script()
