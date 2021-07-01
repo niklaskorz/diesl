@@ -1,21 +1,24 @@
-import script/definitions
-import nimscripter
-import compiler/nimeval
+import compiler/[nimeval, llstream, ast]
 import os
-import db_sqlite
+import sugar
+import strformat
+import operations
+import operations/[parseexport, nimify]
 
-type StdPathNotFoundException* = object of Defect
+type StdPathNotFoundError* = object of Defect
+type DieslPathNotFoundError* = object of Defect
 
 proc getStdPath*(): string =
   # User defined path to standard library
   var stdPath = os.getEnv("NIM_STDLIB")
-  if stdPath != "" and not dirExists(stdPath):
-    raise StdPathNotFoundException.newException(
+  if stdPath != "":
+    if dirExists(stdPath):
+      return
+    raise StdPathNotFoundError.newException(
         "No standard library found at path " & stdPath)
 
   # Fallback to current directory version of stdlib
-  if stdPath == "":
-    stdPath = getCurrentDir() / "stdlib"
+  stdPath = getCurrentDir() / "stdlib"
 
   # Fallback to built-in find function
   if not dirExists(stdPath):
@@ -29,22 +32,74 @@ proc getStdPath*(): string =
     stdPath = home / ".choosenim" / "toolchains" / ("nim-" & NimVersion) / "lib"
 
   if not dirExists(stdPath):
-    raise StdPathNotFoundException.newException("No standard library found, please set NIM_STDLIB environment variable")
+    raise StdPathNotFoundError.newException("No standard library found, please set NIM_STDLIB environment variable")
 
   return stdPath
 
+proc getDieslPath*(): string =
+  # User defined path to DieSL library
+  var dieslPath = os.getEnv("NIM_DIESL")
+  if dieslPath != "":
+    if dirExists(dieslPath):
+      return dieslPath
+    raise DieslPathNotFoundError.newException(
+        "No DieSL library found at path " & dieslPath)
 
-proc runScript*(script: string): Option[Interpreter] =
+  # Fallback to build path of DieSL
+  dieslPath = currentSourcePath.parentDir()
+
+  # Fallback to current directory version of stdlib
+  if not dirExists(dieslPath):
+    dieslPath = getCurrentDir() / "dsl"
+
+  if not dirExists(dieslPath):
+    raise DieslPathNotFoundError.newException("No DieSL library found, please set NIM_DIESL environment variable")
+
+  return dieslPath
+
+proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
   let stdPath = getStdPath()
-  return loadScript(script, isFile = false, stdPath = stdPath)
+  let dieslPath = getDieslPath()
+  var searchPaths = collect(newSeq):
+    for dir in walkDirRec(stdPath, {pcDir}):
+      dir
+  searchPaths.insert(stdPath, 0)
+  searchPaths.add(dieslPath)
+  let intr = createInterpreter("script.nims", searchPaths)
+  defer: intr.destroyInterpreter()
+  let scriptStart = fmt"""
+import tables
+import operations
+import operations/conversion
 
+let dbSchema = {schema.toNimCode()}
+let db = Diesl(dbSchema: dbSchema)
+"""
+  let scriptEnd = """
+let exportedOperations* = db.exportOperationsJson()
+"""
+  intr.evalScript(llStreamOpen(scriptStart & script & scriptEnd))
+  let symbol = intr.selectUniqueSymbol("exportedOperations")
+  let value = intr.getGlobalValue(symbol).getStr()
+  let exportedOperations = parseExportedOperationsJson(value)
+  return exportedOperations
 
-proc runScript*(db: DbConn, script: string): Option[Interpreter] =
-  let stdPath = getStdPath()
-  let ctx = newScriptContext(db)
-  return loadScript(
-    script,
-    isFile = false,
-    stdPath = stdPath,
-    init = some(ctx.initWithContext)
-  )
+when isMainModule:
+  import json
+  import tables
+  let script = """
+db.students.name = "Mr. / Mrs." & db.students.firstName & db.students.lastName
+
+db.students.name = db.students.name
+  .trim()
+  .replace("foo", "bar")
+  .replace(db.students.firstName, "<redacted>")
+"""
+  let exportedOperations = runScript(script, DieslDatabaseSchema(tables: {
+    "students": DieslTableSchema(columns: {
+      "name": ddtString,
+      "firstName": ddtString,
+      "lastName": ddtString
+    }.toTable),
+  }.toTable))
+  echo pretty(%exportedOperations)

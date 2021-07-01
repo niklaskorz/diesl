@@ -1,1 +1,4 @@
 *.db
+*.db-journal
+*.out
+result.xml

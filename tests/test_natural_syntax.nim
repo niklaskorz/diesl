@@ -1,26 +1,21 @@
 
 import unittest
-import dsl
 
-import dsl/[language, natural, db]
-import backend/table
+import dsl/[operations, natural]
+import dsl/operations/conversion
+import json
 
 import utils/test_macro
 
-let dbTable = Table(
-  name: "testTable",
-  creator: "",
-  columnNames: @["text"],
-  columnTypes: @["text"],
-  content: @[@["  foo"], @["  bar  "], @["baz  "]]
-)
+let db = Diesl()
+let dbTable = db.testTable
 
 
 proc test_natural*() =
   suite "natural syntax for string operations":
 
     # TODO: test that there is no ast transformation in this case
-    # since it is not needed 
+    # since it is not needed
     test_macro "trim without parameter":
       expected:
         dbTable.text.trim()
@@ -28,7 +23,7 @@ proc test_natural*() =
       actual:
         transform dbTable:
           trim dbTable.text
-        
+
     test_macro "trim left":
       expected:
         dbTable.text.trim(left)
@@ -62,13 +57,13 @@ proc test_natural*() =
 
       expected:
         dbTable.text.remove("ba").remove("oo").remove("z")
-    
-    
+
+
     test_macro "replace":
       actual:
         transform dbTable:
           replace "ba" with "to" in dbTable.text
-      
+
       expected:
         dbTable.text.replace("ba", "to")
 
