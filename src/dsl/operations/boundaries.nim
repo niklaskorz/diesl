@@ -30,7 +30,7 @@ proc collectTableAccesses(op: DieslOperation): HashSet[string] =
 
 type IllegalTableAccessError* = object of CatchableError
 
-proc checkTableBoundaries*(op: DieslOperation) =
+proc checkTableBoundaries*(op: DieslOperation): void =
   if op.kind == dotStore:
     let tables = op.collectTableAccesses - [op.storeTable].toHashSet
     if tables.len > 0:
