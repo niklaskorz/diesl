@@ -12,13 +12,13 @@ when isMainModule:
   import dsl/operations
 
   let schema = newDatabaseSchema({
-    "students": newTableSchema({
+    "students": @{
       "name": ddtString,
       "firstName": ddtString,
       "secondName": ddtString,
       "lastName": ddtString,
       "age": ddtInteger
-    })
+    }
   })
 
   let exportedOperations = runScript("""

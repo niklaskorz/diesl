@@ -99,7 +99,6 @@ proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchem
   )
   defer: intr.destroyInterpreter()
   let scriptStart = fmt"""
-import tables
 import operations
 import operations/conversion
 import natural
@@ -118,7 +117,6 @@ let exportedOperations* = db.exportOperationsJson()
 
 when isMainModule:
   import json
-  import tables
   let script = """
 db.students.name = "Mr. / Mrs." & db.students.firstName & db.students.lastName
 
@@ -128,10 +126,10 @@ db.students.name = db.students.name
   .replace(db.students.firstName, "<redacted>")
 """
   let exportedOperations = runScript(script, newDatabaseSchema({
-    "students": newTableSchema({
+    "students": @{
       "name": ddtString,
       "firstName": ddtString,
       "lastName": ddtString
-    }),
+    },
   }))
   echo pretty(%exportedOperations)

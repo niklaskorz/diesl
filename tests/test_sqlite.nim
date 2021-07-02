@@ -1,5 +1,4 @@
 import unittest
-import tables
 import sugar
 import strformat
 import sequtils
@@ -11,11 +10,11 @@ proc test_sqlite*() =
   suite "check sqlite operations":
     setup:
       let db = Diesl(dbSchema: newDatabaseSchema({
-        "students": newTableSchema({
+        "students": @{
           "name": ddtString,
           "firstName": ddtString,
           "secondName": ddtString,
-        })
+        }
       }))
 
     test "updates":

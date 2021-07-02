@@ -13,8 +13,8 @@ proc toNimCode*(schema: DieslDatabaseSchema): string =
 
 when isMainModule:
   let schema = newDatabaseSchema({
-    "students": newTableSchema({
+    "students": @{
       "name": ddtString
-    })
+    }
   })
   echo schema.toNimCode

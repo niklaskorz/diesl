@@ -6,15 +6,15 @@ proc test_boundaries*() =
   suite "check boundary operations":
     setup:
       let db = Diesl(dbSchema: newDatabaseSchema({
-        "table": newTableSchema({
+        "table": @{
           "input": ddtString,
           "input1": ddtString,
           "input2": ddtString,
           "output": ddtString,
-        }),
-        "table2": newTableSchema({
+        },
+        "table2": @{
           "input": ddtString,
-        })
+        }
       }))
 
     # whenever we're not storing something i.e. not dotStore

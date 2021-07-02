@@ -1,5 +1,4 @@
 import unittest
-import tables
 
 import dsl/operations/[base, strings, types]
 
@@ -7,13 +6,13 @@ proc test_strings*() =
   suite "check string operations":
     setup:
       let db = Diesl(dbSchema: newDatabaseSchema({
-        "table": newTableSchema({
+        "table": @{
           "to": ddtString,
           "frm": ddtString,
           "lhs": ddtString,
           "rhs": ddtString,
           "cnct": ddtString,
-        })
+        }
       }))
 
     test "substring":

@@ -1,4 +1,6 @@
 import tables
+import sequtils
+import sugar
 
 type
   DieslOperationType* = enum
@@ -100,3 +102,6 @@ proc newTableSchema*(columns: openArray[(string, DieslDataType)]): DieslTableSch
 
 proc newDatabaseSchema*(tables: openArray[(string, DieslTableSchema)]): DieslDatabaseSchema =
   DieslDatabaseSchema(tables: tables.toTable)
+
+proc newDatabaseSchema*(tables: openArray[(string, seq[(string, DieslDataType)])]): DieslDatabaseSchema =
+  DieslDatabaseSchema(tables: tables.map((pair) => (pair[0], newTableSchema(pair[1]))).toTable)
