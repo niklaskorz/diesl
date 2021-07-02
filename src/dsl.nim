@@ -1,6 +1,7 @@
 import dsl/script
 import dsl/natural
 import dsl/backends/sqlite
+import dsl/backends/sqliteviews
 
 export script
 export natural
@@ -24,4 +25,4 @@ db.students.name = db.students.name.replaceAll(@{
   db.students.secondName: "d"
 })
 """)
-  echo exportedOperations.toSqlite
+  echo exportedOperations.toSqliteViews
