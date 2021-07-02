@@ -8,6 +8,19 @@ export natural
 export sqlite
 
 when isMainModule:
+  import tables
+  import dsl/operations
+
+  let schema = DieslDatabaseSchema(tables: {
+    "students": DieslTableSchema(columns: {
+      "name": ddtString,
+      "firstName": ddtString,
+      "secondName": ddtString,
+      "lastName": ddtString,
+      "age": ddtInteger
+    }.toTable)
+  }.toTable)
+
   let exportedOperations = runScript("""
 db.students.name = "Mr. / Mrs. " & db.students.firstName[2..5] & " " & db.students.lastName
 
@@ -24,5 +37,8 @@ db.students.name = db.students.name.replaceAll(@{
   db.students.firstName: "b",
   db.students.secondName: "d"
 })
-""")
-  echo exportedOperations.toSqliteViews
+""", schema)
+
+  var tableAccessMap = {"students": "students"}.toTable()
+  echo exportedOperations.toSqliteViews(schema, tableAccessMap)
+  echo $tableAccessMap

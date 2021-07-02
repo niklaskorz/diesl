@@ -8,7 +8,7 @@ proc toSqlite*(op: DieslOperation): string =
     of dotStore:
       fmt"UPDATE {op.storeTable} SET {op.storeColumn} = {op.storeValue.toSqlite};"
     of dotLoad:
-      fmt"{op.loadTable}.{op.loadColumn}"
+      fmt"{op.loadColumn}"
     of dotStringLiteral:
       dbQuote(op.stringValue)
     of dotIntegerLiteral:
