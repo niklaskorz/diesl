@@ -11,15 +11,15 @@ when isMainModule:
   import tables
   import dsl/operations
 
-  let schema = DieslDatabaseSchema(tables: {
-    "students": DieslTableSchema(columns: {
+  let schema = newDatabaseSchema({
+    "students": newTableSchema({
       "name": ddtString,
       "firstName": ddtString,
       "secondName": ddtString,
       "lastName": ddtString,
       "age": ddtInteger
-    }.toTable)
-  }.toTable)
+    })
+  })
 
   let exportedOperations = runScript("""
 db.students.name = "Mr. / Mrs. " & db.students.firstName[2..5] & " " & db.students.lastName

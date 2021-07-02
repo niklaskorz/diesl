@@ -21,7 +21,7 @@ type
     ddtInteger
 
   DieslTableSchema* = object
-    columns*: Table[string, DieslDataType]
+    columns*: OrderedTable[string, DieslDataType]
 
   DieslDatabaseSchema* = object
     tables*: Table[string, DieslTableSchema]
@@ -94,3 +94,9 @@ proc toDataType*(op: DieslOperation): DieslDataType =
       ddtString
     of dotToUpper:
       ddtString
+
+proc newTableSchema*(columns: openArray[(string, DieslDataType)]): DieslTableSchema =
+  DieslTableSchema(columns: columns.toOrderedTable)
+
+proc newDatabaseSchema*(tables: openArray[(string, DieslTableSchema)]): DieslDatabaseSchema =
+  DieslDatabaseSchema(tables: tables.toTable)

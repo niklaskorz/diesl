@@ -10,13 +10,13 @@ import dsl/backends/sqlite
 proc test_sqlite*() =
   suite "check sqlite operations":
     setup:
-      let db = Diesl(dbSchema: DieslDatabaseSchema(tables: {
-        "students": DieslTableSchema(columns: {
+      let db = Diesl(dbSchema: newDatabaseSchema({
+        "students": newTableSchema({
           "name": ddtString,
           "firstName": ddtString,
           "secondName": ddtString,
-        }.toTable)
-      }.toTable))
+        })
+      }))
 
     test "updates":
       const prefix = "Mr. / Mrs. "

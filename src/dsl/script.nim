@@ -127,11 +127,11 @@ db.students.name = db.students.name
   .replace("foo", "bar")
   .replace(db.students.firstName, "<redacted>")
 """
-  let exportedOperations = runScript(script, DieslDatabaseSchema(tables: {
-    "students": DieslTableSchema(columns: {
+  let exportedOperations = runScript(script, newDatabaseSchema({
+    "students": newTableSchema({
       "name": ddtString,
       "firstName": ddtString,
       "lastName": ddtString
-    }.toTable),
-  }.toTable))
+    }),
+  }))
   echo pretty(%exportedOperations)

@@ -3,18 +3,18 @@ import strformat
 import types
 
 proc `$`(table: DieslTableSchema): string =
-  fmt"DieslTableSchema(columns: {$table.columns}.toTable())"
+  fmt"newTableSchema({$table.columns})"
 
 proc toNimCode*(schema: DieslDatabaseSchema): string =
   if schema.tables.len() > 0:
-    fmt"DieslDatabaseSchema(tables: {$schema.tables}.toTable())"
+    fmt"newDatabaseSchema({$schema.tables})"
   else:
     "DieslDatabaseSchema()"
 
 when isMainModule:
-  let schema = DieslDatabaseSchema(tables: {
-    "students": DieslTableSchema(columns: {
+  let schema = newDatabaseSchema({
+    "students": newTableSchema({
       "name": ddtString
-    }.toTable)
-  }.toTable)
+    })
+  })
   echo schema.toNimCode

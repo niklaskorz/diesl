@@ -1,22 +1,21 @@
 import unittest
-import tables
 
 import dsl/operations/[base, boundaries, strings]
 
 proc test_boundaries*() =
   suite "check boundary operations":
     setup:
-      let db = Diesl(dbSchema: DieslDatabaseSchema(tables: {
-        "table": DieslTableSchema(columns: {
+      let db = Diesl(dbSchema: newDatabaseSchema({
+        "table": newTableSchema({
           "input": ddtString,
           "input1": ddtString,
           "input2": ddtString,
           "output": ddtString,
-        }.toTable),
-        "table2": DieslTableSchema(columns: {
+        }),
+        "table2": newTableSchema({
           "input": ddtString,
-        }.toTable)
-      }.toTable))
+        })
+      }))
 
     # whenever we're not storing something i.e. not dotStore
     test "checkTableBoundaries - no-op":
