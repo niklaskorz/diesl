@@ -18,7 +18,8 @@ type
 
 proc toOperation*(operation: DieslOperation): DieslOperation = operation
 
-proc assertDataType*(op: DieslOperation, dataTypes: set[DieslDataType]): DieslOperation =
+proc assertDataType*(op: DieslOperation, dataTypes: set[
+    DieslDataType]): DieslOperation =
   let dataType = op.toDataType()
   if dataType != ddtUnknown and dataType notin dataTypes and ddtUnknown notin dataTypes:
     raise DieslDataTypeMismatchError.newException("Operation has type " &
@@ -47,12 +48,14 @@ proc getColumnType(table: DieslTable, column: string): DieslDataType =
     return ddtUnknown
   let columns = schema.tables[table.pName].columns
   if not columns.contains(column):
-      raise DieslColumnNotFoundError.newException("column not found: " & table.pName & "." & column)
+    raise DieslColumnNotFoundError.newException("column not found: " &
+        table.pName & "." & column)
   return columns[column]
 
 proc load(table: DieslTable, column: string): DieslOperation =
   let dataType = table.getColumnType(column)
-  DieslOperation(kind: dotLoad, loadTable: table.pName, loadColumn: column, loadType: dataType)
+  DieslOperation(kind: dotLoad, loadTable: table.pName, loadColumn: column,
+      loadType: dataType)
 
 template `.`*(table: DieslTable, column: untyped): DieslOperation =
   load(table, astToStr(column))

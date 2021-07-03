@@ -97,11 +97,15 @@ proc toDataType*(op: DieslOperation): DieslDataType =
     of dotToUpper:
       ddtString
 
-proc newTableSchema*(columns: openArray[(string, DieslDataType)]): DieslTableSchema =
+proc newTableSchema*(columns: openArray[(string,
+    DieslDataType)]): DieslTableSchema =
   DieslTableSchema(columns: columns.toOrderedTable)
 
-proc newDatabaseSchema*(tables: openArray[(string, DieslTableSchema)]): DieslDatabaseSchema =
+proc newDatabaseSchema*(tables: openArray[(string,
+    DieslTableSchema)]): DieslDatabaseSchema =
   DieslDatabaseSchema(tables: tables.toTable)
 
-proc newDatabaseSchema*(tables: openArray[(string, seq[(string, DieslDataType)])]): DieslDatabaseSchema =
-  DieslDatabaseSchema(tables: tables.map((pair) => (pair[0], newTableSchema(pair[1]))).toTable)
+proc newDatabaseSchema*(tables: openArray[(string, seq[(string,
+    DieslDataType)])]): DieslDatabaseSchema =
+  DieslDatabaseSchema(tables: tables.map((pair) => (pair[0], newTableSchema(
+      pair[1]))).toTable)

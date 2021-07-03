@@ -15,14 +15,18 @@ proc collectTableAccesses(op: DieslOperation): HashSet[string] =
     of dotSubstring:
       op.substringValue.collectTableAccesses
     of dotReplace:
-      op.replaceValue.collectTableAccesses + op.replaceTarget.collectTableAccesses + op.replaceReplacement.collectTableAccesses
+      op.replaceValue.collectTableAccesses +
+          op.replaceTarget.collectTableAccesses +
+          op.replaceReplacement.collectTableAccesses
     of dotReplaceAll:
       var tables = op.replaceAllValue.collectTableAccesses
       for pair in op.replaceAllReplacements:
-        tables = tables + pair.target.collectTableAccesses + pair.replacement.collectTableAccesses
+        tables = tables + pair.target.collectTableAccesses +
+            pair.replacement.collectTableAccesses
       tables
     of dotStringConcat:
-      op.stringConcatValueA.collectTableAccesses + op.stringConcatValueB.collectTableAccesses
+      op.stringConcatValueA.collectTableAccesses +
+          op.stringConcatValueB.collectTableAccesses
     of dotToLower:
       op.toLowerValue.collectTableAccesses
     of dotToUpper:
