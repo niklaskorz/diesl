@@ -8,28 +8,31 @@ import sqlite
 
 randomize()
 
-# Cryptographically insecure, could be replaced
-# with std/sysrand in Nim 1.6
-proc randomId(): string =
-  # Sqlite is case insensitive
-  let characters = "abcdefghijklmnopqrstuvwxyz0123456789"
-  let first = sample(characters[0..25])
-  let rest = (1..16).mapIt(sample(characters)).join("")
-  first & rest
+type TableAccessMap* = Table[string, seq[string]]
 
-template getTableAccessName(tableAccessMap: Table[string, string], tableName: string): string =
-  tableAccessMap.getOrDefault(tableName, tableName)
+proc getTableAccessName(tableAccessMap: TableAccessMap,
+    tableName: string): string =
+  tableAccessMap.getOrDefault(tableName, @[tableName])[^1]
 
-template getTableColumns(schema: DieslDatabaseSchema, tableName: string): seq[string] =
+proc addTableAccessName(tableAccessMap: var TableAccessMap, tableName: string,
+    accessName: string) =
+  if tableAccessMap.contains(tableName):
+    tableAccessMap[tableName].add(accessName)
+  else:
+    tableAccessMap[tableName] = @[accessName]
+
+proc getTableColumns(schema: DieslDatabaseSchema, tableName: string): seq[string] =
   toSeq(schema.tables[tableName].columns.keys())
 
-proc toSqliteView*(op: DieslOperation, schema: DieslDatabaseSchema, tableAccessMap: var Table[string, string], dslId: string): string =
+proc toSqliteView*(op: DieslOperation, schema: DieslDatabaseSchema,
+    tableAccessMap: var TableAccessMap, dieslId: string,
+        viewId: var int): string =
   case op.kind:
     of dotStore:
-      let viewId = randomId()
-      let viewName = fmt"{dslId}_{op.storeTable}_{viewId}"
+      let viewName = fmt"{op.storeTable}_{dieslId}_{viewId}"
+      viewId += 1
       let tableAccessName = tableAccessMap.getTableAccessName(op.storeTable)
-      tableAccessMap[op.storeTable] = viewName
+      tableAccessMap.addTableAccessName(op.storeTable, viewName)
       let columns = schema.getTableColumns(op.storeTable)
       let columnNames = columns.join(", ")
       let columnValues = columns.map(proc (column: string): string =
@@ -42,10 +45,19 @@ proc toSqliteView*(op: DieslOperation, schema: DieslDatabaseSchema, tableAccessM
     else:
       op.toSqlite
 
-proc toSqliteViews*(operations: seq[DieslOperation], schema: DieslDatabaseSchema, tableAccessMap: var Table[string, string]): string =
-  let dslId = randomId()
+# Cryptographically insecure, could be replaced
+# with std/sysrand in Nim 1.6
+proc randomId(): string =
+  # Sqlite is case insensitive
+  let characters = "abcdefghijklmnopqrstuvwxyz0123456789"
+  (0..16).mapIt(sample(characters)).join("")
+
+proc toSqliteViews*(operations: seq[DieslOperation],
+    schema: DieslDatabaseSchema, tableAccessMap: var TableAccessMap): string =
+  let dieslId = randomId()
+  var viewId = 0
   var statements: seq[string]
   for operation in operations:
     assert operation.kind == dotStore
-    statements.add(operation.toSqliteView(schema, tableAccessMap, dslId))
+    statements.add(operation.toSqliteView(schema, tableAccessMap, dieslId, viewId))
   return statements.join("\n")

@@ -39,6 +39,6 @@ db.students.name = db.students.name.replaceAll(@{
 })
 """, schema)
 
-  var tableAccessMap = {"students": "students"}.toTable()
+  var tableAccessMap: TableAccessMap
   echo exportedOperations.toSqliteViews(schema, tableAccessMap)
   echo $tableAccessMap
