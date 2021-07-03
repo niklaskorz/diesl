@@ -14,6 +14,8 @@ type
     dotStringConcat
     dotToLower
     dotToUpper
+    dotExtractOne
+    dotExtractMany
 
   DieslDataType* = enum
     ddtUnknown
@@ -68,6 +70,13 @@ type
         toLowerValue*: DieslOperation
       of dotToUpper:
         toUpperValue*: DieslOperation
+      of dotExtractOne:
+        extractOneValue*: DieslOperation
+        extractOnePattern*: string
+      of dotExtractMany:
+        extractManyValue*: DieslOperation
+        extractManyPattern*: string
+
 
 proc toDataType*(op: DieslOperation): DieslDataType =
   case op.kind:
@@ -93,4 +102,8 @@ proc toDataType*(op: DieslOperation): DieslDataType =
     of dotToLower:
       ddtString
     of dotToUpper:
+      ddtString
+    of dotExtractOne:
+      ddtString
+    of dotExtractMany:
       ddtString
