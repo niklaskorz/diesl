@@ -57,7 +57,15 @@ proc toUpper*(value: DieslOperation): DieslOperation =
   DieslOperation(kind: dotToUpper, toUpperValue: value.assertDataType({ddtString}))
 
 proc extractOne*(extractFrom: DieslOperation, fmtString: string): DieslOperation = 
-  DieslOperation(kind: dotExtractOne, extractOneValue: extractFrom, extractOnePattern: fmtString)
+  DieslOperation(
+    kind: dotExtractOne, 
+    extractOneValue: extractFrom.assertDataType({ddtString}), 
+    extractOnePattern: fmtString
+  )
 
 proc extractMany*(extractFrom: DieslOperation, fmtString: string): DieslOperation = 
-  DieslOperation(kind: dotExtractMany, extractManyValue: extractFrom, extractManyPattern: fmtString)
+  DieslOperation(
+    kind: dotExtractMany, 
+    extractManyValue: extractFrom.assertDataType({ddtString}), 
+    extractManyPattern: fmtString
+  )

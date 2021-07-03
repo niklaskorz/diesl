@@ -27,6 +27,10 @@ proc collectTableAccesses(op: DieslOperation): HashSet[string] =
       op.toLowerValue.collectTableAccesses
     of dotToUpper:
       op.toUpperValue.collectTableAccesses
+    of dotExtractOne:
+      op.extractOneValue.collectTableAccesses
+    of dotExtractMany:
+      op.extractManyValue.collectTableAccesses
 
 type IllegalTableAccessError* = object of CatchableError
 
