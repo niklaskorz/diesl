@@ -52,12 +52,18 @@ proc randomId(): string =
   let characters = "abcdefghijklmnopqrstuvwxyz0123456789"
   (0..16).mapIt(sample(characters)).join("")
 
+type ToSqliteViewsResult* = tuple
+  sqlCode: string
+  tableAccessMap: TableAccessMap
+
 proc toSqliteViews*(operations: seq[DieslOperation],
-    schema: DieslDatabaseSchema, tableAccessMap: var TableAccessMap): string =
+    schema: DieslDatabaseSchema, tableAccessMap: TableAccessMap = TableAccessMap()): ToSqliteViewsResult =
+  var updatedTableAccessMap = tableAccessMap
   let dieslId = randomId()
   var viewId = 0
   var statements: seq[string]
   for operation in operations:
     assert operation.kind == dotStore
-    statements.add(operation.toSqliteView(schema, tableAccessMap, dieslId, viewId))
-  return statements.join("\n")
+    statements.add(operation.toSqliteView(schema, updatedTableAccessMap,
+        dieslId, viewId))
+  return (statements.join("\n"), updatedTableAccessMap)
