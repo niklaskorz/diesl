@@ -112,6 +112,7 @@ proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
       if any(columns, column => (tableCopy, column) in loads):
         lastTableStores.del(table)
     if lastTableStores.contains(op.storeTable):
+      # TODO: need to check if any existing storeManyValues depend on this column
       let (columns, index) = lastTableStores[op.storeTable]
       assert op.storeColumn notin columns
       lastTableStores[op.storeTable][0].add(op.storeColumn)
