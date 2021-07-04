@@ -84,7 +84,8 @@ proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
     assert op.kind == dotStore
     let opStoreKey = (op.storeTable, op.storeColumn)
     let loads = op.collectLoads()
-    for store in lastStores.keys:
+    let storeKeys = toSeq(lastStores.keys)
+    for store in storeKeys:
       if store != opStoreKey and store in loads:
         lastStores.del(store)
     if lastStores.contains(opStoreKey):
@@ -104,17 +105,19 @@ proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
   for op in firstResult:
     assert op.kind == dotStore
     let loads = op.collectLoads()
-    for table in lastTableStores.keys:
-      for column in lastTableStores[table][0]:
-        if (table, column) in loads:
-          lastTableStores.del(table)
+    let storeKeys = toSeq(lastTableStores.keys)
+    for table in storeKeys:
+      let tableCopy = table # required because `table` is lent
+      let columns = lastTableStores[table][0]
+      if any(columns, column => (tableCopy, column) in loads):
+        lastTableStores.del(table)
     if lastTableStores.contains(op.storeTable):
       let (columns, index) = lastTableStores[op.storeTable]
       assert op.storeColumn notin columns
       lastTableStores[op.storeTable][0].add(op.storeColumn)
-      var newOp = op
-      newOp.replaceLoad(op.storeTable, op.storeColumn, firstResult[index].storeValue)
-      firstResult[index] = newOp
+      result[index].storeManyColumns.add(op.storeColumn)
+      result[index].storeManyValues.add(op.storeValue)
+      result[index].storeManyTypes.add(op.storeType)
     else:
       lastTableStores[op.storeTable] = (@[op.storeColumn], result.len())
       result.add(op.toStoreMany())

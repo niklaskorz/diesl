@@ -46,7 +46,7 @@ proc toSqliteView*(op: DieslOperation, schema: DieslDatabaseSchema,
       let viewName = fmt"{op.storeManyTable}_{dieslId}_{viewId}"
       viewId += 1
       let tableAccessName = tableAccessMap.getTableAccessName(op.storeManyTable)
-      tableAccessMap.addTableAccessName(op.storeTable, viewName)
+      tableAccessMap.addTableAccessName(op.storeManyTable, viewName)
       let columns = schema.getTableColumns(op.storeManyTable)
       let columnNames = columns.join(", ")
       let columnValues = columns.map(proc (column: string): string =
