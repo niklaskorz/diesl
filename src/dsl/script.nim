@@ -93,14 +93,16 @@ proc searchPaths(): seq[string] =
   result.add(fusionPath)
   result.add(dieslPath)
 
-
-
-proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
-  let intr = createInterpreter("script.nims", searchPaths())
-  intr.registerErrorHook(proc (config, info, msg, severity: auto) {.gcsafe.} =
+proc prepareInterpreter(): Interpreter = 
+  result = createInterpreter("script.nims", searchPaths())
+  result.registerErrorHook(proc (config, info, msg, severity: auto) {.gcsafe.} =
     if severity == Error and config.errorCounter >= config.errorMax:
       raise (ref ScriptExecutionError)(info: info, msg: msg)
   )
+
+
+proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
+  let intr = prepareInterpreter()
   defer: intr.destroyInterpreter()
   let scriptStart = fmt"""
 import tables
