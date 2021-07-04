@@ -37,10 +37,12 @@ proc pattern*(fmtString: string): string =
 
   let replaceBy = collect(newSeq):
     for extractedConstant in extractedConstants:
-      let tableRegex = supportedRegex.getOrDefault(extractedConstant, "")
+      # No need to check length, { and } equal length 2
+      let key = extractedConstant[1..^2]
+      let tableRegex = supportedRegex.getOrDefault(key, "")
       if tableRegex == "":
         raise DieselPatternNotFoundError.newException(
-          fmt"Unsupported pattern: '{extractedConstant}'. DieSL only supports {supportedPatterns}."
+          fmt"Unsupported pattern: '{key}'. DieSL only supports {supportedPatterns}."
         )
 
       ((r"\{" & extractedConstant & r"\}").re, tableRegex)
