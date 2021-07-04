@@ -82,17 +82,21 @@ proc getDieslPath*(): string =
 
   return dieslPath
 
-proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
+proc searchPaths(): seq[string] = 
   let stdPath = getStdPath()
   let fusionPath = getFusionPath()
   let dieslPath = getDieslPath()
-  var searchPaths = collect(newSeq):
+  result = collect(newSeq):
     for dir in walkDirRec(stdPath, {pcDir}):
       dir
-  searchPaths.insert(stdPath, 0)
-  searchPaths.add(fusionPath)
-  searchPaths.add(dieslPath)
-  let intr = createInterpreter("script.nims", searchPaths)
+  result.insert(stdPath, 0)
+  result.add(fusionPath)
+  result.add(dieslPath)
+
+
+
+proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
+  let intr = createInterpreter("script.nims", searchPaths())
   intr.registerErrorHook(proc (config, info, msg, severity: auto) {.gcsafe.} =
     if severity == Error and config.errorCounter >= config.errorMax:
       raise (ref ScriptExecutionError)(info: info, msg: msg)
