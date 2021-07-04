@@ -104,6 +104,16 @@ proc toDataType*(op: DieslOperation): DieslDataType =
     of dotToUpper:
       ddtString
 
+proc toStoreMany*(op: DieslOperation): DieslOperation =
+  assert op.kind == dotStore
+  DieslOperation(
+    kind: dotStoreMany,
+    storeManyTable: op.storeTable,
+    storeManyColumns: @[op.storeColumn],
+    storeManyValues: @[op.storeValue],
+    storeManyTypes: @[op.storeType]
+  )
+
 proc newTableSchema*(columns: openArray[(string,
     DieslDataType)]): DieslTableSchema =
   DieslTableSchema(columns: columns.toOrderedTable)

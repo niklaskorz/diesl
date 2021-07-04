@@ -75,13 +75,11 @@ proc replaceLoad(op: var DieslOperation, table: string, column: string, value: D
       op.toUpperValue.replaceLoad(table, column, value)
 
 proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
-  # Steps:
-  # 1. Merge all stores on the same column into one store, until:
-  #   - the column is used by a load operation in a store on a different column
-  # 2. Merge all stores on the same table into one storeMany, until:
-  #   - the column is used by a load operation in a store on a different table
-  #   - the column is used by a load operation in the current storeMany for a different column
+  # Step 1:
+  # Merge all stores on the same column into one store, until
+  # - the column is used by a load operation in a store on a different column
   var lastStores: Table[(string, string), int]
+  var firstResult: seq[DieslOperation]
   for op in operations:
     assert op.kind == dotStore
     let opStoreKey = (op.storeTable, op.storeColumn)
@@ -92,8 +90,31 @@ proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
     if lastStores.contains(opStoreKey):
       let index = lastStores[opStoreKey]
       var newOp = op
-      newOp.replaceLoad(op.storeTable, op.storeColumn, result[index].storeValue)
-      result[index] = newOp
+      newOp.replaceLoad(op.storeTable, op.storeColumn, firstResult[index].storeValue)
+      firstResult[index] = newOp
     else:
-      lastStores[opStoreKey] = result.len()
-      result.add(op)
+      lastStores[opStoreKey] = firstResult.len()
+      firstResult.add(op)
+
+  # Step 2:
+  # Merge all stores on the same table into one storeMany, until
+  # - the column is used by a load operation in a store on a different table
+  # - the column is used by a load operation in the current storeMany for a different column
+  var lastTableStores: Table[string, (seq[string], int)]
+  for op in firstResult:
+    assert op.kind == dotStore
+    let loads = op.collectLoads()
+    for table in lastTableStores.keys:
+      for column in lastTableStores[table][0]:
+        if (table, column) in loads:
+          lastTableStores.del(table)
+    if lastTableStores.contains(op.storeTable):
+      let (columns, index) = lastTableStores[op.storeTable]
+      assert op.storeColumn notin columns
+      lastTableStores[op.storeTable][0].add(op.storeColumn)
+      var newOp = op
+      newOp.replaceLoad(op.storeTable, op.storeColumn, firstResult[index].storeValue)
+      firstResult[index] = newOp
+    else:
+      lastTableStores[op.storeTable] = (@[op.storeColumn], result.len())
+      result.add(op.toStoreMany())
