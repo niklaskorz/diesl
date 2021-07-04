@@ -5,6 +5,7 @@ import sugar
 type
   DieslOperationType* = enum
     dotStore
+    dotStoreMany
     dotLoad
     dotStringLiteral
     dotIntegerLiteral
@@ -19,6 +20,7 @@ type
 
   DieslDataType* = enum
     ddtUnknown
+    ddtVoid
     ddtString
     ddtInteger
 
@@ -41,6 +43,11 @@ type
         storeColumn*: string
         storeValue*: DieslOperation
         storeType*: DieslDataType
+      of dotStoreMany:
+        storeManyTable*: string
+        storeManyColumns*: seq[string]
+        storeManyValues*: seq[DieslOperation]
+        storeManyTypes*: seq[DieslDataType]
       of dotLoad:
         loadTable*: string
         loadColumn*: string
@@ -73,8 +80,8 @@ type
 
 proc toDataType*(op: DieslOperation): DieslDataType =
   case op.kind:
-    of dotStore:
-      op.storeType
+    of dotStore, dotStoreMany:
+      ddtVoid
     of dotLoad:
       op.loadType
     of dotStringLiteral:

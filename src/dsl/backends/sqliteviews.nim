@@ -42,11 +42,28 @@ proc toSqliteView*(op: DieslOperation, schema: DieslDatabaseSchema,
           column
       ).join(", ")
       fmt"CREATE VIEW {viewName} ({columnNames}) AS SELECT {columnValues} FROM {tableAccessName};"
+    of dotStoreMany:
+      let viewName = fmt"{op.storeManyTable}_{dieslId}_{viewId}"
+      viewId += 1
+      let tableAccessName = tableAccessMap.getTableAccessName(op.storeManyTable)
+      tableAccessMap.addTableAccessName(op.storeTable, viewName)
+      let columns = schema.getTableColumns(op.storeManyTable)
+      let columnNames = columns.join(", ")
+      let columnValues = columns.map(proc (column: string): string =
+        let columnIndex = op.storeManyColumns.find(column)
+        if columnIndex >= 0:
+          op.storeManyValues[columnIndex].toSqlite
+        else:
+          column
+      ).join(", ")
+      fmt"CREATE VIEW {viewName} ({columnNames}) AS SELECT {columnValues} FROM {tableAccessName};"
     else:
-      op.toSqlite
+      assert false
+      ""
 
 # Cryptographically insecure, could be replaced
-# with std/sysrand in Nim 1.6
+# with std/sysrand in Nim 1.6.
+# But then again, this doesn't really need to be secure.
 proc randomId(): string =
   # Sqlite is case insensitive
   let characters = "abcdefghijklmnopqrstuvwxyz0123456789"
@@ -63,7 +80,6 @@ proc toSqliteViews*(operations: seq[DieslOperation],
   var viewId = 0
   var statements: seq[string]
   for operation in operations:
-    assert operation.kind == dotStore
     statements.add(operation.toSqliteView(schema, updatedTableAccessMap,
         dieslId, viewId))
   return (statements.join("\n"), updatedTableAccessMap)

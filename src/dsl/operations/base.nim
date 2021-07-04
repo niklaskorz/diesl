@@ -21,6 +21,8 @@ proc toOperation*(operation: DieslOperation): DieslOperation = operation
 proc assertDataType*(op: DieslOperation, dataTypes: set[
     DieslDataType]): DieslOperation =
   let dataType = op.toDataType()
+  if dataType == ddtVoid:
+    raise DieslDataTypeMismatchError.newException("Operation has type void and cannot be used as value")
   if dataType != ddtUnknown and dataType notin dataTypes and ddtUnknown notin dataTypes:
     raise DieslDataTypeMismatchError.newException("Operation has type " &
         $dataType & ", expected one of " & $dataTypes)

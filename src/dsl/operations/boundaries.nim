@@ -1,10 +1,16 @@
 import collections/sets
+import options
 import types
 
 proc collectTableAccesses(op: DieslOperation): HashSet[string] =
   case op.kind:
     of dotStore:
       op.storeValue.collectTableAccesses
+    of dotStoreMany:
+      var tables = initHashSet[string]()
+      for value in op.storeManyValues:
+        tables = tables + value.collectTableAccesses
+      tables
     of dotLoad:
       [op.loadTable].toHashSet
     of dotStringLiteral, dotIntegerLiteral:
@@ -35,8 +41,18 @@ proc collectTableAccesses(op: DieslOperation): HashSet[string] =
 type IllegalTableAccessError* = object of CatchableError
 
 proc checkTableBoundaries*(op: DieslOperation): void =
-  if op.kind == dotStore:
-    let tables = op.collectTableAccesses - [op.storeTable].toHashSet
-    if tables.len > 0:
-      let msg = "tried to access tables " & $tables & " in context of table " & op.storeTable
-      raise IllegalTableAccessError.newException(msg)
+  let contextTable = case op.kind:
+    of dotStore:
+      op.storeTable
+    of dotStoreMany:
+      op.storeManyTable
+    else:
+      ""
+  let tables = case op.kind:
+    of dotStore, dotStoreMany:
+      op.collectTableAccesses - [contextTable].toHashSet
+    else:
+      initHashSet[string]()
+  if tables.len > 0:
+    let msg = "tried to access tables " & $tables & " in context of table " & contextTable
+    raise IllegalTableAccessError.newException(msg)
