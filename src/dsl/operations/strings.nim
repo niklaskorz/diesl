@@ -63,7 +63,7 @@ proc extractOne*(extractFrom: DieslOperation, fmtString: string): DieslOperation
     extractOnePattern: fmtString
   )
 
-proc extractMany*(extractFrom: DieslOperation, fmtString: string): DieslOperation = 
+proc extractAll*(extractFrom: DieslOperation, fmtString: string): DieslOperation = 
   DieslOperation(
     kind: dotExtractMany, 
     extractManyValue: extractFrom.assertDataType({ddtString}), 

@@ -45,8 +45,9 @@ proc pattern*(fmtString: string): string =
           fmt"Unsupported pattern: '{key}'. DieSL only supports {supportedPatterns}."
         )
 
-      ((r"\{" & extractedConstant & r"\}").re, tableRegex)
+      (fmt"{extractedConstant}", tableRegex)
 
   result = fmtString.multiReplace(replaceBy)
+  echo result
 
   

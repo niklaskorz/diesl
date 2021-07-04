@@ -1,7 +1,7 @@
 import unittest
 import tables
 
-import dsl/operations/[base, strings, patterns, types]
+import dsl/operations/[base, strings, types]
 
 proc test_strings*() =
   suite "check string operations":
@@ -88,22 +88,22 @@ proc test_strings*() =
       check concatOp.kind == dotStringConcat
 
     test "extract one":
-      db.table.lhs = db.table.rhs.extractOne(pattern"{email}")
+      db.table.lhs = db.table.rhs.extractOne("{hashtag}")
 
       let ops = db.exportOperations()
       let storeOp = ops[0]
 
-      let concatOp = storeOp.storeValue
-      check concatOp.kind == dotExtractOne
+      let extractOp = storeOp.storeValue
+      check extractOp.kind == dotExtractOne
 
     test "extract many":
-      db.table.lhs = db.table.rhs.extractMany(pattern"{email}")
+      db.table.lhs = db.table.rhs.extractAll("{email}")
 
       let ops = db.exportOperations()
       let storeOp = ops[0]
 
-      let concatOp = storeOp.storeValue
-      check concatOp.kind == dotExtractMany   
+      let extractOp = storeOp.storeValue
+      check extractOp.kind == dotExtractMany
 
 when isMainModule:
   test_strings()

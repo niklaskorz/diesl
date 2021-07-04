@@ -2,7 +2,7 @@ import strformat
 import strutils
 import db_sqlite
 import ../operations
-import patterns
+import ../operations/patterns
 
 proc toSqlite*(op: DieslOperation): string =
   case op.kind:
@@ -40,9 +40,9 @@ proc toSqlite*(op: DieslOperation): string =
     of dotToUpper:
       fmt"UPPER({op.toUpperValue.toSqlite})"
     of dotExtractOne:
-      fmt"{op.extractOneValue.toSqlite} REGEXP {op.extractOnePattern.pattern}"
+      fmt"{op.extractOneValue.toSqlite} REGEXP '{op.extractOnePattern.pattern}'"
     of dotExtractMany:
-      fmt"{op.extractManyValue.toSqlite} REGEXP {op.extractManyPattern.pattern}"
+      fmt"{op.extractManyValue.toSqlite} REGEXP '{op.extractManyPattern.pattern}'"
 
 
 proc toSqlite*(operations: seq[DieslOperation]): string =
