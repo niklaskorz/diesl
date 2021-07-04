@@ -102,7 +102,7 @@ proc prepareInterpreter(): Interpreter =
 
 
 proc prepareScript(script: string, schema: DieslDatabaseSchema): string =
-  let scriptStart = fmt"""
+  result = fmt"""
 import tables
 import operations
 import operations/conversion
@@ -110,11 +110,11 @@ import natural
 
 let dbSchema = {schema.toNimCode()}
 let db = Diesl(dbSchema: dbSchema)
-"""
-  let scriptEnd = """
+
+{script}
+
 let exportedOperations* = db.exportOperationsJson()
 """
-  return scriptStart & script & scriptEnd
 
 
 proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
