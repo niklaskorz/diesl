@@ -101,9 +101,7 @@ proc prepareInterpreter(): Interpreter =
   )
 
 
-proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
-  let intr = prepareInterpreter()
-  defer: intr.destroyInterpreter()
+proc prepareScript(script: string, schema: DieslDatabaseSchema): string =
   let scriptStart = fmt"""
 import tables
 import operations
@@ -116,7 +114,13 @@ let db = Diesl(dbSchema: dbSchema)
   let scriptEnd = """
 let exportedOperations* = db.exportOperationsJson()
 """
-  intr.evalScript(llStreamOpen(scriptStart & script & scriptEnd))
+  return scriptStart & script & scriptEnd
+
+
+proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
+  let intr = prepareInterpreter()
+  defer: intr.destroyInterpreter()
+  intr.evalScript(llStreamOpen(prepareScript(script, schema)))
   let symbol = intr.selectUniqueSymbol("exportedOperations")
   let value = intr.getGlobalValue(symbol).getStr()
   let exportedOperations = parseExportedOperationsJson(value)
