@@ -116,15 +116,20 @@ let db = Diesl(dbSchema: dbSchema)
 let exportedOperations* = db.exportOperationsJson()
 """
 
+proc extractExportedOperations(interpreter: Interpreter): seq[DieslOperation] = 
+  let symbol = interpreter.selectUniqueSymbol("exportedOperations")
+  let value = interpreter.getGlobalValue(symbol).getStr()
+
+  return parseExportedOperationsJson(value)
 
 proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
-  let intr = prepareInterpreter()
-  defer: intr.destroyInterpreter()
-  intr.evalScript(llStreamOpen(prepareScript(script, schema)))
-  let symbol = intr.selectUniqueSymbol("exportedOperations")
-  let value = intr.getGlobalValue(symbol).getStr()
-  let exportedOperations = parseExportedOperationsJson(value)
-  return exportedOperations
+  let interpreter = prepareInterpreter()
+
+  interpreter.evalScript(llStreamOpen(prepareScript(script, schema)))
+  
+  interpreter.destroyInterpreter()
+
+  return extractExportedOperations(interpreter)
 
 when isMainModule:
   import json
