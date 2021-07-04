@@ -101,8 +101,8 @@ proc prepareInterpreter(): Interpreter =
   )
 
 
-proc prepareScript(script: string, schema: DieslDatabaseSchema): string =
-  result = fmt"""
+proc prepareScript(script: string, schema: DieslDatabaseSchema): PLLStream = 
+  let preparedScript = fmt"""
 import tables
 import operations
 import operations/conversion
@@ -115,6 +115,7 @@ let db = Diesl(dbSchema: dbSchema)
 
 let exportedOperations* = db.exportOperationsJson()
 """
+  return llstreamOpen(preparedScript)
 
 proc extractExportedOperations(interpreter: Interpreter): seq[DieslOperation] = 
   let symbol = interpreter.selectUniqueSymbol("exportedOperations")
@@ -122,10 +123,11 @@ proc extractExportedOperations(interpreter: Interpreter): seq[DieslOperation] =
 
   return parseExportedOperationsJson(value)
 
+
 proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
   let interpreter = prepareInterpreter()
 
-  interpreter.evalScript(llStreamOpen(prepareScript(script, schema)))
+  interpreter.evalScript(prepareScript(script, schema))
   
   interpreter.destroyInterpreter()
 
