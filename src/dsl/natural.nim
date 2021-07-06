@@ -1,6 +1,10 @@
 
 import sequtils
 import macros
+import tables
+
+import operations
+import operations/conversion
 
 import fusion/matching
 {.experimental: "caseStmtMacros".}
@@ -57,10 +61,13 @@ proc transpileTrim(command, table: NimNode): NimNode =
       let textDirection = translateDirection(direction)
 
       result = quote do:
-        `column`.trim(`textDirection`)
-
-    # trim col -> just a function call no macro needed
+        `column` = `column`.trim(`textDirection`)
+    
+    of Command[Ident(strVal: "trim"), @column]:
+      result = quote do:
+        `column` = `column`.trim()
     else:
+      echo "NO MATCH"
       result = command
 
 
@@ -69,7 +76,7 @@ proc transpileReplace(command, table: NimNode): NimNode =
     of [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement,
         Ident(strVal: "in"), @column]:
       result = quote do:
-        `column`.replace(`target`, `replacement`)
+        `column` = `column`.replace(`target`, `replacement`)
 
     of [Ident(strVal: "replace"), Ident(strVal: "in"), @column,
         all @replacements]:
@@ -88,7 +95,7 @@ proc transpileReplace(command, table: NimNode): NimNode =
       let table = newTableConstructor(replacementPairs)
 
       result = quote do:
-        `column`.replaceAll(`table`)
+        `column` = `column`.replaceAll(`table`)
 
     else:
       echo "transpile command did not match"
@@ -99,7 +106,7 @@ proc transpileRemove(command, table: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "remove"), @target, Ident(strVal: "from"), @column]:
       result = quote do:
-        `column`.remove(`target`)
+        `column` = `column`.remove(`target`)
     of Command[Ident(strVal: "remove"), until @targets is Ident(strVal: "from"),
         Ident(strVal: "from"), @column]:
       if targets.len == 0:
@@ -115,6 +122,9 @@ proc transpileRemove(command, table: NimNode): NimNode =
       for target in targets[1..^1]:
         result = newCall(newDotExpr(result, newIdentNode("remove")), target)
 
+      result = quote do:
+        `column` = `result`
+
     else:
       result = command
 
@@ -127,7 +137,7 @@ proc transpileTake(command, table: NimNode): NimNode =
       let higher = newLit(matchedHigher.intVal - 1)
 
       result = quote do:
-        `column`[int(`lower`)..int(`higher`)]
+        `column` = `column`[int(`lower`)..int(`higher`)]
     else:
       result = command
 
