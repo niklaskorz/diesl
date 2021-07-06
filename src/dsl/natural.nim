@@ -61,11 +61,11 @@ proc transpileTrim(command, table: NimNode): NimNode =
       let textDirection = translateDirection(direction)
 
       result = quote do:
-        `column` = `column`.trim(`textDirection`)
+        `table`.`column` = `table`.`column`.trim(`textDirection`)
     
     of Command[Ident(strVal: "trim"), @column]:
       result = quote do:
-        `column` = `column`.trim()
+        `table`.`column` = `table`.`column`.trim()
     else:
       echo "NO MATCH"
       result = command
@@ -76,7 +76,7 @@ proc transpileReplace(command, table: NimNode): NimNode =
     of [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement,
         Ident(strVal: "in"), @column]:
       result = quote do:
-        `column` = `column`.replace(`target`, `replacement`)
+        `table`.`column` = `table`.`column`.replace(`target`, `replacement`)
 
     of [Ident(strVal: "replace"), Ident(strVal: "in"), @column,
         all @replacements]:
@@ -95,7 +95,7 @@ proc transpileReplace(command, table: NimNode): NimNode =
       let table = newTableConstructor(replacementPairs)
 
       result = quote do:
-        `column` = `column`.replaceAll(`table`)
+        `table`.`column` = `table`.`column`.replaceAll(`table`)
 
     else:
       echo "transpile command did not match"
@@ -106,7 +106,7 @@ proc transpileRemove(command, table: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "remove"), @target, Ident(strVal: "from"), @column]:
       result = quote do:
-        `column` = `column`.remove(`target`)
+        `table`.`column` = `table`.`column`.remove(`target`)
     of Command[Ident(strVal: "remove"), until @targets is Ident(strVal: "from"),
         Ident(strVal: "from"), @column]:
       if targets.len == 0:
@@ -123,7 +123,7 @@ proc transpileRemove(command, table: NimNode): NimNode =
         result = newCall(newDotExpr(result, newIdentNode("remove")), target)
 
       result = quote do:
-        `column` = `result`
+        `table`.`column` = `table`.`result`
 
     else:
       result = command
@@ -137,7 +137,7 @@ proc transpileTake(command, table: NimNode): NimNode =
       let higher = newLit(matchedHigher.intVal - 1)
 
       result = quote do:
-        `column` = `column`[int(`lower`)..int(`higher`)]
+        `table`.`column` = `table`.`column`[int(`lower`)..int(`higher`)]
     else:
       result = command
 
@@ -167,7 +167,22 @@ proc transpileTransform(table: NimNode, commands: NimNode): NimNode =
     result.add(transpileCommand(command, table))
 
 
-# macro transform*(table, column, commands: untyped): untyped =
-macro transform*(table, commands: untyped): untyped =
+macro change*(table: untyped, commands: untyped): untyped =
   result = transpileTransform(table, commands)
 
+when isMainModule:
+  const schema = DieslDatabaseSchema(tables: {
+    "table": DieslTableSchema(columns: {
+      "first_name": ddtString,
+      "second_name": ddtString
+    }.toTable)
+  }.toTable)
+
+  let db = Diesl(dbSchema: schema)
+  let dbTable = db.table
+
+  change dbTable:
+    trim first_name
+    replace "foo" with "bar" in second_name
+    remove "baz", "bam" and "boom" from first_name
+    take 1 to 2 from second_name
