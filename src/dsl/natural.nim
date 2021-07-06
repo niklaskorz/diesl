@@ -107,8 +107,7 @@ proc transpileRemove(command, table: NimNode): NimNode =
     of Command[Ident(strVal: "remove"), @target, Ident(strVal: "from"), @column]:
       result = quote do:
         `table`.`column` = `table`.`column`.remove(`target`)
-    of Command[Ident(strVal: "remove"), until @targets is Ident(strVal: "from"),
-        Ident(strVal: "from"), @column]:
+    of Command[Ident(strVal: "remove"), until @targets is Ident(strVal: "from"), Ident(strVal: "from"), @column]:
       if targets.len == 0:
         return command
 
@@ -117,13 +116,10 @@ proc transpileRemove(command, table: NimNode): NimNode =
       if targets[^2].matches(Ident(strVal: "and")):
         targets.delete(targets.len - 2)
 
-      result = newCall(newDotExpr(column, newIdentNode("remove")), targets[0])
+      result = newStmtList()
 
-      for target in targets[1..^1]:
-        result = newCall(newDotExpr(result, newIdentNode("remove")), target)
-
-      result = quote do:
-        `table`.`column` = `table`.`result`
+      for target in targets:
+        result.add(quote do: `table`.`column` = `table`.`column`.remove(`target`))
 
     else:
       result = command
@@ -158,7 +154,7 @@ proc transpileCommand(command, table: NimNode): NimNode =
       return command
 
 
-proc transpileTransform(table: NimNode, commands: NimNode): NimNode =
+proc transpileChangeBlock(table: NimNode, commands: NimNode): NimNode =
   result = newStmtList()
 
   commands.expectKind nnkStmtList
@@ -168,13 +164,14 @@ proc transpileTransform(table: NimNode, commands: NimNode): NimNode =
 
 
 macro change*(table: untyped, commands: untyped): untyped =
-  result = transpileTransform(table, commands)
+  result = transpileChangeBlock(table, commands)
+ 
 
 when isMainModule:
   const schema = DieslDatabaseSchema(tables: {
     "table": DieslTableSchema(columns: {
       "first_name": ddtString,
-      "second_name": ddtString
+      "second_name": ddtString,
     }.toTable)
   }.toTable)
 
@@ -183,6 +180,6 @@ when isMainModule:
 
   change dbTable:
     trim first_name
-    replace "foo" with "bar" in second_name
+    replace "foo" with "bar" in  second_name
     remove "baz", "bam" and "boom" from first_name
-    take 1 to 2 from second_name
+    take 1 to 2 from  second_name
