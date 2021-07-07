@@ -92,10 +92,10 @@ proc transpileReplace(command, table: NimNode): NimNode =
           else:
             echo "could not match substitution ", command.toStrLit
 
-      let table = newTableConstructor(replacementPairs)
+      let replacementTable = newTableConstructor(replacementPairs)
 
       result = quote do:
-        `table`.`column` = `table`.`column`.replaceAll(`table`)
+        `table`.`column` = `table`.`column`.replaceAll(`replacementTable`)
 
     else:
       echo "transpile command did not match"
