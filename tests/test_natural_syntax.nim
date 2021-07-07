@@ -61,11 +61,29 @@ proc test_natural*() =
 
       check operationsEq(actualDB, expectedDB)
 
+
+    test "trim left with specified column":
+      expectedTable.text = expectedTable.text.trim(left)
+
+      change text of actualTable:
+        trim beginning
+
+      check operationsEq(actualDB, expectedDB)
+
+
     test "trim right":
       expectedTable.text = expectedTable.text.trim(right)
 
       change actualTable:
         trim ending of text
+
+      check operationsEq(actualDB, expectedDB)
+
+    test "trim right with specified column":
+      expectedTable.text = expectedTable.text.trim(right)
+
+      change text of actualTable:
+        trim ending
 
       check operationsEq(actualDB, expectedDB)
 
