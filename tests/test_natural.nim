@@ -34,7 +34,6 @@ proc test_natural*() =
       var expectedTable = expectedDB.table 
       var actualTable = actualDB.table 
 
-      
     # TODO: test that there is no ast transformation in this case
     # since it is not needed
     test "trim without parameter":
@@ -44,6 +43,15 @@ proc test_natural*() =
         trim text
 
       check operationsEq(actualDB, expectedDB)
+
+    test "trim without parameter and with specified column":
+      expectedTable.text = actualTable.text.trim()
+
+      change text of actualTable:
+        trim
+
+      check operationsEq(actualDB, expectedDB)
+
 
     test "trim left":
       expectedTable.text = expectedTable.text.trim(left)

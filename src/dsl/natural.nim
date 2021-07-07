@@ -2,6 +2,7 @@
 import sequtils
 import macros
 import tables
+import options
 
 import operations
 import operations/conversion
@@ -55,7 +56,17 @@ proc translateDirection(direction: NimNode): NimNode =
       return newIdentNode("right")
 
 
-proc transpileTrim(command, table: NimNode): NimNode =
+proc transpileTrimWithColumn(command, table, column: NimNode): NimNode = 
+  case command:
+    of Command[Ident(strVal: "trim")]:
+      result = quote do:
+        `table`.`column` = `table`.`column`.trim()
+    of Command[Ident(strVal: "trim"), @direction, Ident(strVal: "of"), @column]:
+      result = quote do:
+        `table`.`column` = `table`.`column`.trim(`direction`)
+
+
+proc transpileTrimWithoutColumn(command, table: NimNode): NimNode = 
   case command:
     of Command[Ident(strVal: "trim"), @direction, Ident(strVal: "of"), @column]:
       let textDirection = translateDirection(direction)
@@ -69,6 +80,15 @@ proc transpileTrim(command, table: NimNode): NimNode =
     else:
       echo "NO MATCH"
       result = command
+
+
+proc transpileTrim(command, table: NimNode, column: Option[NimNode]): NimNode =
+  if column.isSome:
+    return transpileTrimWithColumn(command, table, column.get)
+  else:
+    return transpileTrimWithoutColumn(command, table)
+
+
 
 
 proc transpileReplace(command, table: NimNode): NimNode =
@@ -138,12 +158,12 @@ proc transpileTake(command, table: NimNode): NimNode =
       result = command
 
 
-proc transpileCommand(command, table: NimNode): NimNode =
+proc transpileCommand(table: NimNode, column: Option[NimNode], command: NimNode): NimNode =
   var command = command.flatten()
 
   case command:
     of Command[Ident(strVal: "trim"), .._]:
-      return transpileTrim(command, table)
+      return transpileTrim(command, table, column)
     of Command[Ident(strVal: "replace"), .._]:
       return transpileReplace(command, table)
     of Command[Ident(strVal: "remove"), .._]:
@@ -154,32 +174,33 @@ proc transpileCommand(command, table: NimNode): NimNode =
       return command
 
 
-proc transpileChangeBlock(table: NimNode, commands: NimNode): NimNode =
+proc transpileChangeBlock(selector: NimNode, commands: NimNode): NimNode =
+  var table: NimNode
+  var column: Option[NimNode]
+
+  case selector:
+    of Ident[@tableVal]:
+      echo "1 table ", table.tostrlit
+      table = tableVal
+      column = none(NimNode)
+    of Infix[Ident(strVal: "of"), @columnVal, @tableVal]:
+      table = tableVal
+      column = some(columnVal)
+      echo "2 table ", table.tostrlit
   result = newStmtList()
 
   commands.expectKind nnkStmtList
 
   for command in commands.children:
-    result.add(transpileCommand(command, table))
+    result.add(transpileCommand(table, column, command))
 
 
-macro change*(table: untyped, commands: untyped): untyped =
-  result = transpileChangeBlock(table, commands)
+# selector is one of:
+# <table name>
+# or 
+# <column name> of <table name>
+macro change*(selector: untyped, commands: untyped): untyped = transpileChangeBlock(selector, commands)
  
-
 when isMainModule:
-  const schema = DieslDatabaseSchema(tables: {
-    "table": DieslTableSchema(columns: {
-      "first_name": ddtString,
-      "second_name": ddtString,
-    }.toTable)
-  }.toTable)
-
-  let db = Diesl(dbSchema: schema)
-  let dbTable = db.table
-
-  change dbTable:
-    trim first_name
-    replace "foo" with "bar" in  second_name
-    remove "baz", "bam" and "boom" from first_name
-    take 1 to 2 from  second_name
+  change col of tab:
+    trim
