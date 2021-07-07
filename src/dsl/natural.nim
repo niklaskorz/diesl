@@ -110,35 +110,63 @@ proc transpileTrim(command, table: NimNode, column: Option[NimNode]): NimNode =
     result = transpileTrimWithoutColumn(command, table)
 
 
-proc transpileReplace(command, table: NimNode): NimNode =
+# transpiles a list like
+# replace ...:
+#   "foo" with "bar"
+#   "baz" with "bam"
+#
+# to
+# @{"foo": "bar", "baz": "bam"}
+proc transpileReplacementTable(replacements: var seq[NimNode]): NimNode = 
+  var replacementPairs = newSeq[(NimNode, NimNode)]()
+
+  while replacements.len() > 0:
+    case replacements:
+      of [@target, Ident(strVal: "with"), @replacement, all @rest]:
+        replacements = rest
+
+        replacementPairs.add((target, replacement))
+      else:
+        echo "could not match substitution"
+
+  result = newTableConstructor(replacementPairs)
+
+
+proc transpileReplaceWithColumn(command, table, column: NimNode): NimNode =
   case command:
-    of [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement,
-        Ident(strVal: "in"), @column]:
+    of [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement]:
       result = quote do:
         `table`.`column` = `table`.`column`.replace(`target`, `replacement`)
 
-    of [Ident(strVal: "replace"), Ident(strVal: "in"), @column,
-        all @replacements]:
-
-      var replacementPairs = newSeq[(NimNode, NimNode)]()
-
-      while replacements.len() > 0:
-        case replacements:
-          of [@target, Ident(strVal: "with"), @replacement, all @rest]:
-            replacements = rest
-
-            replacementPairs.add((target, replacement))
-          else:
-            echo "could not match substitution ", command.toStrLit
-
-      let replacementTable = newTableConstructor(replacementPairs)
+    of [Ident(strVal: "replace"), all @replacements]:
+      let replacementTable = transpileReplacementTable(replacements)
 
       result = quote do:
         `table`.`column` = `table`.`column`.replaceAll(`replacementTable`)
-
     else:
-      echo "transpile command did not match"
       result = command
+
+
+proc transpileReplaceWithoutColumn(command, table: NimNode): NimNode =
+  case command:
+    of [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement, Ident(strVal: "in"), @column]:
+      result = quote do:
+        `table`.`column` = `table`.`column`.replace(`target`, `replacement`)
+
+    of [Ident(strVal: "replace"), Ident(strVal: "in"), @column, all @replacements]:
+      let replacementTable = transpileReplacementTable(replacements)
+
+      result = quote do:
+        `table`.`column` = `table`.`column`.replaceAll(`replacementTable`)
+    else:
+      result = command
+
+proc transpileReplace(command, table: NimNode, column: Option[NimNode]): NimNode =
+  if column.isSome:
+    return transpileReplaceWithColumn(command, table, column.get)
+  else:
+    return transpileReplaceWithoutColumn(command, table)
+
 
 proc transpileRemoveWithColumn(command, table, column: NimNode): NimNode =
   case command:
@@ -208,7 +236,7 @@ proc transpileCommand(table: NimNode, column: Option[NimNode], command: NimNode)
     of Command[Ident(strVal: "trim"), .._]:
       return transpileTrim(command, table, column)
     of Command[Ident(strVal: "replace"), .._]:
-      return transpileReplace(command, table)
+      return transpileReplace(command, table, column)
     of Command[Ident(strVal: "remove"), .._]:
       return transpileRemove(command, table, column)
     of Command[Ident(strVal: "take"), .._]:
