@@ -43,6 +43,9 @@ proc doFlatten(node: NimNode): seq[NimNode] =
     of StmtList[all @commands]:
       return commands.map(doFlatten).concat()
 
+    of Call[all @commands]:
+      return commands.map(doFlatten).concat()
+
     else:
       return @[node]
 
