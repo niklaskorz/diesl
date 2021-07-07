@@ -215,8 +215,19 @@ proc transpileRemove(command, table: NimNode, column: Option[NimNode]): NimNode 
     return transpileRemoveWithoutColumn(command, table)
 
 
+proc transpileTakeWithColumn(command, table, column: NimNode): NimNode =
+  case command:
+    of Command[Ident(strVal: "take"), @matchedLower, Ident(strVal: "to"), @matchedHigher]:
+      let lower = newLit(matchedLower.intVal - 1)
+      let higher = newLit(matchedHigher.intVal - 1)
 
-proc transpileTake(command, table: NimNode): NimNode =
+      result = quote do:
+        `table`.`column` = `table`.`column`[int(`lower`)..int(`higher`)]
+    else:
+      result = command
+
+
+proc transpileTakeWithoutColumn(command, table: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "take"), @matchedLower, Ident(strVal: "to"),
         @matchedHigher, Ident(strVal: "from"), @column]:
@@ -227,6 +238,13 @@ proc transpileTake(command, table: NimNode): NimNode =
         `table`.`column` = `table`.`column`[int(`lower`)..int(`higher`)]
     else:
       result = command
+
+
+proc transpileTake(command, table: NimNode, column: Option[NimNode]): NimNode =
+  if column.isSome():
+    return transpileTakeWithColumn(command, table, column.get)
+  else:
+    return transpileTakeWithoutColumn(command, table)
 
 
 proc transpileCommand(table: NimNode, column: Option[NimNode], command: NimNode): NimNode =
@@ -240,7 +258,7 @@ proc transpileCommand(table: NimNode, column: Option[NimNode], command: NimNode)
     of Command[Ident(strVal: "remove"), .._]:
       return transpileRemove(command, table, column)
     of Command[Ident(strVal: "take"), .._]:
-      return transpileTake(command, table)
+      return transpileTake(command, table, column)
     else:
       return command
 
@@ -263,7 +281,6 @@ proc transpileChangeBlock(selector: NimNode, commands: NimNode): NimNode =
 
   for command in commands.children:
     result.add(transpileCommand(table, column, command))
-
 
 # selector is one of:
 # <table name>

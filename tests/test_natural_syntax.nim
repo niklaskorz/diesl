@@ -95,6 +95,16 @@ proc test_natural*() =
 
       check operationsEq(actualDB, expectedDB)
 
+
+    test "remove with specified column":
+      expectedTable.text = expectedTable.text.remove("ba")
+
+      change text of actualTable:
+        remove "ba"
+
+      check operationsEq(actualDB, expectedDB)
+
+
     test "remove multiple targets":
       # TODO we should test data not ast
       # this would fail:
@@ -110,6 +120,17 @@ proc test_natural*() =
       check exportOperationsJson(expectedDB, true) == exportOperationsJson(actualDB, true)
 
 
+    test "remove multiple targets and specified column":
+      expectedTable.text = expectedTable.text.remove("ba")
+      expectedTable.text = expectedTable.text.remove("oo")
+      expectedTable.text = expectedTable.text.remove("z")
+
+      change text of actualTable:
+        remove "ba", "oo" and "z"
+
+      check exportOperationsJson(expectedDB, true) == exportOperationsJson(actualDB, true)
+
+
     test "replace":
       expectedTable.text = expectedTable.text.replace("ba", "to")
 
@@ -119,21 +140,50 @@ proc test_natural*() =
       check operationsEq(actualDB, expectedDB)
 
 
+    test "replace with specified column":
+      expectedTable.text = expectedTable.text.replace("ba", "to")
+
+      change text of actualTable:
+        replace "ba" with "to"
+
+      check operationsEq(actualDB, expectedDB)
+
+
     test "replace multiple substrings":
-      # expectedTable.text = expectedTable.text.replaceAll(@{"ba": "to", "fo": "ta"})
+      expectedTable.text = expectedTable.text.replaceAll(@{"ba": "to", "fo": "ta"})
 
       change actualTable:
         replace in text:
           "ba" with "to"
           "fo" with "ta"
 
-      # check operationsEq(actualDB, expectedDB)
+      check operationsEq(actualDB, expectedDB)
+
+    test "replace multiple substrings with specified column":
+      expectedTable.text = expectedTable.text.replaceAll(@{"ba": "to", "fo": "ta"})
+
+      change text of actualTable:
+        replace:
+          "ba" with "to"
+          "fo" with "ta"
+
+      check operationsEq(actualDB, expectedDB)
+
 
     test "substring":
       expectedTable.text = expectedTable.text[1..3]
 
       change actualTable:
         take 2 to 4 from text
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "substring with specified column":
+      expectedTable.text = expectedTable.text[1..3]
+
+      change text of actualTable:
+        take 2 to 4
 
       check operationsEq(actualDB, expectedDB)
 
