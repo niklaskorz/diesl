@@ -61,10 +61,10 @@ proc transpileTrimWithColumn(command, table, column: NimNode): NimNode =
     of Command[Ident(strVal: "trim")]:
       result = quote do:
         `table`.`column` = `table`.`column`.trim()
-    of Command[Ident(strVal: "trim"), @direction, Ident(strVal: "of"), @column]:
+    of Command[Ident(strVal: "trim"), @direction]:
+      let textDirection = translateDirection(direction)
       result = quote do:
-        `table`.`column` = `table`.`column`.trim(`direction`)
-
+        `table`.`column` = `table`.`column`.trim(`textDirection`)
 
 proc transpileTrimWithoutColumn(command, table: NimNode): NimNode = 
   case command:
@@ -84,9 +84,10 @@ proc transpileTrimWithoutColumn(command, table: NimNode): NimNode =
 
 proc transpileTrim(command, table: NimNode, column: Option[NimNode]): NimNode =
   if column.isSome:
-    return transpileTrimWithColumn(command, table, column.get)
+    result = transpileTrimWithColumn(command, table, column.get)
   else:
-    return transpileTrimWithoutColumn(command, table)
+    result = transpileTrimWithoutColumn(command, table)
+
 
 
 
@@ -179,14 +180,13 @@ proc transpileChangeBlock(selector: NimNode, commands: NimNode): NimNode =
   var column: Option[NimNode]
 
   case selector:
-    of Ident[@tableVal]:
-      echo "1 table ", table.tostrlit
-      table = tableVal
+    of Ident(strVal: _):
+      table = selector
       column = none(NimNode)
     of Infix[Ident(strVal: "of"), @columnVal, @tableVal]:
       table = tableVal
       column = some(columnVal)
-      echo "2 table ", table.tostrlit
+
   result = newStmtList()
 
   commands.expectKind nnkStmtList
