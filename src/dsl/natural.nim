@@ -11,6 +11,22 @@ import fusion/matching
 {.experimental: "caseStmtMacros".}
 
 
+# parses lists like
+# a, b, c
+# or 
+# a, b and c
+proc parseList(nodes: seq[NimNode]): seq[NimNode] = 
+  # less than three because the smallest list with and has 3 elements: a and c 
+  if nodes.len() < 3:
+    return nodes
+
+  # remove optional "and" in the second last position
+  # cannot go out of bounds because of previous check
+  if nodes[^2].matches(Ident(strVal: "and")):
+    return concat(nodes[0..^3], nodes[^1..^1])
+  else:
+    return nodes
+
 proc doFlatten(node: NimNode): seq[NimNode] =
   case node:
     of Infix[@param1, @command, all @params]:
@@ -65,6 +81,9 @@ proc transpileTrimWithColumn(command, table, column: NimNode): NimNode =
       let textDirection = translateDirection(direction)
       result = quote do:
         `table`.`column` = `table`.`column`.trim(`textDirection`)
+    else:
+      result = command
+
 
 proc transpileTrimWithoutColumn(command, table: NimNode): NimNode = 
   case command:
@@ -78,7 +97,6 @@ proc transpileTrimWithoutColumn(command, table: NimNode): NimNode =
       result = quote do:
         `table`.`column` = `table`.`column`.trim()
     else:
-      echo "NO MATCH"
       result = command
 
 
@@ -87,9 +105,6 @@ proc transpileTrim(command, table: NimNode, column: Option[NimNode]): NimNode =
     result = transpileTrimWithColumn(command, table, column.get)
   else:
     result = transpileTrimWithoutColumn(command, table)
-
-
-
 
 
 proc transpileReplace(command, table: NimNode): NimNode =
@@ -122,20 +137,36 @@ proc transpileReplace(command, table: NimNode): NimNode =
       echo "transpile command did not match"
       result = command
 
+proc transpileRemoveWithColumn(command, table, column: NimNode): NimNode =
+  case command:
+    of Command[Ident(strVal: "remove"), @target]:
+      result = quote do:
+        `table`.`column` = `table`.`column`.remove(`target`)
+    of Command[Ident(strVal: "remove"), all @targetsVal]:
+      let targets = parseList(targetsVal)
 
-proc transpileRemove(command, table: NimNode): NimNode =
+      if targets.len() == 0:
+        return command
+
+      result = newStmtList()
+
+      for target in targets:
+        result.add(quote do: `table`.`column` = `table`.`column`.remove(`target`))
+
+
+    else:
+      result = command
+
+proc transpileRemoveWithoutColumn(command, table: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "remove"), @target, Ident(strVal: "from"), @column]:
       result = quote do:
         `table`.`column` = `table`.`column`.remove(`target`)
-    of Command[Ident(strVal: "remove"), until @targets is Ident(strVal: "from"), Ident(strVal: "from"), @column]:
-      if targets.len == 0:
-        return command
+    of Command[Ident(strVal: "remove"), until @targetsVal is Ident(strVal: "from"), Ident(strVal: "from"), @column]:
+      let targets = parseList(targetsVal)
 
-      # remove optional "and" in the second last position
-      # cannot go out of bounds because of previous match
-      if targets[^2].matches(Ident(strVal: "and")):
-        targets.delete(targets.len - 2)
+      if targets.len() == 0:
+        return command
 
       result = newStmtList()
 
@@ -144,6 +175,14 @@ proc transpileRemove(command, table: NimNode): NimNode =
 
     else:
       result = command
+
+
+proc transpileRemove(command, table: NimNode, column: Option[NimNode]): NimNode =
+  if column.isSome:
+    return transpileRemoveWithColumn(command, table, column.get)
+  else:
+    return transpileRemoveWithoutColumn(command, table)
+
 
 
 proc transpileTake(command, table: NimNode): NimNode =
@@ -168,7 +207,7 @@ proc transpileCommand(table: NimNode, column: Option[NimNode], command: NimNode)
     of Command[Ident(strVal: "replace"), .._]:
       return transpileReplace(command, table)
     of Command[Ident(strVal: "remove"), .._]:
-      return transpileRemove(command, table)
+      return transpileRemove(command, table, column)
     of Command[Ident(strVal: "take"), .._]:
       return transpileTake(command, table)
     else:
