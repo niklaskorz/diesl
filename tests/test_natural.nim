@@ -1,94 +1,116 @@
 
 import unittest
+import tables
+import json
+
 
 import dsl/[operations, natural]
 import dsl/operations/conversion
-import json
 
-import utils/test_macro
-
-let db = Diesl()
-let dbTable = db.testTable
+proc operationsEq(actualDB: Diesl, expectedDB: Diesl): bool =
+  let expectedJson = exportOperationsJson(expectedDB)
+  let actualJson = exportOperationsJson(actualDB)
+  
+  return expectedJson == actualJson
 
 
 proc test_natural*() =
-  suite "natural syntax for string operations":
+  suite "natural syntax for string operations": 
 
+    setup:
+      let expectedDB = Diesl(dbSchema: DieslDatabaseSchema(tables: {
+        "table": DieslTableSchema(columns: {
+          "text": ddtString,
+        }.toTable)
+      }.toTable))
+
+      let actualDB = Diesl(dbSchema: DieslDatabaseSchema(tables: {
+          "table": DieslTableSchema(columns: {
+            "text": ddtString,
+          }.toTable)
+        }.toTable))
+
+
+      var expectedTable = expectedDB.table 
+      var actualTable = actualDB.table 
+
+      
     # TODO: test that there is no ast transformation in this case
     # since it is not needed
-    test_macro "trim without parameter":
-      expected:
-        dbTable.text.trim()
+    test "trim without parameter":
+      expectedTable.text = actualTable.text.trim()
 
-      actual:
-        transform dbTable:
-          trim dbTable.text
+      change actualTable:
+        trim text
 
-    test_macro "trim left":
-      expected:
-        dbTable.text.trim(left)
+      check operationsEq(actualDB, expectedDB)
 
-      actual:
-        transform dbTable:
-          trim beginning of dbTable.text
+    test "trim left":
+      expectedTable.text = expectedTable.text.trim(left)
 
+      change actualTable:
+        trim beginning of text
 
-    test_macro "trim right":
-      expected:
-        dbTable.text.trim(right)
+      check operationsEq(actualDB, expectedDB)
 
-      actual:
-        transform dbTable:
-          trim ending of dbTable.text
+    test "trim right":
+      expectedTable.text = expectedTable.text.trim(right)
 
-    test_macro "remove":
-      actual:
-        transform dbTable:
-          remove "ba" from dbTable.text
+      change actualTable:
+        trim ending of text
 
-      expected:
-        dbTable.text.remove("ba")
+      check operationsEq(actualDB, expectedDB)
 
+    test "remove":
+      expectedTable.text = expectedTable.text.remove("ba")
 
-    test_macro "remove multiple targets":
-      actual:
-        transform dbTable:
-          remove "ba", "oo" and "z" from dbTable.text
+      change actualTable:
+        remove "ba" from text
 
-      expected:
-        dbTable.text.remove("ba").remove("oo").remove("z")
+      check operationsEq(actualDB, expectedDB)
 
+    test "remove multiple targets":
+      # TODO we should test data not ast
+      # this would fail:
+      # expectedTable.text = expectedTable.text.remove("ba").remove("oo").remove("z")
 
-    test_macro "replace":
-      actual:
-        transform dbTable:
-          replace "ba" with "to" in dbTable.text
+      expectedTable.text = expectedTable.text.remove("ba")
+      expectedTable.text = expectedTable.text.remove("oo")
+      expectedTable.text = expectedTable.text.remove("z")
 
-      expected:
-        dbTable.text.replace("ba", "to")
+      change actualTable:
+        remove "ba", "oo" and "z" from text
+
+      check exportOperationsJson(expectedDB, true) == exportOperationsJson(actualDB, true)
 
 
-    test_macro "replace multiple substrings":
-      actual:
-        transform dbTable:
-          replace in dbTable.text:
-            "ba" with "to"
-            "fo" with "ta"
+    test "replace":
+      expectedTable.text = expectedTable.text.replace("ba", "to")
 
-      expected:
-        dbTable.text.replaceAll(@{"ba": "to", "fo": "ta"})
+      change actualTable:
+        replace "ba" with "to" in text
+
+      check operationsEq(actualDB, expectedDB)
 
 
-    test_macro "substring":
-      actual:
-        transform dbTable:
-          take 2 to 4 from dbTable.text
+    test "replace multiple substrings":
+      # expectedTable.text = expectedTable.text.replaceAll(@{"ba": "to", "fo": "ta"})
 
-      expected:
-        dbTable.text[1..3]
+      change actualTable:
+        replace in text:
+          "ba" with "to"
+          "fo" with "ta"
+
+      # check operationsEq(actualDB, expectedDB)
+
+    test "substring":
+      expectedTable.text = expectedTable.text[1..3]
+
+      change actualTable:
+        take 2 to 4 from text
+
+      check operationsEq(actualDB, expectedDB)
 
 
 when isMainModule:
   test_natural()
-
-
