@@ -9,11 +9,12 @@ proc lit*(value: string): DieslOperation =
   toOperation(value)
 
 proc trim*(value: DieslOperation, direction: TextDirection = both): DieslOperation =
-  DieslOperation(kind: dotTrim, trimValue: value.assertDataType({ddtString}), trimDirection: direction)
+  DieslOperation(kind: dotTrim, trimValue: value.assertDataType({ddtString}),
+      trimDirection: direction)
 
 proc substring(value: DieslOperation, range: Slice[int]): DieslOperation =
-  DieslOperation(kind: dotSubstring, substringValue: value.assertDataType({ddtString}),
-      substringRange: range)
+  DieslOperation(kind: dotSubstring, substringValue: value.assertDataType({
+      ddtString}), substringRange: range)
 
 proc `[]`*(value: DieslOperation, range: Slice[int]): DieslOperation =
   value.substring(range)
@@ -33,7 +34,8 @@ proc replaceAll*(value: DieslOperation, replacements: seq[(DieslOperation,
     kind: dotReplaceAll,
     replaceAllValue: value.assertDataType({ddtString}),
     replaceAllReplacements: replacements.map((pair) => DieslReplacementPair(
-        target: pair[0].assertDataType({ddtString}), replacement: pair[1].assertDataType({ddtString})))
+        target: pair[0].assertDataType({ddtString}), replacement: pair[
+            1].assertDataType({ddtString})))
   )
 
 proc remove*(value: DieslOperation, target: DieslOperation): DieslOperation =

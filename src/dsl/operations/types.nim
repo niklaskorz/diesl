@@ -1,8 +1,11 @@
 import tables
+import sequtils
+import sugar
 
 type
   DieslOperationType* = enum
     dotStore
+    dotStoreMany
     dotLoad
     dotStringLiteral
     dotIntegerLiteral
@@ -19,11 +22,12 @@ type
 
   DieslDataType* = enum
     ddtUnknown
+    ddtVoid
     ddtString
     ddtInteger
 
   DieslTableSchema* = object
-    columns*: Table[string, DieslDataType]
+    columns*: OrderedTable[string, DieslDataType]
 
   DieslDatabaseSchema* = object
     tables*: Table[string, DieslTableSchema]
@@ -41,6 +45,11 @@ type
         storeColumn*: string
         storeValue*: DieslOperation
         storeType*: DieslDataType
+      of dotStoreMany:
+        storeManyTable*: string
+        storeManyColumns*: seq[string]
+        storeManyValues*: seq[DieslOperation]
+        storeManyTypes*: seq[DieslDataType]
       of dotLoad:
         loadTable*: string
         loadColumn*: string
@@ -80,8 +89,8 @@ type
 
 proc toDataType*(op: DieslOperation): DieslDataType =
   case op.kind:
-    of dotStore:
-      op.storeType
+    of dotStore, dotStoreMany:
+      ddtVoid
     of dotLoad:
       op.loadType
     of dotStringLiteral:
@@ -107,3 +116,26 @@ proc toDataType*(op: DieslOperation): DieslDataType =
       ddtString
     of dotExtractMany:
       ddtString
+
+proc toStoreMany*(op: DieslOperation): DieslOperation =
+  assert op.kind == dotStore
+  DieslOperation(
+    kind: dotStoreMany,
+    storeManyTable: op.storeTable,
+    storeManyColumns: @[op.storeColumn],
+    storeManyValues: @[op.storeValue],
+    storeManyTypes: @[op.storeType]
+  )
+
+proc newTableSchema*(columns: openArray[(string,
+    DieslDataType)]): DieslTableSchema =
+  DieslTableSchema(columns: columns.toOrderedTable)
+
+proc newDatabaseSchema*(tables: openArray[(string,
+    DieslTableSchema)]): DieslDatabaseSchema =
+  DieslDatabaseSchema(tables: tables.toTable)
+
+proc newDatabaseSchema*(tables: openArray[(string, seq[(string,
+    DieslDataType)])]): DieslDatabaseSchema =
+  DieslDatabaseSchema(tables: tables.map((pair) => (pair[0], newTableSchema(
+      pair[1]))).toTable)
