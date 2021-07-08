@@ -6,6 +6,9 @@ import db_sqlite
 import ../operations
 import ../operations/patterns
 
+import re
+import exportToSqlite3
+
 proc toSqlite*(op: DieslOperation): string =
   case op.kind:
     of dotStore:
@@ -47,9 +50,9 @@ proc toSqlite*(op: DieslOperation): string =
     of dotToUpper:
       fmt"UPPER({op.toUpperValue.toSqlite})"
     of dotExtractOne:
-      fmt"{op.extractOneValue.toSqlite} REGEXP '{op.extractOnePattern.pattern}'"
+      fmt"sqlite3ExtractOne({op.extractOneValue.toSqlite}, '{op.extractOnePattern.pattern}')"
     of dotExtractMany:
-      fmt"{op.extractManyValue.toSqlite} REGEXP '{op.extractManyPattern.pattern}'"
+      fmt"sqlite3ExtractMany({op.extractManyValue.toSqlite}, '{op.extractManyPattern.pattern}')"
 
 
 proc toSqlite*(operations: seq[DieslOperation]): string =
@@ -58,3 +61,18 @@ proc toSqlite*(operations: seq[DieslOperation]): string =
     assert operation.kind == dotStore
     statements.add(operation.toSqlite)
   return statements.join("\n")
+
+
+proc sqlite3ExtractOne(input: string, regex: string): string {.exportToSqlite3.} =
+  var matches: seq[string] = @[]
+  let matchRegex = re(regex);
+  let (l, r) = re.findBounds(input, matchRegex, matches)
+
+  return if l == -1 and r == 0:
+     ""
+  else:
+    return matches[0]
+
+
+proc sqlite3Replace(input: string, old: string, nw: string): string {.exportToSqlite3.} = 
+  return re.replace(input, re(old), nw)
