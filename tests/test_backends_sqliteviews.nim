@@ -3,7 +3,7 @@ import sugar
 import db_sqlite
 
 import dsl/operations
-import dsl/operations/[conversion, optimizations]
+import dsl/operations/conversion
 import dsl/backends/sqliteviews
 
 proc test_backends_sqliteviews*() =
