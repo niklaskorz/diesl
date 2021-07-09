@@ -40,6 +40,10 @@ proc collectLoads(op: DieslOperation): HashSet[(string, string)] =
     of dotToUpper:
       op.toUpperValue.collectLoads()
 
+proc collectLoads(operations: seq[DieslOperation]): HashSet[(string, string)] =
+  for op in operations:
+    result = result + op.collectLoads()
+
 proc replaceLoad(op: var DieslOperation, table: string, column: string, value: DieslOperation) =
   case op.kind:
     of dotStore:
@@ -104,6 +108,7 @@ proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
   var lastTableStores: Table[string, (seq[string], int)]
   for op in firstResult:
     assert op.kind == dotStore
+    # Check if this operation depends on any dotStoreMany entries
     let loads = op.collectLoads()
     let storeKeys = toSeq(lastTableStores.keys)
     for table in storeKeys:
@@ -112,13 +117,22 @@ proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
       if any(columns, column => (tableCopy, column) in loads):
         lastTableStores.del(table)
     if lastTableStores.contains(op.storeTable):
-      # TODO: need to check if any existing storeManyValues depend on this column
+      # Check if any existing dotStoreMany entries depend on this operation's column
+      let (_, index) = lastTableStores[op.storeTable]
+      assert result[index].kind == dotStoreMany
+      let loads = result[index].storeManyValues.collectLoads()
+      if (op.storeTable, op.storeColumn) in loads:
+        lastTableStores.del(op.storeTable)
+    if lastTableStores.contains(op.storeTable):
+      # Merge with previous dotStoreMany if possible
       let (columns, index) = lastTableStores[op.storeTable]
       assert op.storeColumn notin columns
       lastTableStores[op.storeTable][0].add(op.storeColumn)
+      assert result[index].kind == dotStoreMany
       result[index].storeManyColumns.add(op.storeColumn)
       result[index].storeManyValues.add(op.storeValue)
       result[index].storeManyTypes.add(op.storeType)
     else:
+      # Add a new dotStoreMany and mark its position
       lastTableStores[op.storeTable] = (@[op.storeColumn], result.len())
       result.add(op.toStoreMany())

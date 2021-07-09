@@ -21,7 +21,7 @@ test coverage:
     stage: test
     script:
         - nimble install --depsOnly
-        - coco  --cov="src" --compiler=--hints:off
+        - coco --cov="src" --compiler=--hints:off
     artifacts:
         paths:
             - coverage/

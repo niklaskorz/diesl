@@ -3,7 +3,7 @@ import os
 import sugar
 import strformat
 import operations
-import operations/[parseexport, nimify, optimizations]
+import operations/[parseexport, nimify]
 
 type StdPathNotFoundError* = object of CatchableError
 type FusionPathNotFoundError* = object of CatchableError
@@ -114,7 +114,7 @@ let exportedOperations* = db.exportOperationsJson()
   let symbol = intr.selectUniqueSymbol("exportedOperations")
   let value = intr.getGlobalValue(symbol).getStr()
   let exportedOperations = parseExportedOperationsJson(value)
-  return exportedOperations.mergeStores()
+  return exportedOperations
 
 when isMainModule:
   import json

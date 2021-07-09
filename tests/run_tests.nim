@@ -1,19 +1,27 @@
 import unittest
 import streams
 
-import test_operations_boundaries
+import test_backends_sqlite
+import test_backends_sqliteviews
+import test_natural
 import test_operations_base
+import test_operations_boundaries
+import test_operations_optimizations
 import test_operations_strings
-import test_sqlite
+import test_script
 
 let resultFile = openFileStream("result.xml", fmWrite)
 
 let outputFormatter = newJUnitOutputFormatter(resultFile)
 addOutputFormatter(outputFormatter)
 
-test_boundaries()
-test_strings()
-test_base()
-test_sqlite()
+test_backends_sqlite()
+test_backends_sqliteviews()
+test_natural()
+test_operations_base()
+test_operations_boundaries()
+test_operations_optimizations()
+test_operations_strings()
+test_script()
 
 outputFormatter.close()

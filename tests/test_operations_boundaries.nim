@@ -2,7 +2,7 @@ import unittest
 
 import dsl/operations/[base, boundaries, strings]
 
-proc test_boundaries*() =
+proc test_operations_boundaries*() =
   suite "check boundary operations":
     setup:
       let db = Diesl(dbSchema: newDatabaseSchema({
@@ -40,4 +40,4 @@ proc test_boundaries*() =
         db.table.output = db.table2.input
 
 when isMainModule:
-  test_boundaries()
+  test_operations_boundaries()
