@@ -3,7 +3,7 @@ import sugar
 import db_sqlite
 
 import dsl/operations
-import dsl/operations/conversion
+import dsl/operations/[conversion, optimizations]
 import dsl/backends/sqliteviews
 
 proc test_backends_sqliteviews*() =
@@ -82,9 +82,9 @@ proc test_backends_sqliteviews*() =
 
     test "one operation per column with interdependencies":
       let db = Diesl(dbSchema: schema)
-      db.students.name = db.students.lastName
-      db.students.firstName = db.students.name
-      db.students.lastName = db.students.firstName
+      db.students.name = "A " & db.students.lastName
+      db.students.firstName = "B " & db.students.name
+      db.students.lastName = "C " & db.students.firstName
       let operations = db.exportOperations()
 
       let (queries, tableAccessMap) = operations.toSqliteViews(schema)
@@ -96,8 +96,8 @@ proc test_backends_sqliteviews*() =
           row
 
       check students == @[
-        @["Parker", "Parker", "Parker"],
-        @["Good", "Good", "Good"],
+        @["A Parker", "B A Parker", "C B A Parker"],
+        @["A Good", "B A Good", "C B A Good"],
       ]
 
 when isMainModule:

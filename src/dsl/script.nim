@@ -114,7 +114,7 @@ let exportedOperations* = db.exportOperationsJson()
   let symbol = intr.selectUniqueSymbol("exportedOperations")
   let value = intr.getGlobalValue(symbol).getStr()
   let exportedOperations = parseExportedOperationsJson(value)
-  return exportedOperations.mergeStores()
+  return exportedOperations
 
 when isMainModule:
   import json
