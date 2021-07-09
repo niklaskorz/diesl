@@ -29,13 +29,20 @@ proc assertDataType*(op: DieslOperation, dataTypes: set[
         $dataType & ", expected one of " & $dataTypes)
   return op
 
-proc exportOperations*(diesl: Diesl): seq[DieslOperation] = diesl.pOperations.mergeStores()
+proc exportOperations*(diesl: Diesl, optimize: bool = true): seq[DieslOperation] =
+  if optimize:
+    diesl.pOperations.mergeStores()
+  else:
+    diesl.pOperations
 
 proc exportOperationsJson*(diesl: Diesl, prettyJson: bool = false): string =
   if prettyJson:
     pretty(%(diesl.exportOperations()))
   else:
     $(%(diesl.exportOperations()))
+
+proc `$`*(operations: seq[DieslOperation]): string =
+  pretty(%operations)
 
 proc load(diesl: Diesl, table: string): DieslTable =
   if diesl.dbSchema.tables.len() > 0 and table notin diesl.dbSchema.tables:

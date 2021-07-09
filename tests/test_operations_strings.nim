@@ -18,7 +18,7 @@ proc test_strings*() =
     test "substring":
       db.table.to = db.table.frm[0..5]
 
-      let ops = db.exportOperations()
+      let ops = db.exportOperations(optimize = false)
       let storeOp = ops[0]
 
       let substringOp = storeOp.storeValue
@@ -29,7 +29,7 @@ proc test_strings*() =
     test "replace":
       db.table.to = db.table.frm.replace("old".toOperation, "new".toOperation)
 
-      let ops = db.exportOperations()
+      let ops = db.exportOperations(optimize = false)
       let storeOp = ops[0]
 
       let replacementOp = storeOp.storeValue
@@ -47,7 +47,7 @@ proc test_strings*() =
         ("old".toOperation, "new".toOperation)
       ])
 
-      let ops = db.exportOperations()
+      let ops = db.exportOperations(optimize = false)
       let storeOp = ops[0]
 
       let replacementOp = storeOp.storeValue
@@ -64,7 +64,7 @@ proc test_strings*() =
     test "remove":
       db.table.to = db.table.frm.remove(lit"$MY-SOCIAL-SECURITY-NUMBER")
 
-      let ops = db.exportOperations()
+      let ops = db.exportOperations(optimize = false)
       let storeOp = ops[0]
 
       let removalOp = storeOp.storeValue
@@ -80,7 +80,7 @@ proc test_strings*() =
     test "concatenation":
       db.table.cnct = db.table.lhs & db.table.rhs
 
-      let ops = db.exportOperations()
+      let ops = db.exportOperations(optimize = false)
       let storeOp = ops[0]
 
       let concatOp = storeOp.storeValue
