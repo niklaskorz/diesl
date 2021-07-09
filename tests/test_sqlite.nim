@@ -24,7 +24,7 @@ proc test_sqlite*() =
       db.students.name = prefix.lit & db.students.firstName[2..5] & whitespace.lit & db.students.secondName
 
       let updateStudentSQL = db.exportOperations[^1].toSqlite
-      let expectedUpdateSQL = fmt"UPDATE students SET name = '{prefix}' || SUBSTR(students.firstName, 2, 5) || '{whitespace}' || students.secondName;"
+      let expectedUpdateSQL = fmt"UPDATE students SET name = '{prefix}' || SUBSTR(firstName, 2, 5) || '{whitespace}' || secondName;"
       check updateStudentSQL == expectedUpdateSQL
 
     test "trim and replace":
@@ -36,7 +36,7 @@ proc test_sqlite*() =
         .replace(foo.lit, bar.lit)
         .replace(db.students.firstName, db.students.secondName)
       let trimmingSQL = db.exportOperations[^1].toSqlite
-      let expectedTrimmingSQL = fmt"UPDATE students SET name = REPLACE(REPLACE(RTRIM(students.name), '{foo}', '{bar}'), students.firstName, students.secondName);"
+      let expectedTrimmingSQL = fmt"UPDATE students SET name = REPLACE(REPLACE(RTRIM(name), '{foo}', '{bar}'), firstName, secondName);"
       check trimmingSQL == expectedTrimmingSQL
 
     test "remove":
@@ -46,7 +46,7 @@ proc test_sqlite*() =
 
       let expectedSQLs = collect(newSeq):
         for word in forbiddenWords:
-          fmt"UPDATE students SET name = REPLACE(students.name, '{word}', '');"
+          fmt"UPDATE students SET name = REPLACE(name, '{word}', '');"
 
       for (expected, generated) in zip(expectedSQLs, db.exportOperations):
         check generated.toSqlite == expected
@@ -61,7 +61,7 @@ proc test_sqlite*() =
       })
 
       let generatedSQL = db.exportOperations[^1].toSqlite
-      let expectedSQL = fmt"UPDATE students SET name = REPLACE(REPLACE(students.name, students.firstName, '{b}'), students.secondName, '{d}');"
+      let expectedSQL = fmt"UPDATE students SET name = REPLACE(REPLACE(name, firstName, '{b}'), secondName, '{d}');"
       check generatedSQL == expectedSQL
 
       # let expectedSQL = fmt"UPDATE students SET name = REPLACE("
