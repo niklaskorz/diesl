@@ -2,6 +2,7 @@ import strformat
 import strutils
 import sequtils
 import sugar
+import algorithm
 import random
 import tables
 import db_common
@@ -102,7 +103,7 @@ type RemoveSqliteViewsResult* = tuple
 
 proc removeSqliteViews*(views: seq[string], tableAccessMap: TableAccessMap): RemoveSqliteViewsResult =
   var queries: seq[SqlQuery]
-  for view in views:
+  for view in views.reversed():
     queries.add(SqlQuery(fmt"DROP VIEW {view}"))
   let updatedTableAccessMap = toSeq(tableAccessMap.pairs).map(
     (pair) => (
