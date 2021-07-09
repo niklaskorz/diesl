@@ -4,3 +4,4 @@
 *.out
 result.xml
 nimcache/
+htmldocs/
