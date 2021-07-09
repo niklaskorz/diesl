@@ -1,6 +1,7 @@
 import strformat
 import strutils
 import sequtils
+import sugar
 import random
 import tables
 import db_common
@@ -13,7 +14,11 @@ type TableAccessMap* = Table[string, seq[string]]
 
 proc getTableAccessName*(tableAccessMap: TableAccessMap,
     tableName: string): string =
-  tableAccessMap.getOrDefault(tableName, @[tableName])[^1]
+  let names = tableAccessMap.getOrDefault(tableName, @[])
+  if names.len() > 0:
+    names[^1]
+  else:
+    tableName
 
 proc addTableAccessName(tableAccessMap: var TableAccessMap, tableName: string,
     accessName: string) =
@@ -26,7 +31,7 @@ proc getTableColumns(schema: DieslDatabaseSchema, tableName: string): seq[string
   toSeq(schema.tables[tableName].columns.keys())
 
 proc toSqliteView*(op: DieslOperation, schema: DieslDatabaseSchema,
-    tableAccessMap: var TableAccessMap, dieslId: string,
+    tableAccessMap: var TableAccessMap, views: var seq[string], dieslId: string,
         viewId: var int): string =
   case op.kind:
     of dotStore:
@@ -34,6 +39,7 @@ proc toSqliteView*(op: DieslOperation, schema: DieslDatabaseSchema,
       viewId += 1
       let tableAccessName = tableAccessMap.getTableAccessName(op.storeTable)
       tableAccessMap.addTableAccessName(op.storeTable, viewName)
+      views.add(viewName)
       let columns = schema.getTableColumns(op.storeTable)
       let columnNames = columns.join(", ")
       let columnValues = columns.map(proc (column: string): string =
@@ -48,6 +54,7 @@ proc toSqliteView*(op: DieslOperation, schema: DieslDatabaseSchema,
       viewId += 1
       let tableAccessName = tableAccessMap.getTableAccessName(op.storeManyTable)
       tableAccessMap.addTableAccessName(op.storeManyTable, viewName)
+      views.add(viewName)
       let columns = schema.getTableColumns(op.storeManyTable)
       let columnNames = columns.join(", ")
       let columnValues = columns.map(proc (column: string): string =
@@ -73,15 +80,34 @@ proc randomId(): string =
 type ToSqliteViewsResult* = tuple
   queries: seq[SqlQuery]
   tableAccessMap: TableAccessMap
+  views: seq[string]
 
 proc toSqliteViews*(operations: seq[DieslOperation],
     schema: DieslDatabaseSchema, tableAccessMap: TableAccessMap = TableAccessMap()): ToSqliteViewsResult =
   var updatedTableAccessMap = tableAccessMap
+  var views: seq[string]
   let dieslId = randomId()
   var viewId = 0
   var queries: seq[SqlQuery]
   for operation in operations:
-    let query = operation.toSqliteView(schema, updatedTableAccessMap,
+    let query = operation.toSqliteView(schema, updatedTableAccessMap, views,
         dieslId, viewId)
     queries.add(SqlQuery(query))
+  return (queries, updatedTableAccessMap, views)
+
+
+type RemoveSqliteViewsResult* = tuple
+  queries: seq[SqlQuery]
+  tableAccessMap: TableAccessMap
+
+proc removeSqliteViews*(views: seq[string], tableAccessMap: TableAccessMap): RemoveSqliteViewsResult =
+  var queries: seq[SqlQuery]
+  for view in views:
+    queries.add(SqlQuery(fmt"DROP VIEW {view}"))
+  let updatedTableAccessMap = toSeq(tableAccessMap.pairs).map(
+    (pair) => (
+      pair[0],
+      pair[1].filter((name) => name notin views)
+    )
+  ).toTable()
   return (queries, updatedTableAccessMap)

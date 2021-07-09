@@ -39,7 +39,8 @@ db.students.secondName = db.students.secondName.replaceAll(@{
 })
 """, schema)
 
-  let (queries, tableAccessMap) = exportedOperations.toSqliteViews(schema)
+  let (queries, tableAccessMap, views) = exportedOperations.toSqliteViews(schema)
   for query in queries:
     echo string(query)
   echo $tableAccessMap
+  echo $views

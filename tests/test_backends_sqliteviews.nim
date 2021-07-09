@@ -29,7 +29,7 @@ proc test_backends_sqliteviews*() =
       let db = Diesl(dbSchema: schema)
       let operations = db.exportOperations()
 
-      let (queries, tableAccessMap) = operations.toSqliteViews(schema)
+      let (queries, tableAccessMap, _) = operations.toSqliteViews(schema)
       for query in queries:
         dbConn.exec(query)
 
@@ -47,7 +47,7 @@ proc test_backends_sqliteviews*() =
       db.students.name = db.students.lastName & ", " & db.students.firstName
       let operations = db.exportOperations()
 
-      let (queries, tableAccessMap) = operations.toSqliteViews(schema)
+      let (queries, tableAccessMap, _) = operations.toSqliteViews(schema)
       for query in queries:
         dbConn.exec(query)
 
@@ -67,7 +67,7 @@ proc test_backends_sqliteviews*() =
       db.students.lastName = "Last name"
       let operations = db.exportOperations()
 
-      let (queries, tableAccessMap) = operations.toSqliteViews(schema)
+      let (queries, tableAccessMap, _) = operations.toSqliteViews(schema)
       for query in queries:
         dbConn.exec(query)
 
@@ -87,7 +87,7 @@ proc test_backends_sqliteviews*() =
       db.students.lastName = "C " & db.students.firstName
       let operations = db.exportOperations()
 
-      let (queries, tableAccessMap) = operations.toSqliteViews(schema)
+      let (queries, tableAccessMap, _) = operations.toSqliteViews(schema)
       for query in queries:
         dbConn.exec(query)
 
@@ -99,6 +99,34 @@ proc test_backends_sqliteviews*() =
         @["A Parker", "B A Parker", "C B A Parker"],
         @["A Good", "B A Good", "C B A Good"],
       ]
+
+    test "undo operations":
+      let db = Diesl(dbSchema: schema)
+      db.students.name = db.students.lastName & ", " & db.students.firstName
+      let operations = db.exportOperations()
+
+      let (queries, tableAccessMap, views) = operations.toSqliteViews(schema)
+      for query in queries:
+        dbConn.exec(query)
+      var students = collect(newSeq):
+        for row in dbConn.fastRows(sql"SELECT name, firstName, lastName FROM ?", tableAccessMap.getTableAccessName("students")):
+          row
+      check students == @[
+        @["Parker, Peter", "Peter", "Parker"],
+        @["Good, John", "John", "Good"],
+      ]
+
+      let (undoQueries, undoTableAccessMap) = views.removeSqliteViews(tableAccessMap)
+      for query in undoQueries:
+        dbConn.exec(query)
+      var undoStudents = collect(newSeq):
+        for row in dbConn.fastRows(sql"SELECT name, firstName, lastName FROM ?", undoTableAccessMap.getTableAccessName("students")):
+          row
+      check undoStudents == @[
+        @["  Peter  Parker", "Peter", "Parker"],
+        @[" John Good ", "John", "Good"],
+      ]
+
 
 when isMainModule:
   test_backends_sqliteviews()
