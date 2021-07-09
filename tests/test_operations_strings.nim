@@ -2,7 +2,7 @@ import unittest
 
 import dsl/operations/[base, strings, types]
 
-proc test_strings*() =
+proc test_operations_strings*() =
   suite "check string operations":
     setup:
       let db = Diesl(dbSchema: newDatabaseSchema({
@@ -87,4 +87,4 @@ proc test_strings*() =
       check concatOp.kind == dotStringConcat
 
 when isMainModule:
-  test_strings()
+  test_operations_strings()

@@ -3,7 +3,7 @@ import os
 import sugar
 import strformat
 import operations
-import operations/[parseexport, nimify, optimizations]
+import operations/[parseexport, nimify]
 
 type StdPathNotFoundError* = object of CatchableError
 type FusionPathNotFoundError* = object of CatchableError
