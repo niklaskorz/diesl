@@ -3,6 +3,7 @@ import strutils
 import sequtils
 import random
 import tables
+import db_common
 import ../operations
 import sqlite
 
@@ -10,7 +11,7 @@ randomize()
 
 type TableAccessMap* = Table[string, seq[string]]
 
-proc getTableAccessName(tableAccessMap: TableAccessMap,
+proc getTableAccessName*(tableAccessMap: TableAccessMap,
     tableName: string): string =
   tableAccessMap.getOrDefault(tableName, @[tableName])[^1]
 
@@ -41,7 +42,7 @@ proc toSqliteView*(op: DieslOperation, schema: DieslDatabaseSchema,
         else:
           column
       ).join(", ")
-      fmt"CREATE VIEW {viewName} ({columnNames}) AS SELECT {columnValues} FROM {tableAccessName};"
+      fmt"CREATE VIEW {viewName} ({columnNames}) AS SELECT {columnValues} FROM {tableAccessName}"
     of dotStoreMany:
       let viewName = fmt"{op.storeManyTable}_{dieslId}_{viewId}"
       viewId += 1
@@ -56,7 +57,7 @@ proc toSqliteView*(op: DieslOperation, schema: DieslDatabaseSchema,
         else:
           column
       ).join(", ")
-      fmt"CREATE VIEW {viewName} ({columnNames}) AS SELECT {columnValues} FROM {tableAccessName};"
+      fmt"CREATE VIEW {viewName} ({columnNames}) AS SELECT {columnValues} FROM {tableAccessName}"
     else:
       assert false
       ""
@@ -70,7 +71,7 @@ proc randomId(): string =
   (0..16).mapIt(sample(characters)).join("")
 
 type ToSqliteViewsResult* = tuple
-  sqlCode: string
+  queries: seq[SqlQuery]
   tableAccessMap: TableAccessMap
 
 proc toSqliteViews*(operations: seq[DieslOperation],
@@ -78,8 +79,9 @@ proc toSqliteViews*(operations: seq[DieslOperation],
   var updatedTableAccessMap = tableAccessMap
   let dieslId = randomId()
   var viewId = 0
-  var statements: seq[string]
+  var queries: seq[SqlQuery]
   for operation in operations:
-    statements.add(operation.toSqliteView(schema, updatedTableAccessMap,
-        dieslId, viewId))
-  return (statements.join("\n"), updatedTableAccessMap)
+    let query = operation.toSqliteView(schema, updatedTableAccessMap,
+        dieslId, viewId)
+    queries.add(SqlQuery(query))
+  return (queries, updatedTableAccessMap)

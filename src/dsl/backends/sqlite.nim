@@ -8,12 +8,12 @@ import ../operations
 proc toSqlite*(op: DieslOperation): string =
   case op.kind:
     of dotStore:
-      fmt"UPDATE {op.storeTable} SET {op.storeColumn} = {op.storeValue.toSqlite};"
+      fmt"UPDATE {op.storeTable} SET {op.storeColumn} = {op.storeValue.toSqlite}"
     of dotStoreMany:
       let assignmentValues = op.storeManyValues.map(toSqlite)
       let assignmentPairs = zip(op.storeManyColumns, assignmentValues)
       let assignments = assignmentPairs.map((pair) => [pair[0], pair[1]].join(" = ")).join(", ")
-      fmt"UPDATE {op.storeManyTable} SET {assignments};"
+      fmt"UPDATE {op.storeManyTable} SET {assignments}"
     of dotLoad:
       fmt"{op.loadColumn}"
     of dotStringLiteral:
@@ -46,9 +46,10 @@ proc toSqlite*(op: DieslOperation): string =
     of dotToUpper:
       fmt"UPPER({op.toUpperValue.toSqlite})"
 
-proc toSqlite*(operations: seq[DieslOperation]): string =
-  var statements: seq[string]
+proc toSqlite*(operations: seq[DieslOperation]): seq[SqlQuery] =
+  var queries: seq[SqlQuery]
   for operation in operations:
     assert operation.kind == dotStore
-    statements.add(operation.toSqlite)
-  return statements.join("\n")
+    let query = operation.toSqlite()
+    queries.add(SqlQuery(query))
+  return queries
