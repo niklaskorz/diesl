@@ -52,7 +52,15 @@ proc toSqlite*(op: DieslOperation): string =
     of dotExtractOne:
       fmt"sqlite3ExtractOne({op.extractOneValue.toSqlite}, '{op.extractOnePattern.pattern}')"
     of dotExtractMany:
+      assert(false, "Not implemented")
       fmt"sqlite3ExtractMany({op.extractManyValue.toSqlite}, '{op.extractManyPattern.pattern}')"
+    of dotRegexReplace:
+      fmt"sqlite3Replace({op.regexReplaceValue.toSqlite}, {op.regexReplaceTarget.toSqlite.pattern}, {op.regexReplaceReplacement.toSqlite})"
+    of dotRegexReplaceAll:
+      var value = op.replaceAllValue.toSqlite
+      for pair in op.regexReplaceAllReplacements:
+        value = fmt"sqlite3Replace({value}, {pair.target.toSqlite.pattern}, {pair.replacement.toSqlite})"
+      value
 
 
 proc toSqlite*(operations: seq[DieslOperation]): string =

@@ -20,8 +20,8 @@ type
     dotToUpper
     
     # Regex
-    # dotRegexReplace
-    # dotRegexReplaceAll
+    dotRegexReplace
+    dotRegexReplaceAll
     dotExtractOne
     dotExtractMany
 
@@ -93,14 +93,13 @@ type
       of dotExtractMany:
         extractManyValue*: DieslOperation
         extractManyPattern*: string
-
-      #[ of dotRegexReplace:
+      of dotRegexReplace:
         regexReplaceValue*: DieslOperation
         regexReplaceTarget*: DieslOperation
         regexReplaceReplacement*: DieslOperation
       of dotRegexReplaceAll:
         regexReplaceAllValue*: DieslOperation
-        regexReplaceAllReplacements*: seq[DieslReplacementPair] ]#
+        regexReplaceAllReplacements*: seq[DieslReplacementPair]
 
 
 proc toDataType*(op: DieslOperation): DieslDataType =
@@ -132,11 +131,11 @@ proc toDataType*(op: DieslOperation): DieslDataType =
       ddtString
     of dotExtractMany:
       ddtString
-    #[ of dotRegexReplace:
+    of dotRegexReplace:
       ddtString
     of dotRegexReplaceAll:
       ddtString
- ]#
+      
 proc toStoreMany*(op: DieslOperation): DieslOperation =
   assert op.kind == dotStore
   DieslOperation(
