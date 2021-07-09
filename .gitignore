@@ -3,3 +3,4 @@
 *.sqbpro
 *.out
 result.xml
+nimcache/

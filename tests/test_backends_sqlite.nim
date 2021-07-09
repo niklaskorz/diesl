@@ -46,9 +46,9 @@ proc test_backends_sqlite*() =
 
       let expectedSQLs = collect(newSeq):
         for word in forbiddenWords:
-          fmt"UPDATE students SET name = REPLACE(name, '{word}', '');"
+          fmt"UPDATE students SET name = REPLACE(name, '{word}', '')"
 
-      for (expected, generated) in zip(expectedSQLs, db.exportOperations):
+      for (expected, generated) in zip(expectedSQLs, db.exportOperations(optimize = false)):
         check generated.toSqlite == expected
 
     test "replaceAll":
