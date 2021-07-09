@@ -39,6 +39,21 @@ proc collectLoads(op: DieslOperation): HashSet[(string, string)] =
       op.toLowerValue.collectLoads()
     of dotToUpper:
       op.toUpperValue.collectLoads()
+    of dotRegexReplace:
+      op.regexReplaceValue.collectLoads() +
+        op.regexReplaceTarget.collectLoads() +
+          op.regexReplaceReplacement.collectLoads()
+    of dotRegexReplaceAll:
+      var loads = op.regexReplaceAllValue.collectLoads()
+      for pair in op.regexReplaceAllReplacements:
+        loads = loads + pair.target.collectLoads() +
+            pair.replacement.collectLoads()
+      loads
+    of dotExtractOne:
+      op.extractOneValue.collectLoads
+    of dotExtractMany:
+      op.extractManyValue.collectLoads
+
 
 proc collectLoads(operations: seq[DieslOperation]): HashSet[(string, string)] =
   for op in operations:
@@ -77,6 +92,21 @@ proc replaceLoad(op: var DieslOperation, table: string, column: string, value: D
       op.toLowerValue.replaceLoad(table, column, value)
     of dotToUpper:
       op.toUpperValue.replaceLoad(table, column, value)
+    of dotRegexReplace:
+      op.regexReplaceValue.replaceLoad(table, column, value)
+      op.regexReplaceTarget.replaceLoad(table, column, value)
+      op.regexReplaceReplacement.replaceLoad(table, column, value)
+    of dotRegexReplaceAll:
+      op.regexReplaceAllValue.replaceLoad(table, column, value)
+      op.regexReplaceAllReplacements.apply(proc (pair: var DieslReplacementPair) =
+        pair.target.replaceLoad(table, column, value)
+        pair.replacement.replaceLoad(table, column, value)
+      )
+    of dotExtractOne:
+      op.extractOneValue.replaceLoad(table, column, value)
+    of dotExtractMany:
+      op.extractManyValue.replaceLoad(table, column, value)
+
 
 proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
   # Step 1:

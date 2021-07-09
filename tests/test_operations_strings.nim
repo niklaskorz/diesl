@@ -92,7 +92,9 @@ proc test_operations_strings*() =
       let ops = db.exportOperations()
       let storeOp = ops[0]
 
-      let extractOp = storeOp.storeValue
+      # Why is it dotStoreMany?
+      check storeOp.kind == dotStoreMany
+      let extractOp = storeOp.storeManyValues[0]
       check extractOp.kind == dotExtractOne
 
     test "extract many":
@@ -101,7 +103,8 @@ proc test_operations_strings*() =
       let ops = db.exportOperations()
       let storeOp = ops[0]
 
-      let extractOp = storeOp.storeValue
+      check storeOp.kind == dotStoreMany
+      let extractOp = storeOp.storeManyValues[0]
       check extractOp.kind == dotExtractMany
 
 when isMainModule:
