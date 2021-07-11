@@ -75,7 +75,7 @@ proc getDieslPath*(): string =
 
   # Fallback to current directory version of stdlib
   if not dirExists(dieslPath):
-    dieslPath = getCurrentDir() / "dsl"
+    dieslPath = getCurrentDir() / "diesl"
 
   if not dirExists(dieslPath):
     raise DieslPathNotFoundError.newException("No DieSL library found, please set NIM_DIESL environment variable")
