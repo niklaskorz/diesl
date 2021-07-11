@@ -1,4 +1,4 @@
-
+import strformat
 import sequtils
 import macros
 import tables
@@ -239,6 +239,19 @@ proc transpileTakeWithoutColumn(command, table: NimNode): NimNode =
     else:
       result = command
 
+proc transpileExtract(command, table: NimNode): NimNode =
+  # TODO: can currently only capture extract one
+  # TODO: how can I capture beliebig many identifiers? how can I check that they're unique
+  case command:
+    of Command[Ident(strVal: "extract"), @mthd, @pattern, Ident(strVal: "from"), @src]:
+      if mthd.strVal == "one":
+        result = newCall(ident"extractOne", src, pattern)
+      elif mthd.strVal == "all":
+        result = newCall(ident"extractAll", src, pattern)
+      else:
+        macros.error(fmt"Unknown extraction mode: '{mthd.strVal}'", command)
+    else:
+      result = command
 
 proc transpileTake(command, table: NimNode, column: Option[NimNode]): NimNode =
   if column.isSome():
@@ -259,6 +272,8 @@ proc transpileCommand(table: NimNode, column: Option[NimNode], command: NimNode)
       return transpileRemove(command, table, column)
     of Command[Ident(strVal: "take"), .._]:
       return transpileTake(command, table, column)
+    of Command[Ident(strVal: "extract"), .._]:
+      return transpileExtract(command, table)
     else:
       return command
 

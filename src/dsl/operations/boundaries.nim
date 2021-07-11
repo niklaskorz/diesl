@@ -36,7 +36,21 @@ proc collectTableAccesses(op: DieslOperation): HashSet[string] =
     of dotToLower:
       op.toLowerValue.collectTableAccesses()
     of dotToUpper:
-      op.toUpperValue.collectTableAccesses()
+      op.toUpperValue.collectTableAccesses
+    of dotExtractOne:
+      op.extractOneValue.collectTableAccesses
+    of dotExtractMany:
+      op.extractManyValue.collectTableAccesses
+    of dotRegexReplace:
+      op.regexReplaceValue.collectTableAccesses +
+          op.regexReplaceTarget.collectTableAccesses +
+              op.regexReplaceValue.collectTableAccesses
+    of dotRegexReplaceAll:
+      var tables = op.regexReplaceAllValue.collectTableAccesses()
+      for pair in op.regexReplaceAllReplacements:
+        tables = tables + pair.target.collectTableAccesses() +
+            pair.replacement.collectTableAccesses()
+      tables
 
 type IllegalTableAccessError* = object of CatchableError
 

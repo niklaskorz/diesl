@@ -9,14 +9,21 @@ type
     dotLoad
     dotStringLiteral
     dotIntegerLiteral
+
     # String operations
-    dotTrim
-    dotSubstring
     dotReplace
     dotReplaceAll
+    dotTrim
+    dotSubstring
     dotStringConcat
     dotToLower
     dotToUpper
+    
+    # Regex
+    dotRegexReplace
+    dotRegexReplaceAll
+    dotExtractOne
+    dotExtractMany
 
   DieslDataType* = enum
     ddtUnknown
@@ -56,6 +63,7 @@ type
         stringValue*: string
       of dotIntegerLiteral:
         integerValue*: int
+
       # String operations
       of dotTrim:
         trimValue*: DieslOperation
@@ -77,6 +85,22 @@ type
         toLowerValue*: DieslOperation
       of dotToUpper:
         toUpperValue*: DieslOperation
+        
+      # Regex
+      of dotExtractOne:
+        extractOneValue*: DieslOperation
+        extractOnePattern*: string
+      of dotExtractMany:
+        extractManyValue*: DieslOperation
+        extractManyPattern*: string
+      of dotRegexReplace:
+        regexReplaceValue*: DieslOperation
+        regexReplaceTarget*: DieslOperation
+        regexReplaceReplacement*: DieslOperation
+      of dotRegexReplaceAll:
+        regexReplaceAllValue*: DieslOperation
+        regexReplaceAllReplacements*: seq[DieslReplacementPair]
+
 
 proc toDataType*(op: DieslOperation): DieslDataType =
   case op.kind:
@@ -103,7 +127,15 @@ proc toDataType*(op: DieslOperation): DieslDataType =
       ddtString
     of dotToUpper:
       ddtString
-
+    of dotExtractOne:
+      ddtString
+    of dotExtractMany:
+      ddtString
+    of dotRegexReplace:
+      ddtString
+    of dotRegexReplaceAll:
+      ddtString
+      
 proc toStoreMany*(op: DieslOperation): DieslOperation =
   assert op.kind == dotStore
   DieslOperation(
@@ -124,5 +156,6 @@ proc newDatabaseSchema*(tables: openArray[(string,
 
 proc newDatabaseSchema*(tables: openArray[(string, seq[(string,
     DieslDataType)])]): DieslDatabaseSchema =
-  DieslDatabaseSchema(tables: tables.map((pair) => (pair[0], newTableSchema(
-      pair[1]))).toTable)
+  DieslDatabaseSchema(tables: tables.map(
+    (pair) => (pair[0], newTableSchema(pair[1]))
+  ).toTable)

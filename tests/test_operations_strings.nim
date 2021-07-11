@@ -86,5 +86,26 @@ proc test_operations_strings*() =
       let concatOp = storeOp.storeValue
       check concatOp.kind == dotStringConcat
 
+    test "extract one":
+      db.table.lhs = db.table.rhs.extractOne("{hashtag}")
+
+      let ops = db.exportOperations()
+      let storeOp = ops[0]
+
+      # Why is it dotStoreMany?
+      check storeOp.kind == dotStoreMany
+      let extractOp = storeOp.storeManyValues[0]
+      check extractOp.kind == dotExtractOne
+
+    test "extract many":
+      db.table.lhs = db.table.rhs.extractAll("{email}")
+
+      let ops = db.exportOperations()
+      let storeOp = ops[0]
+
+      check storeOp.kind == dotStoreMany
+      let extractOp = storeOp.storeManyValues[0]
+      check extractOp.kind == dotExtractMany
+
 when isMainModule:
   test_operations_strings()
