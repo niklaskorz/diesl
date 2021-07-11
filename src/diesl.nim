@@ -1,7 +1,7 @@
-import dsl/script
-import dsl/natural
-import dsl/backends/sqlite
-import dsl/backends/sqliteviews
+import diesl/script
+import diesl/natural
+import diesl/backends/sqlite
+import diesl/backends/sqliteviews
 
 export script
 export natural
@@ -9,7 +9,7 @@ export sqlite
 
 when isMainModule:
   import tables
-  import dsl/operations
+  import diesl/operations
 
   let schema = newDatabaseSchema({
     "students": @{

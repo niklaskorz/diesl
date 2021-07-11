@@ -1,7 +1,7 @@
 import unittest
 
-import dsl/operations
-import dsl/operations/conversion
+import diesl/operations
+import diesl/operations/conversion
 
 proc test_operations_optimizations*() =
   suite "Operations optimizations":

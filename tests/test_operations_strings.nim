@@ -1,6 +1,6 @@
 import unittest
 
-import dsl/operations/[base, strings, types]
+import diesl/operations/[base, strings, types]
 
 proc test_operations_strings*() =
   suite "check string operations":

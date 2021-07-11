@@ -2,9 +2,9 @@ import unittest
 import sugar
 import db_sqlite
 
-import dsl/operations
-import dsl/operations/conversion
-import dsl/backends/sqliteviews
+import diesl/operations
+import diesl/operations/conversion
+import diesl/backends/sqliteviews
 
 proc test_backends_sqliteviews*() =
   suite "SQLite views backend":

@@ -1,8 +1,8 @@
 
 import unittest
 
-import dsl/[operations, natural]
-import dsl/operations/conversion
+import diesl/[operations, natural]
+import diesl/operations/conversion
 
 proc operationsEq(actualDB: Diesl, expectedDB: Diesl): bool =
   let expectedJson = exportOperationsJson(expectedDB)

@@ -3,8 +3,8 @@ import sugar
 import strformat
 import sequtils
 
-import dsl/operations/[base, strings]
-import dsl/backends/sqlite
+import diesl/operations/[base, strings]
+import diesl/backends/sqlite
 
 proc test_backends_sqlite*() =
   suite "check sqlite operations":

@@ -1,5 +1,5 @@
 import unittest
-import dsl/script
+import diesl/script
 
 proc test_script*() =
   suite "script execution":

@@ -1,6 +1,6 @@
 import unittest
 
-import dsl/operations/[base, boundaries, strings]
+import diesl/operations/[base, boundaries, strings]
 
 proc test_operations_boundaries*() =
   suite "check boundary operations":
