@@ -82,7 +82,8 @@ proc getDieslPath*(): string =
 
   return dieslPath
 
-proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
+proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema(
+    )): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
   let stdPath = getStdPath()
   let fusionPath = getFusionPath()
   let dieslPath = getDieslPath()
@@ -99,7 +100,6 @@ proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchem
   )
   defer: intr.destroyInterpreter()
   let scriptStart = fmt"""
-import tables
 import operations
 import operations/conversion
 import natural
@@ -118,7 +118,6 @@ let exportedOperations* = db.exportOperationsJson()
 
 when isMainModule:
   import json
-  import tables
   let script = """
 db.students.name = "Mr. / Mrs." & db.students.firstName & db.students.lastName
 
@@ -127,11 +126,11 @@ db.students.name = db.students.name
   .replace("foo", "bar")
   .replace(db.students.firstName, "<redacted>")
 """
-  let exportedOperations = runScript(script, DieslDatabaseSchema(tables: {
-    "students": DieslTableSchema(columns: {
+  let exportedOperations = runScript(script, newDatabaseSchema({
+    "students": @{
       "name": ddtString,
       "firstName": ddtString,
       "lastName": ddtString
-    }.toTable),
-  }.toTable))
+    },
+  }))
   echo pretty(%exportedOperations)

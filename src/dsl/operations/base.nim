@@ -3,6 +3,7 @@ import json
 import types
 import boundaries
 import errors
+import optimizations
 
 export types
 export errors
@@ -18,20 +19,30 @@ type
 
 proc toOperation*(operation: DieslOperation): DieslOperation = operation
 
-proc assertDataType*(op: DieslOperation, dataTypes: set[DieslDataType]): DieslOperation =
+proc assertDataType*(op: DieslOperation, dataTypes: set[
+    DieslDataType]): DieslOperation =
   let dataType = op.toDataType()
+  if dataType == ddtVoid:
+    raise DieslDataTypeMismatchError.newException("Operation has type void and cannot be used as value")
   if dataType != ddtUnknown and dataType notin dataTypes and ddtUnknown notin dataTypes:
     raise DieslDataTypeMismatchError.newException("Operation has type " &
         $dataType & ", expected one of " & $dataTypes)
   return op
 
-proc exportOperations*(diesl: Diesl): seq[DieslOperation] = diesl.pOperations
+proc exportOperations*(diesl: Diesl, optimize: bool = true): seq[DieslOperation] =
+  if optimize:
+    diesl.pOperations.mergeStores()
+  else:
+    diesl.pOperations
 
 proc exportOperationsJson*(diesl: Diesl, prettyJson: bool = false): string =
   if prettyJson:
-    pretty(%(diesl.pOperations))
+    pretty(%(diesl.exportOperations()))
   else:
-    $(%(diesl.pOperations))
+    $(%(diesl.exportOperations()))
+
+proc `$`*(operations: seq[DieslOperation]): string =
+  pretty(%operations)
 
 proc load(diesl: Diesl, table: string): DieslTable =
   if diesl.dbSchema.tables.len() > 0 and table notin diesl.dbSchema.tables:
@@ -47,12 +58,14 @@ proc getColumnType(table: DieslTable, column: string): DieslDataType =
     return ddtUnknown
   let columns = schema.tables[table.pName].columns
   if not columns.contains(column):
-      raise DieslColumnNotFoundError.newException("column not found: " & table.pName & "." & column)
+    raise DieslColumnNotFoundError.newException("column not found: " &
+        table.pName & "." & column)
   return columns[column]
 
 proc load(table: DieslTable, column: string): DieslOperation =
   let dataType = table.getColumnType(column)
-  DieslOperation(kind: dotLoad, loadTable: table.pName, loadColumn: column, loadType: dataType)
+  DieslOperation(kind: dotLoad, loadTable: table.pName, loadColumn: column,
+      loadType: dataType)
 
 template `.`*(table: DieslTable, column: untyped): DieslOperation =
   load(table, astToStr(column))

@@ -1,8 +1,5 @@
 
 import unittest
-import tables
-import json
-
 
 import dsl/[operations, natural]
 import dsl/operations/conversion
@@ -10,29 +7,29 @@ import dsl/operations/conversion
 proc operationsEq(actualDB: Diesl, expectedDB: Diesl): bool =
   let expectedJson = exportOperationsJson(expectedDB)
   let actualJson = exportOperationsJson(actualDB)
-  
+
   return expectedJson == actualJson
 
 
 proc test_natural*() =
-  suite "natural syntax for string operations": 
+  suite "natural syntax for string operations":
 
     setup:
-      let expectedDB = Diesl(dbSchema: DieslDatabaseSchema(tables: {
-        "table": DieslTableSchema(columns: {
+      let expectedDB = Diesl(dbSchema: newDatabaseSchema({
+        "table": @{
           "text": ddtString,
-        }.toTable)
-      }.toTable))
+        }
+      }))
 
-      let actualDB = Diesl(dbSchema: DieslDatabaseSchema(tables: {
-          "table": DieslTableSchema(columns: {
+      let actualDB = Diesl(dbSchema: newDatabaseSchema({
+          "table": @{
             "text": ddtString,
-          }.toTable)
-        }.toTable))
+          }
+        }))
 
 
-      var expectedTable = expectedDB.table 
-      var actualTable = actualDB.table 
+      var expectedTable = expectedDB.table
+      var actualTable = actualDB.table
 
     # TODO: test that there is no ast transformation in this case
     # since it is not needed

@@ -1,25 +1,24 @@
 import unittest
-import tables
 
 import dsl/operations/[base, strings, types]
 
-proc test_strings*() =
+proc test_operations_strings*() =
   suite "check string operations":
     setup:
-      let db = Diesl(dbSchema: DieslDatabaseSchema(tables: {
-        "table": DieslTableSchema(columns: {
+      let db = Diesl(dbSchema: newDatabaseSchema({
+        "table": @{
           "to": ddtString,
           "frm": ddtString,
           "lhs": ddtString,
           "rhs": ddtString,
           "cnct": ddtString,
-        }.toTable)
-      }.toTable))
-    
+        }
+      }))
+
     test "substring":
       db.table.to = db.table.frm[0..5]
 
-      let ops = db.exportOperations()
+      let ops = db.exportOperations(optimize = false)
       let storeOp = ops[0]
 
       let substringOp = storeOp.storeValue
@@ -30,7 +29,7 @@ proc test_strings*() =
     test "replace":
       db.table.to = db.table.frm.replace("old".toOperation, "new".toOperation)
 
-      let ops = db.exportOperations()
+      let ops = db.exportOperations(optimize = false)
       let storeOp = ops[0]
 
       let replacementOp = storeOp.storeValue
@@ -48,7 +47,7 @@ proc test_strings*() =
         ("old".toOperation, "new".toOperation)
       ])
 
-      let ops = db.exportOperations()
+      let ops = db.exportOperations(optimize = false)
       let storeOp = ops[0]
 
       let replacementOp = storeOp.storeValue
@@ -65,7 +64,7 @@ proc test_strings*() =
     test "remove":
       db.table.to = db.table.frm.remove(lit"$MY-SOCIAL-SECURITY-NUMBER")
 
-      let ops = db.exportOperations()
+      let ops = db.exportOperations(optimize = false)
       let storeOp = ops[0]
 
       let removalOp = storeOp.storeValue
@@ -81,11 +80,11 @@ proc test_strings*() =
     test "concatenation":
       db.table.cnct = db.table.lhs & db.table.rhs
 
-      let ops = db.exportOperations()
+      let ops = db.exportOperations(optimize = false)
       let storeOp = ops[0]
 
       let concatOp = storeOp.storeValue
       check concatOp.kind == dotStringConcat
 
 when isMainModule:
-  test_strings()
+  test_operations_strings()
