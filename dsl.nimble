@@ -14,7 +14,7 @@ requires "fusion >= 1.0"
 requires "compiler"
 requires "eminim >= 2.8"
 requires "https://gitlab.com/pvs-hd/ot/backend.git >= 0.2.3"
-requires "https://github.com/niklaskorz/nim-exporttosqlite3.git >= 0.2.0"
+requires "exporttosqlite3 >= 0.2.0"
 
 task test_ci, "runs tests and generates a report":
   exec "nimble c -r tests/run_tests.nim"
