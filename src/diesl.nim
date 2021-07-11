@@ -6,6 +6,7 @@ import diesl/backends/sqliteviews
 export script
 export natural
 export sqlite
+export sqliteviews
 
 when isMainModule:
   import tables
