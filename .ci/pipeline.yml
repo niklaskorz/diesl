@@ -11,6 +11,7 @@ stages:
 unit tests:
     stage: test
     script:
+        - nimble update
         - nimble test_ci
     artifacts:
         reports:
@@ -20,6 +21,7 @@ unit tests:
 test coverage:
     stage: test
     script:
+        - nimble update
         - nimble install --depsOnly
         - coco --cov="src" --compiler=--hints:off
     artifacts:
@@ -32,6 +34,7 @@ test coverage:
 build docs:
     stage: docs
     script:
+        - nimble update
         - nimble docgen
     artifacts:
         paths:
