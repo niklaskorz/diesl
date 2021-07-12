@@ -5,9 +5,9 @@ import strutils
 import db_sqlite
 import ../operations
 import ../operations/patterns
+import ../extensions/sqlite
 
 import re
-import exportToSqlite3
 
 proc toSqlite*(op: DieslOperation): string =
   case op.kind:
@@ -50,16 +50,16 @@ proc toSqlite*(op: DieslOperation): string =
     of dotToUpper:
       fmt"UPPER({op.toUpperValue.toSqlite})"
     of dotExtractOne:
-      fmt"sqlite3ExtractOne({op.extractOneValue.toSqlite}, '{op.extractOnePattern.pattern}')"
+      fmt"extractOne({op.extractOneValue.toSqlite}, '{op.extractOnePattern.pattern}')"
     of dotExtractMany:
       assert(false, "Not implemented")
-      fmt"sqlite3ExtractMany({op.extractManyValue.toSqlite}, '{op.extractManyPattern.pattern}')"
+      fmt"extractMany({op.extractManyValue.toSqlite}, '{op.extractManyPattern.pattern}')"
     of dotRegexReplace:
-      fmt"sqlite3Replace({op.regexReplaceValue.toSqlite}, {op.regexReplaceTarget.toSqlite.pattern}, {op.regexReplaceReplacement.toSqlite})"
+      fmt"rReplace({op.regexReplaceValue.toSqlite}, {op.regexReplaceTarget.toSqlite.pattern}, {op.regexReplaceReplacement.toSqlite})"
     of dotRegexReplaceAll:
       var value = op.replaceAllValue.toSqlite
       for pair in op.regexReplaceAllReplacements:
-        value = fmt"sqlite3Replace({value}, {pair.target.toSqlite.pattern}, {pair.replacement.toSqlite})"
+        value = fmt"rReplace({value}, {pair.target.toSqlite.pattern}, {pair.replacement.toSqlite})"
       value
 
 
@@ -72,16 +72,3 @@ proc toSqlite*(operations: seq[DieslOperation]): seq[SqlQuery] =
   return queries
 
 
-proc sqlite3ExtractOne(input: string, regex: string): string {.exportToSqlite3.} =
-  var matches: seq[string] = @[]
-  let matchRegex = re(regex);
-  let (l, r) = re.findBounds(input, matchRegex, matches)
-
-  return if l == -1 and r == 0:
-     ""
-  else:
-    return matches[0]
-
-
-proc sqlite3Replace(input: string, old: string, nw: string): string {.exportToSqlite3.} = 
-  return re.replace(input, re(old), nw)
