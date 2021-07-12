@@ -13,10 +13,10 @@ import fusion/matching
 
 # parses lists like
 # a, b, c
-# or 
+# or
 # a, b and c
-proc parseList(nodes: seq[NimNode]): seq[NimNode] = 
-  # less than three because the smallest list with and has 3 elements: a and c 
+proc parseList(nodes: seq[NimNode]): seq[NimNode] =
+  # less than three because the smallest list with and has 3 elements: a and c
   if nodes.len() < 3:
     return nodes
 
@@ -75,7 +75,7 @@ proc translateDirection(direction: NimNode): NimNode =
       return newIdentNode("right")
 
 
-proc transpileTrimWithColumn(command, table, column: NimNode): NimNode = 
+proc transpileTrimWithColumn(command, table, column: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "trim")]:
       result = quote do:
@@ -88,14 +88,14 @@ proc transpileTrimWithColumn(command, table, column: NimNode): NimNode =
       result = command
 
 
-proc transpileTrimWithoutColumn(command, table: NimNode): NimNode = 
+proc transpileTrimWithoutColumn(command, table: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "trim"), @direction, Ident(strVal: "of"), @column]:
       let textDirection = translateDirection(direction)
 
       result = quote do:
         `table`.`column` = `table`.`column`.trim(`textDirection`)
-    
+
     of Command[Ident(strVal: "trim"), @column]:
       result = quote do:
         `table`.`column` = `table`.`column`.trim()
@@ -117,7 +117,7 @@ proc transpileTrim(command, table: NimNode, column: Option[NimNode]): NimNode =
 #
 # to
 # @{"foo": "bar", "baz": "bam"}
-proc transpileReplacementTable(replacements: var seq[NimNode]): NimNode = 
+proc transpileReplacementTable(replacements: var seq[NimNode]): NimNode =
   var replacementPairs = newSeq[(NimNode, NimNode)]()
 
   while replacements.len() > 0:
@@ -283,12 +283,12 @@ proc transpileChangeBlock(selector: NimNode, commands: NimNode): NimNode =
   var column: Option[NimNode]
 
   case selector:
-    of Ident(strVal: _):
-      table = selector
-      column = none(NimNode)
     of Infix[Ident(strVal: "of"), @columnVal, @tableVal]:
       table = tableVal
       column = some(columnVal)
+    else:
+      table = selector
+      column = none(NimNode)
 
   result = newStmtList()
 
@@ -299,10 +299,12 @@ proc transpileChangeBlock(selector: NimNode, commands: NimNode): NimNode =
 
 # selector is one of:
 # <table name>
-# or 
+# or
 # <column name> of <table name>
 macro change*(selector: untyped, commands: untyped): untyped = transpileChangeBlock(selector, commands)
- 
+
 when isMainModule:
-  change col of tab:
+  let db = Diesl()
+  change col of db.tab:
     trim
+  echo $db.exportOperations()
