@@ -82,39 +82,56 @@ proc getDieslPath*(): string =
 
   return dieslPath
 
-proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema(
-    )): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
+proc searchPaths(): seq[string] = 
   let stdPath = getStdPath()
   let fusionPath = getFusionPath()
   let dieslPath = getDieslPath()
-  var searchPaths = collect(newSeq):
+  result = collect(newSeq):
     for dir in walkDirRec(stdPath, {pcDir}):
       dir
-  searchPaths.insert(stdPath, 0)
-  searchPaths.add(fusionPath)
-  searchPaths.add(dieslPath)
-  let intr = createInterpreter("script.nims", searchPaths)
-  intr.registerErrorHook(proc (config, info, msg, severity: auto) {.gcsafe.} =
+  result.insert(stdPath, 0)
+  result.add(fusionPath)
+  result.add(dieslPath)
+
+proc prepareInterpreter(): Interpreter = 
+  result = createInterpreter("script.nims", searchPaths())
+  result.registerErrorHook(proc (config, info, msg, severity: auto) {.gcsafe.} =
     if severity == Error and config.errorCounter >= config.errorMax:
       raise (ref ScriptExecutionError)(info: info, msg: msg)
   )
-  defer: intr.destroyInterpreter()
-  let scriptStart = fmt"""
+
+
+proc prepareScript(script: string, schema: DieslDatabaseSchema): PLLStream = 
+  let preparedScript = fmt"""
+import tables
 import operations
 import operations/conversion
 import natural
 
 let dbSchema = {schema.toNimCode()}
 let db = Diesl(dbSchema: dbSchema)
-"""
-  let scriptEnd = """
+
+{script}
+
 let exportedOperations* = db.exportOperationsJson()
 """
-  intr.evalScript(llStreamOpen(scriptStart & script & scriptEnd))
-  let symbol = intr.selectUniqueSymbol("exportedOperations")
-  let value = intr.getGlobalValue(symbol).getStr()
-  let exportedOperations = parseExportedOperationsJson(value)
-  return exportedOperations
+  return llstreamOpen(preparedScript)
+
+proc extractExportedOperations(interpreter: Interpreter): seq[DieslOperation] = 
+  let symbol = interpreter.selectUniqueSymbol("exportedOperations")
+  let value = interpreter.getGlobalValue(symbol).getStr()
+
+  return parseExportedOperationsJson(value)
+
+
+proc runScript*(script: string, schema: DieslDatabaseSchema = DieslDatabaseSchema()): seq[DieslOperation] {.gcsafe.} = {.cast(gcsafe).}:
+  let interpreter = prepareInterpreter()
+
+  interpreter.evalScript(prepareScript(script, schema))
+  
+  interpreter.destroyInterpreter()
+
+  return extractExportedOperations(interpreter)
 
 when isMainModule:
   import json
