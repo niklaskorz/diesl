@@ -9,7 +9,7 @@ import ../extensions/sqlite
 
 import re
 
-proc toSqlite*(op: DieslOperation): string =
+proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
   case op.kind:
     of dotStore:
       fmt"UPDATE {op.storeTable} SET {op.storeColumn} = {op.storeValue.toSqlite}"
@@ -63,10 +63,10 @@ proc toSqlite*(op: DieslOperation): string =
       value
 
 
-proc toSqlite*(operations: seq[DieslOperation]): seq[SqlQuery] =
+proc toSqlite*(operations: seq[DieslOperation]): seq[SqlQuery] {.gcSafe.} =
   var queries: seq[SqlQuery]
   for operation in operations:
-    assert operation.kind == dotStore
+    assert operation.kind == dotStore or operation.kind == dotStoreMany
     let query = operation.toSqlite()
     queries.add(SqlQuery(query))
   return queries

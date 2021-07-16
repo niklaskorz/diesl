@@ -5,7 +5,7 @@ import strutils
 import backend
 import ../operations
 
-proc sqlToDieslDataType(sqlType: string): DieslDataType =
+proc sqlToDieslDataType(sqlType: string): DieslDataType {.gcSafe.} =
   case sqlType.toLower():
     of "text":
       ddtString
@@ -15,13 +15,13 @@ proc sqlToDieslDataType(sqlType: string): DieslDataType =
       ddtUnknown
 
 
-proc toDieslTableSchema*(table: backend.Table): DieslTableSchema =
+proc toDieslTableSchema*(table: backend.Table): DieslTableSchema {.gcSafe.} =
   let dieslColumnTypes = table.columnTypes.map(sqlToDieslDataType)
   DieslTableSchema(
     columns: zip(table.columnNames, dieslColumnTypes).toOrderedTable()
   )
 
-proc toDieslDatabaseSchema*(tables: openarray[backend.Table]): DieslDatabaseSchema =
+proc toDieslDatabaseSchema*(tables: openarray[backend.Table]): DieslDatabaseSchema {.gcSafe.} =
   DieslDatabaseSchema(
     tables: tables.map(t => (t.name, t.toDieslTableSchema())).toTable()
   )
