@@ -66,7 +66,7 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
 proc toSqlite*(operations: seq[DieslOperation]): seq[SqlQuery] {.gcSafe.} =
   var queries: seq[SqlQuery]
   for operation in operations:
-    assert operation.kind == dotStore
+    assert operation.kind == dotStore or operation.kind == dotStoreMany
     let query = operation.toSqlite()
     queries.add(SqlQuery(query))
   return queries
