@@ -51,6 +51,8 @@ proc collectTableAccesses(op: DieslOperation): HashSet[string] =
         tables = tables + pair.target.collectTableAccesses() +
             pair.replacement.collectTableAccesses()
       tables
+    of dotPadString:
+      op.padStringValue.collectTableAccesses
 
 type IllegalTableAccessError* = object of CatchableError
 

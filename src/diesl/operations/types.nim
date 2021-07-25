@@ -87,9 +87,9 @@ type
       of dotToUpper:
         toUpperValue*: DieslOperation
       of dotPadString:
-        padStringValue: DieslOperation,
-        padStringDirection: TextDirection,
-        padStringCount: int
+        padStringValue*: DieslOperation
+        padStringDirection*: TextDirection
+        padStringCount*: int
         
       # Regex
       of dotExtractOne:
@@ -139,6 +139,8 @@ proc toDataType*(op: DieslOperation): DieslDataType =
     of dotRegexReplace:
       ddtString
     of dotRegexReplaceAll:
+      ddtString
+    of dotPadString:
       ddtString
       
 proc toStoreMany*(op: DieslOperation): DieslOperation =
