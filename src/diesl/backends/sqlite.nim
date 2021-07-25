@@ -61,6 +61,8 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
       for pair in op.regexReplaceAllReplacements:
         value = fmt"rReplace({value}, {pair.target.toSqlite.pattern}, {pair.replacement.toSqlite})"
       value
+    of dotMatch:
+      "{op.matchValue.toSqlite} REGEXP {op.matchPattern.pattern}"
 
 
 proc toSqlite*(operations: seq[DieslOperation]): seq[SqlQuery] {.gcSafe.} =
