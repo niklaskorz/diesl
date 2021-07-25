@@ -61,6 +61,16 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
       for pair in op.regexReplaceAllReplacements:
         value = fmt"rReplace({value}, {pair.target.toSqlite.pattern}, {pair.replacement.toSqlite})"
       value
+    of dotPadString:
+      let padding = op.padStringWithString.repeat(op.padStringCount)
+      case op.trimDirection:
+        of TextDirection.left:
+          fmt"{padding} || {op.padStringValue.toSqlite}"
+        of TextDirection.right:
+          fmt"{op.padStringValue.toSqlite} || {padding}"
+        of TextDirection.both:
+          fmt"{padding} || {op.padStringValue.toSqlite} || {padding}"
+
 
 
 proc toSqlite*(operations: seq[DieslOperation]): seq[SqlQuery] {.gcSafe.} =
