@@ -24,6 +24,7 @@ type
     dotRegexReplaceAll
     dotExtractOne
     dotExtractMany
+    dotMatch
 
   DieslDataType* = enum
     ddtUnknown
@@ -100,6 +101,9 @@ type
       of dotRegexReplaceAll:
         regexReplaceAllValue*: DieslOperation
         regexReplaceAllReplacements*: seq[DieslReplacementPair]
+      of dotMatch:
+        matchValue*: DieslOperation
+        matchPattern*: string
 
 
 proc toDataType*(op: DieslOperation): DieslDataType =
@@ -134,6 +138,8 @@ proc toDataType*(op: DieslOperation): DieslDataType =
     of dotRegexReplace:
       ddtString
     of dotRegexReplaceAll:
+      ddtString
+    of dotMatch:
       ddtString
       
 proc toStoreMany*(op: DieslOperation): DieslOperation =
