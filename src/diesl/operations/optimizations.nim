@@ -53,7 +53,8 @@ proc collectLoads(op: DieslOperation): HashSet[(string, string)] =
       op.extractOneValue.collectLoads
     of dotExtractMany:
       op.extractManyValue.collectLoads
-
+    of dotMatch:
+      op.matchValue.collectLoads
 
 proc collectLoads(operations: seq[DieslOperation]): HashSet[(string, string)] =
   for op in operations:
@@ -106,6 +107,8 @@ proc replaceLoad(op: var DieslOperation, table: string, column: string, value: D
       op.extractOneValue.replaceLoad(table, column, value)
     of dotExtractMany:
       op.extractManyValue.replaceLoad(table, column, value)
+    of dotMatch:
+      op.matchValue.replaceLoad(table, column, value)
 
 
 proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
