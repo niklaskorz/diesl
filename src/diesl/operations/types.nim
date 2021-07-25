@@ -10,7 +10,7 @@ type
     dotStringLiteral
     dotIntegerLiteral
 
-    # String operations
+    # Plain string operations
     dotReplace
     dotReplaceAll
     dotTrim
@@ -18,8 +18,9 @@ type
     dotStringConcat
     dotToLower
     dotToUpper
+    dotPadString
     
-    # Regex
+    # Regex operations
     dotRegexReplace
     dotRegexReplaceAll
     dotExtractOne
@@ -85,6 +86,10 @@ type
         toLowerValue*: DieslOperation
       of dotToUpper:
         toUpperValue*: DieslOperation
+      of dotPadString:
+        padStringValue: DieslOperation,
+        padStringDirection: TextDirection,
+        padStringCount: int
         
       # Regex
       of dotExtractOne:
