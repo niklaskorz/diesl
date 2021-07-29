@@ -86,6 +86,9 @@ type
         toLowerValue*: DieslOperation
       of dotToUpper:
         toUpperValue*: DieslOperation
+      of dotStringSplit:
+        stringSplitValue*: DieslOperation
+        stringSplitBy*: string 
         
       # Regex
       of dotExtractOne:
@@ -135,6 +138,8 @@ proc toDataType*(op: DieslOperation): DieslDataType =
     of dotRegexReplace:
       ddtString
     of dotRegexReplaceAll:
+      ddtString
+    of dotStringSplit:
       ddtString
       
 proc toStoreMany*(op: DieslOperation): DieslOperation =
