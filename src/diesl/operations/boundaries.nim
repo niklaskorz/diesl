@@ -41,6 +41,8 @@ proc collectTableAccesses(op: DieslOperation): HashSet[string] =
       op.extractOneValue.collectTableAccesses
     of dotExtractMany:
       op.extractManyValue.collectTableAccesses
+
+    # Regex operations
     of dotRegexReplace:
       op.regexReplaceValue.collectTableAccesses +
           op.regexReplaceTarget.collectTableAccesses +
@@ -51,6 +53,8 @@ proc collectTableAccesses(op: DieslOperation): HashSet[string] =
         tables = tables + pair.target.collectTableAccesses() +
             pair.replacement.collectTableAccesses()
       tables
+    of dotStringSplit:
+      op.stringSplitValue.collectTableAccesses
 
 type IllegalTableAccessError* = object of CatchableError
 
