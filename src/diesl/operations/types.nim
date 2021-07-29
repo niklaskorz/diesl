@@ -18,6 +18,7 @@ type
     dotStringConcat
     dotToLower
     dotToUpper
+    dotStringSplit
     
     # Regex
     dotRegexReplace
