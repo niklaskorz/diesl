@@ -2,7 +2,7 @@ import tables
 import sequtils
 import sugar
 import strutils
-import backend
+import core
 import ../operations
 
 proc sqlToDieslDataType(sqlType: string): DieslDataType {.gcSafe.} =
@@ -15,13 +15,13 @@ proc sqlToDieslDataType(sqlType: string): DieslDataType {.gcSafe.} =
       ddtUnknown
 
 
-proc toDieslTableSchema*(table: backend.Table): DieslTableSchema {.gcSafe.} =
+proc toDieslTableSchema*(table: core.Table): DieslTableSchema {.gcSafe.} =
   let dieslColumnTypes = table.columnTypes.map(sqlToDieslDataType)
   DieslTableSchema(
     columns: zip(table.columnNames, dieslColumnTypes).toOrderedTable()
   )
 
-proc toDieslDatabaseSchema*(tables: openarray[backend.Table]): DieslDatabaseSchema {.gcSafe.} =
+proc toDieslDatabaseSchema*(tables: openarray[core.Table]): DieslDatabaseSchema {.gcSafe.} =
   DieslDatabaseSchema(
     tables: tables.map(t => (t.name, t.toDieslTableSchema())).toTable()
   )
