@@ -73,21 +73,21 @@ proc load(table: DieslTable, column: string): DieslOperation =
 template `.`*(table: DieslTable, column: untyped): DieslOperation =
   load(table, astToStr(column))
 
-proc store(table: DieslTable, column: string,
-    value: DieslOperation): DieslOperation =
+proc store(table: DieslTable, column: string, value: DieslOperation) =
   let dataType = table.getColumnType(column)
-  result = DieslOperation(
+  let op = DieslOperation(
     kind: dotStore,
     storeTable: table.pName,
     storeColumn: column,
     storeValue: value.assertDataType({dataType}),
     storeType: dataType
   )
-  result.checkTableBoundaries()
+  op.checkTableBoundaries()
+  table.pDiesl.pOperations.add(op)
 
 template `.=`*(table: DieslTable, column: untyped,
     value: DieslOperation): untyped =
-  table.pDiesl.pOperations.add(store(table, astToStr(column), value))
+  store(table, astToStr(column), value)
 
 proc storeMany*(table: DieslTable, columns: seq[string], values: seq[DieslOperation]) =
   let op = DieslOperation(kind: dotStoreMany, storeManyColumns: columns, storeManyValues: values, storeManyTypes: values.map(toDataType))
@@ -97,7 +97,3 @@ macro `[]=`*(table: DieslTable, nodes: varargs[untyped]): untyped =
   let columns = newLit(nodes[0..^2].map((n) => $n))
   let values = nodes[^1]
   result = newCall(ident"storeMany", table, columns, values)
-
-# when isMainModule:
-  # let db = Diesl()
-  # db.students[firstName, lastName] = @["a".toOperation(), "b".toOperation(), "c".toOperation()]
