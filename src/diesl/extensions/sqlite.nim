@@ -20,3 +20,11 @@ proc extractOne(input: string, regex: string): string {.exportToSqlite3.} =
 
 proc rReplace(input: string, old: string, nw: string): string {.exportToSqlite3.} = 
   return re.replace(input, re(old), nw)
+
+proc stringSplit(input: string, splitOn: string, index: int): string {.exportToSqlite3.} = 
+  let ss = input.split(input, re(splitOn))
+  return if index < len(ss):
+    ss[index]
+  else:
+    ""
+
