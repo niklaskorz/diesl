@@ -69,7 +69,8 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
           1
         of TextDirection.both:
           0
-      fmt"padding({op.padStringValue.toSqlite}, {direction}, {op.padStringCount}, {$op.padStringWith})"
+      let padWith: char = op.padStringWith[0]
+      fmt"padding({op.padStringValue.toSqlite}, {direction}, {op.padStringCount}, {padWith})"
 
 
 

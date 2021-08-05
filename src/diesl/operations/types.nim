@@ -90,7 +90,7 @@ type
         padStringValue*: DieslOperation
         padStringDirection*: TextDirection
         padStringCount*: int
-        padStringWith*: char
+        padStringWith*: string
         
       # Regex
       of dotExtractOne:

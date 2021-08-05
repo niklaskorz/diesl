@@ -72,11 +72,11 @@ proc extractAll*(extractFrom: DieslOperation, fmtString: string): DieslOperation
     extractManyPattern: fmtString
   )
 
-proc padStringValue*(value: DieslOperation, direction: TextDirection, cnt: int, padWith: string = " "): DieslOperation = 
+proc padStringValue*(value: DieslOperation, direction: TextDirection, cnt: int, padWith: char = ' '): DieslOperation = 
   DieslOperation(
     kind: dotPadString,
     padStringValue: value.assertDataType({ddtString}),
     padStringDirection: direction,
     padStringCount: cnt,
-    padStringWithString: padWith
+    padStringWith: $padWith
   )
