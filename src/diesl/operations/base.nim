@@ -32,17 +32,22 @@ proc assertDataType*(op: DieslOperation, dataTypes: set[
         $dataType & ", expected one of " & $dataTypes)
   return op
 
+proc assertDataTypes*(ops: seq[DieslOperation], dataTypes: seq[DieslDataType]): seq[DieslOperation] =
+  for (op, dataType) in zip(ops, dataTypes):
+    discard op.assertDataType({dataType})
+  return ops
+
 proc exportOperations*(diesl: Diesl, optimize: bool = true): seq[DieslOperation] =
   if optimize:
     diesl.pOperations.mergeStores()
   else:
     diesl.pOperations
 
-proc exportOperationsJson*(diesl: Diesl, prettyJson: bool = false): string =
+proc exportOperationsJson*(diesl: Diesl, prettyJson: bool = false, optimize: bool = true): string =
   if prettyJson:
-    pretty(%(diesl.exportOperations()))
+    pretty(%(diesl.exportOperations(optimize)))
   else:
-    $(%(diesl.exportOperations()))
+    $(%(diesl.exportOperations(optimize)))
 
 proc `$`*(operations: seq[DieslOperation]): string =
   pretty(%operations)
@@ -90,8 +95,21 @@ template `.=`*(table: DieslTable, column: untyped,
   store(table, astToStr(column), value)
 
 proc storeMany*(table: DieslTable, columns: seq[string], values: seq[DieslOperation]) =
-  let op = DieslOperation(kind: dotStoreMany, storeManyColumns: columns, storeManyValues: values, storeManyTypes: values.map(toDataType))
+  assert columns.len == values.len, "must provide as many values as columns"
+  let types = values.map(toDataType)
+  let op = DieslOperation(
+    kind: dotStoreMany,
+    storeManyTable: table.pName,
+    storeManyColumns: columns,
+    storeManyValues: values.assertDataTypes(types),
+    storeManyTypes: types
+  )
+  op.checkTableBoundaries()
   table.pDiesl.pOperations.add(op)
+
+proc storeMany*(table: DieslTable, columns: seq[string], value: DieslOperation) =
+  let values = value.repeat(columns.len)
+  storeMany(table, columns, values)
 
 macro `[]=`*(table: DieslTable, nodes: varargs[untyped]): untyped =
   let columns = newLit(nodes[0..^2].map((n) => $n))
