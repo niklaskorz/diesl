@@ -82,7 +82,7 @@ proc withAccessIndex*(op: DieslOperation, index: int): DieslOperation =
         kind: dotExtractMany,
         extractManyValue: op.extractManyValue.withAccessIndex(index),
         extractManyPattern: op.extractManyPattern,
-        extractManyIndex: op.extractManyIndex
+        extractManyIndex: index
       )
     of dotRegexReplace:
       DieslOperation(
