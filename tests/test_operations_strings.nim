@@ -99,13 +99,31 @@ proc test_operations_strings*() =
 
     test "extract many":
       db.table.lhs = db.table.rhs.extractAll("{email}")
+      let ops = db.exportOperations(optimize = false)
 
-      let ops = db.exportOperations()
       let storeOp = ops[0]
+      check storeOp.kind == dotStore
 
-      check storeOp.kind == dotStoreMany
-      let extractOp = storeOp.storeManyValues[0]
+      let extractOp = storeOp.storeValue
       check extractOp.kind == dotExtractMany
+
+    test "string split":
+      db.table[to, frm]  = db.table.rhs.split(",")
+      let ops = db.exportOperations(optimize = false)
+
+      let storeOp = ops[0]
+      check storeOp.kind == dotStoreMany
+
+      let extractOp0 = storeOp.storeManyValues[0]
+      check extractOp0.kind == dotStringSplit
+      check extractOp0.stringSplitIndex == 0
+
+      let extractOp1 = storeOp.storeManyValues[1]
+      check extractOp1.kind == dotStringSplit
+      check extractOp1.stringSplitIndex == 1
+
+
+
 
 when isMainModule:
   test_operations_strings()
