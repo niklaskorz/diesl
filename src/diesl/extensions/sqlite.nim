@@ -22,7 +22,7 @@ proc rReplace(input: string, old: string, nw: string): string {.exportToSqlite3.
   return re.replace(input, re(old), nw)
 
 proc stringSplit(input: string, splitOn: string, index: int64): string {.exportToSqlite3.} = 
-  let ss = input.split(input, re(splitOn))
+  let ss = input.split(re(splitOn))
   return if index < len(ss):
     ss[index]
   else:
