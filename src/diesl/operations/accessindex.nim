@@ -2,53 +2,101 @@ import sequtils
 import sugar
 import types
 
-proc updateAccessIndex(op: var DieslOperation, index: int) =
+proc withAccessIndex*(op: DieslOperation, index: int): DieslOperation =
+  # We have to create new objects here because:
+  # - there's no `deepCopy` in Nimscript
+  # - `ref object` values are not copied on assignment
   case op.kind:
     of dotStore:
-      op.storeValue.updateAccessIndex(index)
+      DieslOperation(
+        kind: dotStore,
+        storeTable: op.storeTable,
+        storeColumn: op.storeColumn,
+        storeValue: op.storeValue.withAccessIndex(index),
+        storeType: op.storeType
+      )
     of dotStoreMany:
-      op.storeManyValues.apply((v: var DieslOperation) => v.updateAccessIndex(index))
+      DieslOperation(
+        kind: dotStoreMany,
+        storeManyTable: op.storeManyTable,
+        storeManyColumns: op.storeManyColumns,
+        storeManyValues: op.storeManyValues.map(v => v.withAccessIndex(index)),
+        storeManyTypes: op.storeManyTypes,
+      )
     of dotLoad, dotStringLiteral, dotIntegerLiteral:
-      discard
+      op
     # String operations
     of dotTrim:
-      op.trimValue.updateAccessIndex(index)
+      DieslOperation(
+        kind: dotTrim,
+        trimValue: op.trimValue.withAccessIndex(index),
+        trimDirection: op.trimDirection
+      )
     of dotSubstring:
-      op.substringValue.updateAccessIndex(index)
+      DieslOperation(
+        kind: dotSubstring,
+        substringValue: op.substringValue.withAccessIndex(index),
+        substringRange: op.substringRange
+      )
     of dotReplace:
-      op.replaceValue.updateAccessIndex(index)
-      op.replaceTarget.updateAccessIndex(index)
-      op.replaceReplacement.updateAccessIndex(index)
+      DieslOperation(
+        kind: dotReplace,
+        replaceValue: op.replaceValue.withAccessIndex(index),
+        replaceTarget: op.replaceTarget.withAccessIndex(index),
+        replaceReplacement: op.replaceReplacement.withAccessIndex(index)
+      )
     of dotReplaceAll:
-      op.replaceAllValue.updateAccessIndex(index)
-      op.replaceAllReplacements.apply(proc (pair: var DieslReplacementPair) =
-        pair.target.updateAccessIndex(index)
-        pair.replacement.updateAccessIndex(index)
+      DieslOperation(
+        kind: dotReplaceAll,
+        replaceAllValue: op.replaceAllValue.withAccessIndex(index),
+        replaceAllReplacements: op.replaceAllReplacements.map(pair => DieslReplacementPair(
+          target: pair.target.withAccessIndex(index),
+          replacement: pair.replacement.withAccessIndex(index)
+        ))
       )
     of dotStringConcat:
-      op.stringConcatValueA.updateAccessIndex(index)
-      op.stringConcatValueB.updateAccessIndex(index)
+      DieslOperation(
+        kind: dotStringConcat,
+        stringConcatValueA: op.stringConcatValueA.withAccessIndex(index),
+        stringConcatValueB: op.stringConcatValueB.withAccessIndex(index)
+      )
     of dotToLower:
-      op.toLowerValue.updateAccessIndex(index)
+      DieslOperation(
+        kind: dotToLower,
+        toLowerValue: op.toLowerValue.withAccessIndex(index)
+      )
     of dotToUpper:
-      op.toUpperValue.updateAccessIndex(index)
+      DieslOperation(
+        kind: dotToUpper,
+        toUpperValue: op.toUpperValue.withAccessIndex(index)
+      )
     # Regex
     of dotExtractOne:
-      op.extractOneValue.updateAccessIndex(index)
-    of dotExtractMany:
-      op.extractManyValue.updateAccessIndex(index)
-      op.extractManyIndex = index
-    of dotRegexReplace:
-      op.regexReplaceValue.updateAccessIndex(index)
-      op.regexReplaceTarget.updateAccessIndex(index)
-      op.regexReplaceReplacement.updateAccessIndex(index)
-    of dotRegexReplaceAll:
-      op.regexReplaceAllValue.updateAccessIndex(index)
-      op.regexReplaceAllReplacements.apply(proc (pair: var DieslReplacementPair) =
-        pair.target.updateAccessIndex(index)
-        pair.replacement.updateAccessIndex(index)
+      DieslOperation(
+        kind: dotExtractOne,
+        extractOneValue: op.extractOneValue.withAccessIndex(index),
+        extractOnePattern: op.extractOnePattern
       )
-
-proc withAccessIndex*(op: DieslOperation, index: int): DieslOperation =
-  result.deepCopy(op)
-  result.updateAccessIndex(index)
+    of dotExtractMany:
+      DieslOperation(
+        kind: dotExtractMany,
+        extractManyValue: op.extractManyValue.withAccessIndex(index),
+        extractManyPattern: op.extractManyPattern,
+        extractManyIndex: op.extractManyIndex
+      )
+    of dotRegexReplace:
+      DieslOperation(
+        kind: dotRegexReplace,
+        regexReplaceValue: op.regexReplaceValue.withAccessIndex(index),
+        regexReplaceTarget: op.regexReplaceTarget.withAccessIndex(index),
+        regexReplaceReplacement: op.regexReplaceReplacement.withAccessIndex(index)
+      )
+    of dotRegexReplaceAll:
+      DieslOperation(
+        kind: dotRegexReplaceAll,
+        regexReplaceAllValue: op.regexReplaceAllValue.withAccessIndex(index),
+        regexReplaceAllReplacements: op.regexReplaceAllReplacements.map(pair => DieslReplacementPair(
+          target: pair.target.withAccessIndex(index),
+          replacement: pair.replacement.withAccessIndex(index)
+        ))
+      )
