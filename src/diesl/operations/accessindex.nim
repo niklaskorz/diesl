@@ -105,5 +105,5 @@ proc withAccessIndex*(op: DieslOperation, index: int): DieslOperation =
         kind: dotStringSplit,
         stringSplitValue: op.stringSplitValue.withAccessIndex(index),
         stringSplitBy: op.stringSplitBy,
-        stringSplitIndex: op.stringSplitIndex
+        stringSplitIndex: index
       )

@@ -123,7 +123,5 @@ proc test_operations_strings*() =
       check extractOp1.stringSplitIndex == 1
 
 
-
-
 when isMainModule:
   test_operations_strings()
