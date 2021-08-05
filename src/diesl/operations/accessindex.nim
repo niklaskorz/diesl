@@ -100,3 +100,10 @@ proc withAccessIndex*(op: DieslOperation, index: int): DieslOperation =
           replacement: pair.replacement.withAccessIndex(index)
         ))
       )
+    of dotStringSplit:
+      DieslOperation(
+        kind: dotStringSplit,
+        stringSplitValue: op.stringSplitValue.withAccessIndex(index),
+        stringSplitBy: op.stringSplitBy,
+        stringSplitIndex: op.stringSplitIndex
+      )

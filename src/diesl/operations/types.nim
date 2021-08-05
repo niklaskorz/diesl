@@ -89,6 +89,7 @@ type
       of dotStringSplit:
         stringSplitValue*: DieslOperation
         stringSplitBy*: string 
+        stringSplitIndex*: int
         
       # Regex
       of dotExtractOne:
