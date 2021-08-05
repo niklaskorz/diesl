@@ -7,6 +7,7 @@ import types
 import boundaries
 import errors
 import optimizations
+import accessindex
 
 export types
 export errors
@@ -19,23 +20,6 @@ type
   DieslTable* = object
     pDiesl: Diesl
     pName: string
-
-proc toOperation*(operation: DieslOperation): DieslOperation = operation
-
-proc assertDataType*(op: DieslOperation, dataTypes: set[
-    DieslDataType]): DieslOperation =
-  let dataType = op.toDataType()
-  if dataType == ddtVoid:
-    raise DieslDataTypeMismatchError.newException("Operation has type void and cannot be used as value")
-  if dataType != ddtUnknown and dataType notin dataTypes and ddtUnknown notin dataTypes:
-    raise DieslDataTypeMismatchError.newException("Operation has type " &
-        $dataType & ", expected one of " & $dataTypes)
-  return op
-
-proc assertDataTypes*(ops: seq[DieslOperation], dataTypes: seq[DieslDataType]): seq[DieslOperation] =
-  for (op, dataType) in zip(ops, dataTypes):
-    discard op.assertDataType({dataType})
-  return ops
 
 proc exportOperations*(diesl: Diesl, optimize: bool = true): seq[DieslOperation] =
   if optimize:
@@ -97,7 +81,7 @@ template `.=`*(table: DieslTable, column: untyped,
 proc storeMany*(table: DieslTable, columns: seq[string], values: seq[DieslOperation]) =
   assert columns.len == values.len, "must provide as many values as columns"
   let types = values.map(toDataType)
-  let op = DieslOperation(
+  var op = DieslOperation(
     kind: dotStoreMany,
     storeManyTable: table.pName,
     storeManyColumns: columns,
@@ -108,7 +92,9 @@ proc storeMany*(table: DieslTable, columns: seq[string], values: seq[DieslOperat
   table.pDiesl.pOperations.add(op)
 
 proc storeMany*(table: DieslTable, columns: seq[string], value: DieslOperation) =
-  let values = value.repeat(columns.len)
+  var values = collect(newSeq):
+    for i in 0..<columns.len:
+      value.withAccessIndex(i)
   storeMany(table, columns, values)
 
 macro `[]=`*(table: DieslTable, nodes: varargs[untyped]): untyped =
