@@ -20,3 +20,7 @@ proc extractOne(input: string, regex: string): string {.exportToSqlite3.} =
 
 proc rReplace(input: string, old: string, nw: string): string {.exportToSqlite3.} = 
   return re.replace(input, re(old), nw)
+
+
+proc boolMatching(input: string, pattern: string): bool {.exportToSqlite3.} = 
+  return re.match(input, re(pattern))
