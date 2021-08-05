@@ -4,6 +4,7 @@ import sequtils
 import sugar
 import types
 
+
 proc collectLoads(op: DieslOperation): HashSet[(string, string)] =
   case op.kind:
     of dotStore:
@@ -58,6 +59,7 @@ proc collectLoads(op: DieslOperation): HashSet[(string, string)] =
 proc collectLoads(operations: seq[DieslOperation]): HashSet[(string, string)] =
   for op in operations:
     result = result + op.collectLoads()
+
 
 proc replaceLoad(op: var DieslOperation, table: string, column: string, value: DieslOperation) =
   case op.kind:
@@ -115,7 +117,8 @@ proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
   var lastStores: Table[(string, string), int]
   var firstResult: seq[DieslOperation]
   for op in operations:
-    assert op.kind == dotStore
+    if op.kind != dotStore:
+      continue
     let opStoreKey = (op.storeTable, op.storeColumn)
     let loads = op.collectLoads()
     let storeKeys = toSeq(lastStores.keys)
