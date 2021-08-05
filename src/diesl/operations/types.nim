@@ -97,6 +97,7 @@ type
       of dotExtractMany:
         extractManyValue*: DieslOperation
         extractManyPattern*: string
+        extractManyIndex*: int
       of dotRegexReplace:
         regexReplaceValue*: DieslOperation
         regexReplaceTarget*: DieslOperation
@@ -105,6 +106,7 @@ type
         regexReplaceAllValue*: DieslOperation
         regexReplaceAllReplacements*: seq[DieslReplacementPair]
 
+proc toOperation*(operation: DieslOperation): DieslOperation = operation
 
 proc toDataType*(op: DieslOperation): DieslDataType =
   case op.kind:
@@ -131,6 +133,7 @@ proc toDataType*(op: DieslOperation): DieslDataType =
       ddtString
     of dotToUpper:
       ddtString
+    # Regex
     of dotExtractOne:
       ddtString
     of dotExtractMany:
