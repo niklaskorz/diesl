@@ -1,4 +1,5 @@
 import re
+import strutils
 
 import exportToSqlite3
 import db_sqlite
@@ -20,3 +21,12 @@ proc extractOne(input: string, regex: string): string {.exportToSqlite3.} =
 
 proc rReplace(input: string, old: string, nw: string): string {.exportToSqlite3.} = 
   return re.replace(input, re(old), nw)
+
+
+proc padding(input: string, direction: int32, count: int64, padWith: string): string {.exportToSqlite3.} =
+  return if direction == -1: # TextDirection.left
+    strutils.align(input, count, padWith[0])
+  elif direction == 1: # TextDirection.right
+    strutils.alignLeft(input, count, padWith[0])
+  else:
+    strutils.center(input, int(count), padWith[0])
