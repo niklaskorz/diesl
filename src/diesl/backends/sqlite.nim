@@ -62,14 +62,14 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
         value = fmt"rReplace({value}, {pair.target.toSqlite.pattern}, {pair.replacement.toSqlite})"
       value
     of dotPadString:
-      let padding = op.padStringWithString.repeat(op.padStringCount)
-      case op.trimDirection:
+      let direction = case op.trimDirection:
         of TextDirection.left:
-          fmt"{padding} || {op.padStringValue.toSqlite}"
+          -1
         of TextDirection.right:
-          fmt"{op.padStringValue.toSqlite} || {padding}"
+          1
         of TextDirection.both:
-          fmt"{padding} || {op.padStringValue.toSqlite} || {padding}"
+          0
+      fmt"padding({op.padStringValue.toSqlite}, {direction}, {op.padStringCount}, {$op.padStringWith})"
 
 
 
