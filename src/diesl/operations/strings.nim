@@ -72,3 +72,11 @@ proc extractAll*(extractFrom: DieslOperation, fmtString: string): DieslOperation
     extractManyPattern: fmtString,
     extractManyIndex: -1, # filled by storeMany
   )
+
+proc split*(splitFrom: DieslOperation, splitOn: string): DieslOperation =
+  DieslOperation(
+    kind: dotStringSplit,
+    stringSplitValue: splitFrom,
+    stringSplitBy: splitOn,
+    stringSplitIndex: -1
+  )
