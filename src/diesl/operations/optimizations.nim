@@ -118,6 +118,8 @@ proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
   var firstResult: seq[DieslOperation]
   for op in operations:
     if op.kind != dotStore:
+      assert op.kind == dotStoreMany
+      firstResult.add(op)
       continue
     let opStoreKey = (op.storeTable, op.storeColumn)
     let loads = op.collectLoads()
@@ -140,7 +142,11 @@ proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
   # - the column is used by a load operation in the current storeMany for a different column
   var lastTableStores: Table[string, (seq[string], int)]
   for op in firstResult:
-    assert op.kind == dotStore
+    if op.kind != dotStore:
+      assert op.kind == dotStoreMany
+      lastTableStores[op.storeManyTable] = (op.storeManyColumns, result.len())
+      result.add(op)
+      continue
     # Check if this operation depends on any dotStoreMany entries
     let loads = op.collectLoads()
     let storeKeys = toSeq(lastTableStores.keys)
