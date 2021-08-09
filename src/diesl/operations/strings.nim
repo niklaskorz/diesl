@@ -73,6 +73,15 @@ proc extractAll*(extractFrom: DieslOperation, fmtString: string): DieslOperation
     extractManyIndex: -1, # filled by storeMany
   )
 
+proc padStringValue*(value: DieslOperation, direction: TextDirection, cnt: int, padWith: char = ' '): DieslOperation =
+  DieslOperation(
+    kind: dotPadString,
+    padStringValue: value.assertDataType({ddtString}),
+    padStringDirection: direction,
+    padStringCount: cnt,
+    padStringWith: $padWith
+  )
+
 proc split*(splitFrom: DieslOperation, splitOn: string): DieslOperation =
   DieslOperation(
     kind: dotStringSplit,

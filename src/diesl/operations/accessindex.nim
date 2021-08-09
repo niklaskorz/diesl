@@ -113,3 +113,11 @@ proc withAccessIndex*(op: DieslOperation, index: int): DieslOperation =
         stringSplitBy: op.stringSplitBy,
         stringSplitIndex: index
       )
+    of dotPadString:
+      DieslOperation(
+        kind: dotPadString,
+        padStringValue: op.padStringValue.withAccessIndex(index),
+        padStringDirection: op.padStringDirection,
+        padStringCount: op.padStringCount,
+        padStringWith: op.padStringWith
+      )

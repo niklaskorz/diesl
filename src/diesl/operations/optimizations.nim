@@ -56,6 +56,8 @@ proc collectLoads(op: DieslOperation): HashSet[(string, string)] =
       op.extractManyValue.collectLoads
     of dotMatch:
       op.matchValue.collectLoads
+    of dotPadString:
+      op.padStringValue.collectLoads
     of dotStringSplit:
       op.stringSplitValue.collectLoads
 
@@ -114,6 +116,8 @@ proc replaceLoad(op: var DieslOperation, table: string, column: string, value: D
       op.extractManyValue.replaceLoad(table, column, value)
     of dotMatch:
       op.matchValue.replaceLoad(table, column, value)
+    of dotPadString:
+      op.padStringValue.replaceLoad(table, column, value)
     of dotStringSplit:
       op.stringSplitValue.replaceLoad(table, column, value)
 

@@ -55,6 +55,8 @@ proc collectTableAccesses(op: DieslOperation): HashSet[string] =
       tables
     of dotMatch:
       op.matchValue.collectTableAccesses
+    of dotPadString:
+      op.padStringValue.collectTableAccesses
     of dotStringSplit:
       op.stringSplitValue.collectTableAccesses
 

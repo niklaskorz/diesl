@@ -62,6 +62,17 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
       value
     of dotMatch:
       "boolMatching({op.matchValue.toSqlite}, {op.matchPattern.pattern})"
+
+    of dotPadString:
+      let direction = case op.trimDirection:
+        of TextDirection.left:
+          -1
+        of TextDirection.right:
+          1
+        of TextDirection.both:
+          0
+      let padWith: char = op.padStringWith[0]
+      fmt"padding({op.padStringValue.toSqlite}, {direction}, {op.padStringCount}, {padWith})"
     of dotStringSplit:
       fmt"stringSplit({op.stringSplitValue.toSqlite}, {op.stringSplitBy}, {op.stringSplitIndex})"
 

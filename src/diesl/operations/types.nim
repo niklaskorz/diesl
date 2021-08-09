@@ -10,7 +10,7 @@ type
     dotStringLiteral
     dotIntegerLiteral
 
-    # String operations
+    # Plain string operations
     dotReplace
     dotReplaceAll
     dotTrim
@@ -18,6 +18,7 @@ type
     dotStringConcat
     dotToLower
     dotToUpper
+    dotPadString
     dotStringSplit
 
     # Regex
@@ -87,6 +88,11 @@ type
         toLowerValue*: DieslOperation
       of dotToUpper:
         toUpperValue*: DieslOperation
+      of dotPadString:
+        padStringValue*: DieslOperation
+        padStringDirection*: TextDirection
+        padStringCount*: int
+        padStringWith*: string
       of dotStringSplit:
         stringSplitValue*: DieslOperation
         stringSplitBy*: string
@@ -148,6 +154,8 @@ proc toDataType*(op: DieslOperation): DieslDataType =
     of dotRegexReplaceAll:
       ddtString
     of dotMatch:
+      ddtString
+    of dotPadString:
       ddtString
     of dotStringSplit:
       ddtString
