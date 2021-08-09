@@ -53,6 +53,8 @@ proc collectTableAccesses(op: DieslOperation): HashSet[string] =
         tables = tables + pair.target.collectTableAccesses() +
             pair.replacement.collectTableAccesses()
       tables
+    of dotMatch:
+      op.matchValue.collectTableAccesses
     of dotStringSplit:
       op.stringSplitValue.collectTableAccesses
 

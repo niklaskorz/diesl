@@ -19,12 +19,13 @@ type
     dotToLower
     dotToUpper
     dotStringSplit
-    
+
     # Regex
     dotRegexReplace
     dotRegexReplaceAll
     dotExtractOne
     dotExtractMany
+    dotMatch
 
   DieslDataType* = enum
     ddtUnknown
@@ -88,9 +89,9 @@ type
         toUpperValue*: DieslOperation
       of dotStringSplit:
         stringSplitValue*: DieslOperation
-        stringSplitBy*: string 
+        stringSplitBy*: string
         stringSplitIndex*: int
-        
+
       # Regex
       of dotExtractOne:
         extractOneValue*: DieslOperation
@@ -106,6 +107,9 @@ type
       of dotRegexReplaceAll:
         regexReplaceAllValue*: DieslOperation
         regexReplaceAllReplacements*: seq[DieslReplacementPair]
+      of dotMatch:
+        matchValue*: DieslOperation
+        matchPattern*: string
 
 proc toOperation*(operation: DieslOperation): DieslOperation = operation
 
@@ -143,9 +147,11 @@ proc toDataType*(op: DieslOperation): DieslDataType =
       ddtString
     of dotRegexReplaceAll:
       ddtString
+    of dotMatch:
+      ddtString
     of dotStringSplit:
       ddtString
-      
+
 proc toStoreMany*(op: DieslOperation): DieslOperation =
   assert op.kind == dotStore
   DieslOperation(
