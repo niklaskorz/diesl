@@ -38,5 +38,4 @@ proc pattern*(fmtString: string): string =
       (fmt"{extractedConstant}", tableRegex)
 
   result = fmtString.multiReplace(replaceBy)
-  echo result
 

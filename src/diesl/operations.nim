@@ -12,4 +12,5 @@ when isMainModule:
     .trim()
     .replace("foo", "bar")
     .replace(db.students.firstName, "<redacted>")
+  db.students[firstName, lastName] = @["a", "b", "c"]
   echo db.exportOperationsJson(true)

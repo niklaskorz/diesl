@@ -52,8 +52,7 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
     of dotExtractOne:
       fmt"extractOne({op.extractOneValue.toSqlite}, '{op.extractOnePattern.pattern}')"
     of dotExtractMany:
-      assert(false, "Not implemented")
-      fmt"extractMany({op.extractManyValue.toSqlite}, '{op.extractManyPattern.pattern}')"
+      fmt"extractMany({op.extractManyValue.toSqlite}, '{op.extractManyPattern.pattern}', {op.extractManyIndex})"
     of dotRegexReplace:
       fmt"rReplace({op.regexReplaceValue.toSqlite}, {op.regexReplaceTarget.toSqlite.pattern}, {op.regexReplaceReplacement.toSqlite})"
     of dotRegexReplaceAll:
@@ -63,6 +62,8 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
       value
     of dotMatch:
       "boolMatching({op.matchValue.toSqlite}, {op.matchPattern.pattern})"
+    of dotStringSplit:
+      fmt"stringSplit({op.stringSplitValue.toSqlite}, {op.stringSplitBy}, {op.stringSplitIndex})"
 
 
 proc toSqlite*(operations: seq[DieslOperation]): seq[SqlQuery] {.gcSafe.} =
@@ -72,5 +73,4 @@ proc toSqlite*(operations: seq[DieslOperation]): seq[SqlQuery] {.gcSafe.} =
     let query = operation.toSqlite()
     queries.add(SqlQuery(query))
   return queries
-
 

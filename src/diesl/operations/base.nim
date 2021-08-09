@@ -1,9 +1,13 @@
 import tables
 import json
+import macros
+import sequtils
+import sugar
 import types
 import boundaries
 import errors
 import optimizations
+import accessindex
 
 export types
 export errors
@@ -17,29 +21,17 @@ type
     pDiesl: Diesl
     pName: string
 
-proc toOperation*(operation: DieslOperation): DieslOperation = operation
-
-proc assertDataType*(op: DieslOperation, dataTypes: set[
-    DieslDataType]): DieslOperation =
-  let dataType = op.toDataType()
-  if dataType == ddtVoid:
-    raise DieslDataTypeMismatchError.newException("Operation has type void and cannot be used as value")
-  if dataType != ddtUnknown and dataType notin dataTypes and ddtUnknown notin dataTypes:
-    raise DieslDataTypeMismatchError.newException("Operation has type " &
-        $dataType & ", expected one of " & $dataTypes)
-  return op
-
 proc exportOperations*(diesl: Diesl, optimize: bool = true): seq[DieslOperation] =
   if optimize:
     diesl.pOperations.mergeStores()
   else:
     diesl.pOperations
 
-proc exportOperationsJson*(diesl: Diesl, prettyJson: bool = false): string =
+proc exportOperationsJson*(diesl: Diesl, prettyJson: bool = false, optimize: bool = true): string =
   if prettyJson:
-    pretty(%(diesl.exportOperations()))
+    pretty(%(diesl.exportOperations(optimize)))
   else:
-    $(%(diesl.exportOperations()))
+    $(%(diesl.exportOperations(optimize)))
 
 proc `$`*(operations: seq[DieslOperation]): string =
   pretty(%operations)
@@ -70,18 +62,42 @@ proc load(table: DieslTable, column: string): DieslOperation =
 template `.`*(table: DieslTable, column: untyped): DieslOperation =
   load(table, astToStr(column))
 
-proc store(table: DieslTable, column: string,
-    value: DieslOperation): DieslOperation =
+proc store(table: DieslTable, column: string, value: DieslOperation) =
   let dataType = table.getColumnType(column)
-  result = DieslOperation(
+  let op = DieslOperation(
     kind: dotStore,
     storeTable: table.pName,
     storeColumn: column,
     storeValue: value.assertDataType({dataType}),
     storeType: dataType
   )
-  result.checkTableBoundaries()
+  op.checkTableBoundaries()
+  table.pDiesl.pOperations.add(op)
 
 template `.=`*(table: DieslTable, column: untyped,
     value: DieslOperation): untyped =
-  table.pDiesl.pOperations.add(store(table, astToStr(column), value))
+  store(table, astToStr(column), value)
+
+proc storeMany*(table: DieslTable, columns: seq[string], values: seq[DieslOperation]) =
+  assert columns.len == values.len, "must provide as many values as columns"
+  let types = values.map(toDataType)
+  var op = DieslOperation(
+    kind: dotStoreMany,
+    storeManyTable: table.pName,
+    storeManyColumns: columns,
+    storeManyValues: values.assertDataTypes(types),
+    storeManyTypes: types
+  )
+  op.checkTableBoundaries()
+  table.pDiesl.pOperations.add(op)
+
+proc storeMany*(table: DieslTable, columns: seq[string], value: DieslOperation) =
+  var values = collect(newSeq):
+    for i in 0..<columns.len:
+      value.withAccessIndex(i)
+  storeMany(table, columns, values)
+
+macro `[]=`*(table: DieslTable, nodes: varargs[untyped]): untyped =
+  let columns = newLit(nodes[0..^2].map((n) => $n))
+  let values = nodes[^1]
+  result = newCall(ident"storeMany", table, columns, values)
