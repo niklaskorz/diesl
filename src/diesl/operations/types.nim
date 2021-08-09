@@ -18,7 +18,8 @@ type
     dotStringConcat
     dotToLower
     dotToUpper
-
+    dotStringSplit
+    
     # Regex
     dotRegexReplace
     dotRegexReplaceAll
@@ -85,7 +86,11 @@ type
         toLowerValue*: DieslOperation
       of dotToUpper:
         toUpperValue*: DieslOperation
-
+      of dotStringSplit:
+        stringSplitValue*: DieslOperation
+        stringSplitBy*: string 
+        stringSplitIndex*: int
+        
       # Regex
       of dotExtractOne:
         extractOneValue*: DieslOperation
@@ -138,7 +143,9 @@ proc toDataType*(op: DieslOperation): DieslDataType =
       ddtString
     of dotRegexReplaceAll:
       ddtString
-
+    of dotStringSplit:
+      ddtString
+      
 proc toStoreMany*(op: DieslOperation): DieslOperation =
   assert op.kind == dotStore
   DieslOperation(
