@@ -4,6 +4,9 @@ import base
 import strings
 import integers
 
+converter toDieslOperations*[T](values: seq[T]): seq[DieslOperation] =
+  values.map(v => v.toOperation)
+
 converter toDieslOperation*(value: string): DieslOperation =
   value.toOperation
 

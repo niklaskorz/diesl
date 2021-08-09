@@ -18,7 +18,7 @@ type
     dotStringConcat
     dotToLower
     dotToUpper
-    
+
     # Regex
     dotRegexReplace
     dotRegexReplaceAll
@@ -85,7 +85,7 @@ type
         toLowerValue*: DieslOperation
       of dotToUpper:
         toUpperValue*: DieslOperation
-        
+
       # Regex
       of dotExtractOne:
         extractOneValue*: DieslOperation
@@ -93,6 +93,7 @@ type
       of dotExtractMany:
         extractManyValue*: DieslOperation
         extractManyPattern*: string
+        extractManyIndex*: int
       of dotRegexReplace:
         regexReplaceValue*: DieslOperation
         regexReplaceTarget*: DieslOperation
@@ -101,6 +102,7 @@ type
         regexReplaceAllValue*: DieslOperation
         regexReplaceAllReplacements*: seq[DieslReplacementPair]
 
+proc toOperation*(operation: DieslOperation): DieslOperation = operation
 
 proc toDataType*(op: DieslOperation): DieslDataType =
   case op.kind:
@@ -127,6 +129,7 @@ proc toDataType*(op: DieslOperation): DieslDataType =
       ddtString
     of dotToUpper:
       ddtString
+    # Regex
     of dotExtractOne:
       ddtString
     of dotExtractMany:
@@ -135,7 +138,7 @@ proc toDataType*(op: DieslOperation): DieslDataType =
       ddtString
     of dotRegexReplaceAll:
       ddtString
-      
+
 proc toStoreMany*(op: DieslOperation): DieslOperation =
   assert op.kind == dotStore
   DieslOperation(
