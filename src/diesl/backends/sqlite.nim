@@ -52,8 +52,7 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
     of dotExtractOne:
       fmt"extractOne({op.extractOneValue.toSqlite}, '{op.extractOnePattern.pattern}')"
     of dotExtractMany:
-      assert(false, "Not implemented")
-      fmt"extractMany({op.extractManyValue.toSqlite}, '{op.extractManyPattern.pattern}')"
+      fmt"extractMany({op.extractManyValue.toSqlite}, '{op.extractManyPattern.pattern}', {op.extractManyIndex})"
     of dotRegexReplace:
       fmt"rReplace({op.regexReplaceValue.toSqlite}, {op.regexReplaceTarget.toSqlite.pattern}, {op.regexReplaceReplacement.toSqlite})"
     of dotRegexReplaceAll:
@@ -61,6 +60,9 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
       for pair in op.regexReplaceAllReplacements:
         value = fmt"rReplace({value}, {pair.target.toSqlite.pattern}, {pair.replacement.toSqlite})"
       value
+    of dotMatch:
+      "boolMatching({op.matchValue.toSqlite}, {op.matchPattern.pattern})"
+
     of dotPadString:
       let direction = case op.trimDirection:
         of TextDirection.left:
@@ -71,7 +73,8 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
           0
       let padWith: char = op.padStringWith[0]
       fmt"padding({op.padStringValue.toSqlite}, {direction}, {op.padStringCount}, {padWith})"
-
+    of dotStringSplit:
+      fmt"stringSplit({op.stringSplitValue.toSqlite}, {op.stringSplitBy}, {op.stringSplitIndex})"
 
 
 proc toSqlite*(operations: seq[DieslOperation]): seq[SqlQuery] {.gcSafe.} =
@@ -81,5 +84,4 @@ proc toSqlite*(operations: seq[DieslOperation]): seq[SqlQuery] {.gcSafe.} =
     let query = operation.toSqlite()
     queries.add(SqlQuery(query))
   return queries
-
 

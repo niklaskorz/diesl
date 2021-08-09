@@ -4,6 +4,7 @@ import sequtils
 import sugar
 import types
 
+
 proc collectLoads(op: DieslOperation): HashSet[(string, string)] =
   case op.kind:
     of dotStore:
@@ -53,13 +54,18 @@ proc collectLoads(op: DieslOperation): HashSet[(string, string)] =
       op.extractOneValue.collectLoads
     of dotExtractMany:
       op.extractManyValue.collectLoads
+    of dotMatch:
+      op.matchValue.collectLoads
     of dotPadString:
       op.padStringValue.collectLoads
+    of dotStringSplit:
+      op.stringSplitValue.collectLoads
 
 
 proc collectLoads(operations: seq[DieslOperation]): HashSet[(string, string)] =
   for op in operations:
     result = result + op.collectLoads()
+
 
 proc replaceLoad(op: var DieslOperation, table: string, column: string, value: DieslOperation) =
   case op.kind:
@@ -108,8 +114,12 @@ proc replaceLoad(op: var DieslOperation, table: string, column: string, value: D
       op.extractOneValue.replaceLoad(table, column, value)
     of dotExtractMany:
       op.extractManyValue.replaceLoad(table, column, value)
+    of dotMatch:
+      op.matchValue.replaceLoad(table, column, value)
     of dotPadString:
       op.padStringValue.replaceLoad(table, column, value)
+    of dotStringSplit:
+      op.stringSplitValue.replaceLoad(table, column, value)
 
 
 proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
@@ -119,7 +129,10 @@ proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
   var lastStores: Table[(string, string), int]
   var firstResult: seq[DieslOperation]
   for op in operations:
-    assert op.kind == dotStore
+    if op.kind != dotStore:
+      assert op.kind == dotStoreMany
+      firstResult.add(op)
+      continue
     let opStoreKey = (op.storeTable, op.storeColumn)
     let loads = op.collectLoads()
     let storeKeys = toSeq(lastStores.keys)
@@ -141,7 +154,11 @@ proc mergeStores*(operations: seq[DieslOperation]): seq[DieslOperation] =
   # - the column is used by a load operation in the current storeMany for a different column
   var lastTableStores: Table[string, (seq[string], int)]
   for op in firstResult:
-    assert op.kind == dotStore
+    if op.kind != dotStore:
+      assert op.kind == dotStoreMany
+      lastTableStores[op.storeManyTable] = (op.storeManyColumns, result.len())
+      result.add(op)
+      continue
     # Check if this operation depends on any dotStoreMany entries
     let loads = op.collectLoads()
     let storeKeys = toSeq(lastTableStores.keys)

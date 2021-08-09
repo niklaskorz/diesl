@@ -58,25 +58,34 @@ proc toLower*(value: DieslOperation): DieslOperation =
 proc toUpper*(value: DieslOperation): DieslOperation =
   DieslOperation(kind: dotToUpper, toUpperValue: value.assertDataType({ddtString}))
 
-proc extractOne*(extractFrom: DieslOperation, fmtString: string): DieslOperation = 
+proc extractOne*(extractFrom: DieslOperation, fmtString: string): DieslOperation =
   DieslOperation(
-    kind: dotExtractOne, 
-    extractOneValue: extractFrom.assertDataType({ddtString}), 
+    kind: dotExtractOne,
+    extractOneValue: extractFrom.assertDataType({ddtString}),
     extractOnePattern: fmtString
   )
 
-proc extractAll*(extractFrom: DieslOperation, fmtString: string): DieslOperation = 
+proc extractAll*(extractFrom: DieslOperation, fmtString: string): DieslOperation =
   DieslOperation(
-    kind: dotExtractMany, 
-    extractManyValue: extractFrom.assertDataType({ddtString}), 
-    extractManyPattern: fmtString
+    kind: dotExtractMany,
+    extractManyValue: extractFrom.assertDataType({ddtString}),
+    extractManyPattern: fmtString,
+    extractManyIndex: -1, # filled by storeMany
   )
 
-proc padStringValue*(value: DieslOperation, direction: TextDirection, cnt: int, padWith: char = ' '): DieslOperation = 
+proc padStringValue*(value: DieslOperation, direction: TextDirection, cnt: int, padWith: char = ' '): DieslOperation =
   DieslOperation(
     kind: dotPadString,
     padStringValue: value.assertDataType({ddtString}),
     padStringDirection: direction,
     padStringCount: cnt,
     padStringWith: $padWith
+  )
+
+proc split*(splitFrom: DieslOperation, splitOn: string): DieslOperation =
+  DieslOperation(
+    kind: dotStringSplit,
+    stringSplitValue: splitFrom,
+    stringSplitBy: splitOn,
+    stringSplitIndex: -1
   )

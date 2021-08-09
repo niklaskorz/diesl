@@ -5,7 +5,7 @@ import exportToSqlite3
 import db_sqlite
 
 
-proc installCommands*(db: DbConn): void = 
+proc installCommands*(db: DbConn): void =
   db.registerFunctions()
 
 proc extractOne(input: string, regex: string): string {.exportToSqlite3.} =
@@ -19,7 +19,7 @@ proc extractOne(input: string, regex: string): string {.exportToSqlite3.} =
     return matches[0]
 
 
-proc rReplace(input: string, old: string, nw: string): string {.exportToSqlite3.} = 
+proc rReplace(input: string, old: string, nw: string): string {.exportToSqlite3.} =
   return re.replace(input, re(old), nw)
 
 
@@ -30,3 +30,16 @@ proc padding(input: string, direction: int32, count: int64, padWith: string): st
     strutils.alignLeft(input, count, padWith[0])
   else:
     strutils.center(input, int(count), padWith[0])
+
+
+proc boolMatching(input: string, pattern: string): bool {.exportToSqlite3.} =
+  return re.match(input, re(pattern))
+
+
+proc stringSplit(input: string, splitOn: string, index: int64): string {.exportToSqlite3.} =
+  let ss = input.split(re(splitOn))
+  return if index < len(ss):
+    ss[index]
+  else:
+    ""
+
