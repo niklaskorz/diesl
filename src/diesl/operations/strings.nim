@@ -89,3 +89,22 @@ proc split*(splitFrom: DieslOperation, splitOn: string): DieslOperation =
     stringSplitBy: splitOn,
     stringSplitIndex: -1
   )
+
+proc regexReplace*(value: DieslOperation, target: DieslOperation,
+    replacement: DieslOperation): DieslOperation =
+  DieslOperation(
+    kind: dotRegexReplace,
+    regexReplaceValue: value.assertDataType({ddtString}),
+    regexReplaceTarget: target.assertDataType({ddtString}),
+    regexReplaceReplacement: replacement.assertDataType({ddtString})
+  )
+
+proc regexReplaceAll*(value: DieslOperation, replacements: seq[(DieslOperation,
+    DieslOperation)]): DieslOperation =
+  DieslOperation(
+    kind: dotRegexReplaceAll,
+    regexReplaceAllValue: value.assertDataType({ddtString}),
+    regexReplaceAllReplacements: replacements.map((pair) => DieslReplacementPair(
+        target: pair[0].assertDataType({ddtString}), replacement: pair[
+            1].assertDataType({ddtString})))
+  )
