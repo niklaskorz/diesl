@@ -187,6 +187,12 @@ proc padStringValue*(value: DieslOperation, direction: TextDirection, cnt: int, 
   )
 
 proc split*(splitFrom: DieslOperation, splitOn: string): DieslOperation =
+  ## Split one column into multiple columns based on `splitOn`
+  ## 
+  ## Examples:
+  ## ```nim
+  ## db.students[firstName, lastName] = db.students.name.split(" ")
+  ## ```
   DieslOperation(
     kind: dotStringSplit,
     stringSplitValue: splitFrom,
