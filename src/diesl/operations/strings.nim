@@ -11,6 +11,9 @@ proc toOperation*(value: string): DieslOperation =
   ## ```
   DieslOperation(kind: dotStringLiteral, stringValue: value)
 
+proc lit*(value: string): DieslOperation = 
+  value.toOperation
+
 proc trim*(value: DieslOperation, direction: TextDirection = both): DieslOperation =
   ## Trim whitespace according to `direction` parameter
   ## 
