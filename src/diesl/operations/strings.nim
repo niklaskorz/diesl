@@ -12,6 +12,7 @@ proc toOperation*(value: string): DieslOperation =
   DieslOperation(kind: dotStringLiteral, stringValue: value)
 
 proc lit*(value: string): DieslOperation = 
+  ## An alias of toOperation
   value.toOperation
 
 proc trim*(value: DieslOperation, direction: TextDirection = both): DieslOperation =
@@ -96,6 +97,12 @@ proc replaceAll*(value: DieslOperation, replacements: seq[(DieslOperation,
   )
 
 proc remove*(value: DieslOperation, target: DieslOperation): DieslOperation =
+  ## Remove all occurrences of `target` from `value`.
+  ## 
+  ## Examples:
+  ## ```nim
+  ## db.students.name = db.students.name.remove("some swear word")
+  ## ```
   value.replace(target.assertDataType({ddtString}), "".toOperation)
 
 proc stringConcat(valueA: DieslOperation,
@@ -106,13 +113,35 @@ proc stringConcat(valueA: DieslOperation,
     stringConcatValueB: valueB.assertDataType({ddtString})
   )
 
-proc `&`*(valueA: DieslOperation, valueB: DieslOperation): DieslOperation = stringConcat(
-    valueA, valueB)
+proc `&`*(valueA: DieslOperation, valueB: DieslOperation): DieslOperation = 
+  ## Concatenate strings from two columns
+  ## 
+  ## Examples:
+  ## ```nim
+  ## # Concat two columns and store in concat
+  ## db.student.concat = db.students.lhs & db.students.rhs
+  ## 
+  ## # Create the student's full name from their first and last names
+  ## db.student.fullName = db.students.firstName & " " & db.students.lastName
+  ## ```
+  stringConcat(valueA, valueB)
 
 proc toLower*(value: DieslOperation): DieslOperation =
+  ## Convert a column's strings to lowercase
+  ## 
+  ## Examples:
+  ## ```nim
+  ## db.students.lower = db.students.mixedCase.toLower()
+  ## ``` 
   DieslOperation(kind: dotToLower, toLowerValue: value.assertDataType({ddtString}))
 
 proc toUpper*(value: DieslOperation): DieslOperation =
+  ## Convert a column's strings to lowercase
+  ## 
+  ## Examples:
+  ## ```nim
+  ## db.students.lower = db.students.mixedCase.toUpper()
+  ## ```
   DieslOperation(kind: dotToUpper, toUpperValue: value.assertDataType({ddtString}))
 
 proc extractOne*(extractFrom: DieslOperation, fmtString: string): DieslOperation =
