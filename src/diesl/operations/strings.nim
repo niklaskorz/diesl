@@ -140,11 +140,17 @@ proc toUpper*(value: DieslOperation): DieslOperation =
   ## 
   ## Examples:
   ## ```nim
-  ## db.students.lower = db.students.mixedCase.toUpper()
+  ## db.students.upper = db.students.mixedCase.toUpper()
   ## ```
   DieslOperation(kind: dotToUpper, toUpperValue: value.assertDataType({ddtString}))
 
 proc extractOne*(extractFrom: DieslOperation, fmtString: string): DieslOperation =
+  ## Extract the first occurrence according to the regex in `fmtString` 
+  ## 
+  ## Examples:
+  ## ```nim
+  ## db.student.hashtag = db.student.blob.extractOne("{hashtag}")
+  ## ```
   DieslOperation(
     kind: dotExtractOne,
     extractOneValue: extractFrom.assertDataType({ddtString}),
@@ -152,6 +158,12 @@ proc extractOne*(extractFrom: DieslOperation, fmtString: string): DieslOperation
   )
 
 proc extractAll*(extractFrom: DieslOperation, fmtString: string): DieslOperation =
+  ## Extract the all occurrences according to the regex in `fmtString` 
+  ## 
+  ## Examples:
+  ## ```nim
+  ## db.students[firstName, lastName] = db.students.name.extractAll("([a-z]+) ([a-z]+)")
+  ## ```
   DieslOperation(
     kind: dotExtractMany,
     extractManyValue: extractFrom.assertDataType({ddtString}),
@@ -160,6 +172,12 @@ proc extractAll*(extractFrom: DieslOperation, fmtString: string): DieslOperation
   )
 
 proc padStringValue*(value: DieslOperation, direction: TextDirection, cnt: int, padWith: char = ' '): DieslOperation =
+  ## Pad string with characters so it fits a specific minimum size
+  ## 
+  ## Examples:
+  ## ```
+  ## db.students.name = db.students.name.padStringValue(left, 5, "x")
+  ## ```
   DieslOperation(
     kind: dotPadString,
     padStringValue: value.assertDataType({ddtString}),
