@@ -9,14 +9,19 @@ proc toOperation*(value: string): DieslOperation =
   DieslOperation(kind: dotStringLiteral, stringValue: value)
 
 proc trim*(value: DieslOperation, direction: TextDirection = both): DieslOperation =
-  ## Trim whitespace of `name` column in `students` table according to `direction` parameter
+  ## Trim whitespace according to `direction` parameter
   ## 
   ## Examples: 
   ## ```
-  ## db.students.name = db.students.name.trim(left) # Only trim on whitespace on the left side
-  ## db.students.name = db.students.name.trim(right) # Only trim on whitespace on the right side
-  ## db.students.name = db.students.name.trim(both) # Trim whitespace on both sides
-  ## db.students.name = db.students.name.trim() # Alias for `TextDirection.both`
+  ## # Only trim on whitespace on the left side
+  ## db.students.name = db.students.name.trim(left) 
+  ## 
+  ## # Only trim on whitespace on the right side
+  ## db.students.name = db.students.name.trim(right) 
+  ## 
+  ## # Trim whitespace on both sides
+  ## db.students.name = db.students.name.trim(both)
+  ## db.students.name = db.students.name.trim()
   ## ```
   DieslOperation(kind: dotTrim, trimValue: value.assertDataType({ddtString}),
       trimDirection: direction)
@@ -26,6 +31,13 @@ proc substring(value: DieslOperation, range: Slice[int]): DieslOperation =
       ddtString}), substringRange: range)
 
 proc `[]`*(value: DieslOperation, range: Slice[int]): DieslOperation =
+  ## Slice strings according to `range` parameter
+  ## 
+  ## Examples:
+  ## ```
+  ## # Extracts all characters between the third (incl.) and sixth (excl.) points
+  ## db.students.name = db.students.name[2..5] 
+  ## ```
   value.substring(range)
 
 proc replace*(value: DieslOperation, target: DieslOperation,
