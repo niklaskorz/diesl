@@ -5,14 +5,17 @@ import sequtils
 proc toOperation*(value: string): DieslOperation =
   ## Lift a string into an operation
   ## 
-  ## Example: "Hello World".toOperation
+  ## Example: 
+  ## ```nim
+  ## "Hello World".toOperation
+  ## ```
   DieslOperation(kind: dotStringLiteral, stringValue: value)
 
 proc trim*(value: DieslOperation, direction: TextDirection = both): DieslOperation =
   ## Trim whitespace according to `direction` parameter
   ## 
   ## Examples: 
-  ## ```
+  ## ```nim
   ## # Only trim on whitespace on the left side
   ## db.students.name = db.students.name.trim(left) 
   ## 
@@ -34,7 +37,7 @@ proc `[]`*(value: DieslOperation, range: Slice[int]): DieslOperation =
   ## Slice strings according to `range` parameter
   ## 
   ## Examples:
-  ## ```
+  ## ```nim
   ## # Extracts all characters between the third (incl.) and sixth (excl.) points
   ## db.students.name = db.students.name[2..5] 
   ## ```
@@ -42,6 +45,16 @@ proc `[]`*(value: DieslOperation, range: Slice[int]): DieslOperation =
 
 proc replace*(value: DieslOperation, target: DieslOperation,
     replacement: DieslOperation): DieslOperation =
+  ## Replace all occurrences of `target` in `value` by `replacement`
+  ## 
+  ## Examples:
+  ## ```nim
+  ## # Replace "Hello" with "World"
+  ## db.migration.new = db.migration.old.replace("Hello".toOperation, "World".toOperation)
+  ## 
+  ## # Replace every student's first name with "Mr."
+  ## db.student.firstName = db.student.firstName(db.students.firstName, "Mr. ")
+  ## ```
   DieslOperation(
     kind: dotReplace,
     replaceValue: value.assertDataType({ddtString}),
@@ -51,6 +64,26 @@ proc replace*(value: DieslOperation, target: DieslOperation,
 
 proc replaceAll*(value: DieslOperation, replacements: seq[(DieslOperation,
     DieslOperation)]): DieslOperation =
+  ## Pairwise replacing according to `replacements`. 
+  ## The first entry is the target, the second is what the target is replaced by
+  ## 
+  ## Examples:
+  ## ```nim
+  ## # All replacements occur in the name column
+  ## db.students.name = db.students.name.replaceAll(@{
+  ##    # Replace every occurrence of a student's first name with "Mr."
+  ##    db.students.firstName: "Mr. ",
+  ## 
+  ##    # Replace every "<LastName>" with the student's last name
+  ##    "<LastName>": db.students.lastName,
+  ## 
+  ##    # General Kenobi
+  ##    "Hello": "there",
+  ## 
+  ##    # Replace every occurrence of a student's columnA with the columnB entry
+  ##    db.students.columnA: db.students.columnB
+  ## })
+  ## ```
   DieslOperation(
     kind: dotReplaceAll,
     replaceAllValue: value.assertDataType({ddtString}),
