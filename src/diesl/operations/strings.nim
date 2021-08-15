@@ -3,12 +3,21 @@ import sugar
 import sequtils
 
 proc toOperation*(value: string): DieslOperation =
+  ## Lift a string into an operation
+  ## 
+  ## Example: "Hello World".toOperation
   DieslOperation(kind: dotStringLiteral, stringValue: value)
 
-proc lit*(value: string): DieslOperation =
-  toOperation(value)
-
 proc trim*(value: DieslOperation, direction: TextDirection = both): DieslOperation =
+  ## Trim whitespace of `name` column in `students` table according to `direction` parameter
+  ## 
+  ## Examples: 
+  ## ```
+  ## db.students.name = db.students.name.trim(left) # Only trim on whitespace on the left side
+  ## db.students.name = db.students.name.trim(right) # Only trim on whitespace on the right side
+  ## db.students.name = db.students.name.trim(both) # Trim whitespace on both sides
+  ## db.students.name = db.students.name.trim() # Alias for `TextDirection.both`
+  ## ```
   DieslOperation(kind: dotTrim, trimValue: value.assertDataType({ddtString}),
       trimDirection: direction)
 

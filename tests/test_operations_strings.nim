@@ -62,7 +62,7 @@ proc test_operations_strings*() =
 
 
     test "remove":
-      db.table.to = db.table.frm.remove(lit"$MY-SOCIAL-SECURITY-NUMBER")
+      db.table.to = db.table.frm.remove(toOperation"$MY-SOCIAL-SECURITY-NUMBER")
 
       let ops = db.exportOperations(optimize = false)
       let storeOp = ops[0]
