@@ -90,8 +90,16 @@ proc split*(splitFrom: DieslOperation, splitOn: string): DieslOperation =
     stringSplitIndex: -1
   )
 
-proc regexReplace*(value: DieslOperation, target: DieslOperation,
+proc patternReplace*(value: DieslOperation, target: DieslOperation,
     replacement: DieslOperation): DieslOperation =
+  ## Replace all occurrences of `target` in `value` by `replacement`.
+  ## This is the regex-based counterpart of `replace`
+  ## 
+  ## Examples:
+  ## ```nim
+  ## # Replace pattern in name with "Mr. "
+  ## db.students.name = db.students.name.patternReplace("{email}", "Mr. ")
+  ## ```
   DieslOperation(
     kind: dotRegexReplace,
     regexReplaceValue: value.assertDataType({ddtString}),
@@ -99,8 +107,20 @@ proc regexReplace*(value: DieslOperation, target: DieslOperation,
     regexReplaceReplacement: replacement.assertDataType({ddtString})
   )
 
-proc regexReplaceAll*(value: DieslOperation, replacements: seq[(DieslOperation,
+proc patternReplaceAll*(value: DieslOperation, replacements: seq[(DieslOperation,
     DieslOperation)]): DieslOperation =
+  ## Pairwise replacing according to `replacements`. 
+  ## The first entry is the target, the second is what the target is replaced by
+  ## 
+  ## Examples:
+  ## ```nim
+  ## # Replace pattern pairs in column "name"
+  ## db.students.name = db.students.name.patternReplaceAll(@{
+  ##   "{email}": "Mr. ",
+  ##   "[a-z]+": db.students.lastName,
+  ##   "{hashtag}": "there",
+  ## })
+  ## ```
   DieslOperation(
     kind: dotRegexReplaceAll,
     regexReplaceAllValue: value.assertDataType({ddtString}),
