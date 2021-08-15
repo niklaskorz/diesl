@@ -89,3 +89,10 @@ proc split*(splitFrom: DieslOperation, splitOn: string): DieslOperation =
     stringSplitBy: splitOn,
     stringSplitIndex: -1
   )
+
+proc match*(value: DieslOperation, pattern: string): DieslOperation = 
+  DieslOperation(
+    kind: dotMatch,
+    matchValue: value,
+    matchPattern: pattern
+  )
