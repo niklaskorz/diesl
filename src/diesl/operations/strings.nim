@@ -195,7 +195,7 @@ proc split*(splitFrom: DieslOperation, splitOn: string): DieslOperation =
   ## ```
   DieslOperation(
     kind: dotStringSplit,
-    stringSplitValue: splitFrom.assertDataType({ddtString}),,
+    stringSplitValue: splitFrom.assertDataType({ddtString}),
     stringSplitBy: splitOn,
     stringSplitIndex: -1
   )
@@ -247,6 +247,6 @@ proc match*(value: DieslOperation, pattern: string): DieslOperation =
   ## ```
   DieslOperation(
     kind: dotMatch,
-    matchValue: value.assertDataType({ddtString}),,
+    matchValue: value.assertDataType({ddtString}),
     matchPattern: pattern
   )
