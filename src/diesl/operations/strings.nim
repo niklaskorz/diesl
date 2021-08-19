@@ -85,14 +85,20 @@ proc padStringValue*(value: DieslOperation, direction: TextDirection, cnt: int, 
 proc split*(splitFrom: DieslOperation, splitOn: string): DieslOperation =
   DieslOperation(
     kind: dotStringSplit,
-    stringSplitValue: splitFrom,
+    stringSplitValue: splitFrom.assertDataType({ddtString}),,
     stringSplitBy: splitOn,
     stringSplitIndex: -1
   )
 
-proc match*(value: DieslOperation, pattern: string): DieslOperation = 
+proc match*(value: DieslOperation, pattern: string): DieslOperation =
+  ## Compute boolean values for each entry corresponding to whether the given `pattern` matches.
+  ## 
+  ## Examples:
+  ## ```nim
+  ## db.students.coolNamesMask = db.students.match("(?:Ben)")
+  ## ```
   DieslOperation(
     kind: dotMatch,
-    matchValue: value,
+    matchValue: value.assertDataType({ddtString}),,
     matchPattern: pattern
   )
