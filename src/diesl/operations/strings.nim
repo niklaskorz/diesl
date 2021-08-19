@@ -195,7 +195,7 @@ proc split*(splitFrom: DieslOperation, splitOn: string): DieslOperation =
   ## ```
   DieslOperation(
     kind: dotStringSplit,
-    stringSplitValue: splitFrom,
+    stringSplitValue: splitFrom.assertDataType({ddtString}),,
     stringSplitBy: splitOn,
     stringSplitIndex: -1
   )
@@ -237,4 +237,16 @@ proc patternReplaceAll*(value: DieslOperation, replacements: seq[(DieslOperation
     regexReplaceAllReplacements: replacements.map((pair) => DieslReplacementPair(
         target: pair[0].assertDataType({ddtString}), replacement: pair[
             1].assertDataType({ddtString})))
+  )
+proc match*(value: DieslOperation, pattern: string): DieslOperation =
+  ## Compute boolean values for each entry corresponding to whether the given `pattern` matches.
+  ## 
+  ## Examples:
+  ## ```nim
+  ## db.students.coolNamesMask = db.students.match("(?:Ben)")
+  ## ```
+  DieslOperation(
+    kind: dotMatch,
+    matchValue: value.assertDataType({ddtString}),,
+    matchPattern: pattern
   )
