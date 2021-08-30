@@ -20,7 +20,7 @@ Specifically, this type is an enum that is controlled by the [DieslOperationType
 
 ### Defining a new DieslOperation
 
-For example, if a new operation for trimming strings is to be introduced, a new DieslOperationType called `dotTrim` can be introduced
+For example, if a new operation for trimming strings is to be introduced, a new DieslOperationType called `dotTrim` can be defined
 
 ```nim
 type DieslOperationType* = enum
@@ -87,7 +87,7 @@ proc toSqlite*(op: DieslOperation): string =
 ### Advanced Implementation: exportToSqlite3
 
 More complex actions are tricky to implement or cannot be solely implemented in SQL.
-To this end, [extension methods](src/diesl/extensions/sqlite.nim) can been implemented.
+To this end, [extension methods](src/diesl/extensions/sqlite.nim) can be implemented.
 This approach was deemed viable for string padding, where Nim provides corresponding methods in the standard library and SQLite does not.
 
 First, the scalar [padding](src/diesl/extensions/sqlite.nim#26) procedure is defined in Nim.
