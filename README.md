@@ -66,6 +66,7 @@ proc toSqlite*(op: DieslOperation): string =
     of dotLoad:
       ...
     of dotTrim:
+      # Derive which kind of trimming is desired
       let trimFunction = case op.trimDirection:
         of TextDirection.left:
           "LTRIM"
@@ -73,9 +74,13 @@ proc toSqlite*(op: DieslOperation): string =
           "RTRIM"
         of TextDirection.both:
           "TRIM"
-      # This is an interpolated string, substituting expressions into their corresponding placeholders within the string.
-      # The `op.trimValue.toSqlite` expression recurses into the `trimValue` member for its own SQL generation
+
+      # This is an interpolated string, substituting expressions
+      # into their corresponding placeholders within the string.
       fmt"{trimFunction}({op.trimValue.toSqlite})"
+
+      # The `op.trimValue.toSqlite` expression recurses into the
+      # `trimValue` member for its own SQL generation
 ```
 
 
