@@ -115,7 +115,7 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
 
 
 
-# Accounting
+## Accounting
 
 * Niklas Korz: 40% + aforementioned exportage library, in particular:
   * SQL generation and optimization
