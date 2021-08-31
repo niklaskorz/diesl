@@ -105,3 +105,26 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
       # Generate the corresponding SQL call
       fmt"padding({op.padStringValue.toSqlite}, {direction}, {op.padStringCount}, {padWith})"
 ```
+
+
+# Side Projects
+
+[Making Nim functions available to SQLite](https://github.com/niklaskorz/nim-exporttosqlite3/)
+
+[Tracking TODOs in the project](https://github.com/preslavmihaylov/todocheck/pull/160)
+
+
+
+# Accounting
+
+* Niklas Korz: 40% + aforementioned exportage library, in particular:
+  * SQL generation and optimization
+
+* Benjamin Sparks: 30%, in particular:
+  * String and Regex operations + Documentation
+
+* Samuel Melm: 30%, in particular:
+  * Natural Language Parsing
+
+All aspects of requirements, main implementation, testing etc., were shared amongst the team and assigned during meetings in the Issue Tracker.
+Accordingly, this means that the responsibility of main and test code was shared equally.
