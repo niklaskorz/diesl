@@ -5,7 +5,7 @@ The documentation of the DSL API can be found here: https://pvs-hd.gitlab.io/ot/
 
 ## How it works
 
-DieSL code consists of one or more change macros (which is defined in `natural.nim`). When a script is passed into the `runScript` function (in `script.nim`) it is executed in a NimVM where the macro is expanded. The `change` macro looks for all Nim statements that match a pattern of the DieSL commands and translates them to their Nim counterpart - all Nim statements inbetween stay the same. After that the code is evaluated by the Nim interpreter. __Important:__ This does not execute any changes on the database it just creates an object representing what operations should take place (this object is defined in `src/operations`). This object is then retrieved from the VM and translated to the target language (currently only SQLite).
+DieSL code consists of one or more change macros (which is defined in [natural.nim](src/diesl/natural.nim)). When a script is passed into the [runScript](src/diesl/script.nim#L127) function it is executed in a NimVM where the macro is expanded. The [change macro](src/diesl/natural.nim#L304) looks for all Nim statements that match a pattern of the DieSL commands and translates them to their Nim counterpart - all Nim statements inbetween stay the same. After that the code is evaluated by the Nim interpreter. __Important:__ This does not execute any changes on the database it just creates an [object](src/diesl/operations/base.nim#L16) representing what operations should take place. This object is then retrieved from the VM and translated to the target language (currently only SQLite).
 
 ## Repository Structure
 
@@ -15,7 +15,7 @@ Tests are located in the tests folder (duh). All library logic is implemented un
 - compat: Anything related to compability with other modules goes here (things like conversion functions)
 - extensions: Everything here will be compiled to C and registered to SQLite and can be used in queries
 - natural.nim: Contains everything for the parsing of the natural syntax
-- operations: Defines the very important operation datatype and it's functions. A operation represents anything that can be done in DieSL.
+- operations: Defines the very important operation datatype and its functions. A operation represents anything that can be done in DieSL.
 - script.nim: Takes care of executing DieSL script in the NimVM and retrieving the operations from there
 
 ## Extending DieSL with New Operations
@@ -56,8 +56,7 @@ DieSL defines multiple visitors on DieslOperations that have to be extended when
 
 ### Adding Syntax for the new Operation
 
-The natural syntax of Diesl is defined in the `natural.nim` file. To add a new one it needs to be added in `transpileCommand`. For parsing we use [pattern matching](https://nim-lang.github.io/fusion/src/fusion/matching.html) on the AST. If the command cannot be parsed it is important that the old command is returned instead per default. 
-
+The natural syntax of Diesl is defined in [natural.nim](src/diesl/natural.nim). To add a new one it needs to be added in [transpileCommand](src/diesl/natural.nim#L263). For parsing we use [pattern matching](https://nim-lang.github.io/fusion/src/fusion/matching.html) on the AST. If the command cannot be parsed it is important that the old command is returned instead per default. At the moment you need to account for both variants of a operation (one where the column is given directly and one where the column is given in the first line of the change block), you can see this in the other operations as well. We tried our hand at smarter solutions and failed to problems with how Nim's type system handles generics.
 
 Currently, the project's sole backend targets SQLite.
 To this end, the functionality for each DieslOperation can be implemented directly in SQLite's SQL dialect, or compiled into a native binary, loaded into SQLite at startup and accordingly referenced.
