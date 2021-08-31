@@ -1,14 +1,7 @@
 # The DieSL Language
 
 ## Documentation
-
 The documentation of the DSL API can be found here: https://pvs-hd.gitlab.io/ot/diesl/documentation/
-
-## Test Coverage
-
-The unit test coverage report can be found here: https://pvs-hd.gitlab.io/ot/diesl/coverage/
-
-
 
 # Tutorial
 
@@ -48,9 +41,13 @@ type DieslOperation* = ref object
 DieSL defines multiple visitors on DieslOperations that have to be extended when a new variant is introduced, namely [withAccessIndex](src/diesl/operations/accessindex.nim#L5), [collectTableAccesses](src/diesl/operations/boundaries.nim#L5), [collectLoads](src/diesl/operations/optimizations.nim#L8) and [toDataType](src/diesl/operations/types.nim#L122).
 
 
+### Adding Syntax for the new Operation
+
+The natural syntax of Diesl is defined in the `natural.nim` file. To add a new one it needs to be added in `transpileCommand`. For parsing we use [pattern matching](https://nim-lang.github.io/fusion/src/fusion/matching.html) on the AST. If the command cannot be parsed it is important that the old command is returned instead per default. 
+
+
 Currently, the project's sole backend targets SQLite.
 To this end, the functionality for each DieslOperation can be implemented directly in SQLite's SQL dialect, or compiled into a native binary, loaded into SQLite at startup and accordingly referenced.
-
 
 ### Simple Implementation: SQLite's SQL dialect
 
