@@ -3,7 +3,20 @@
 ## Documentation
 The documentation of the DSL API can be found here: https://pvs-hd.gitlab.io/ot/diesl/documentation/
 
-# Tutorial
+## How it works
+
+DieSL code consists of one or more change macros (which is defined in `natural.nim`). When a script is passed into the `runScript` function (in `script.nim`) it is executed in a NimVM where the macro is expanded. The `change` macro looks for all Nim statements that match a pattern of the DieSL commands and translates them to their Nim counterpart - all Nim statements inbetween stay the same. After that the code is evaluated by the Nim interpreter. __Important:__ This does not execute any changes on the database it just creates an object representing what operations should take place (this object is defined in `src/operations`). This object is then retrieved from the VM and translated to the target language (currently only SQLite).
+
+## Repository Structure
+
+Tests are located in the tests folder (duh). All library logic is implemented under `src/diesl`.
+
+- backends: Anything related to SQL generation goes here
+- compat: Anything related to compability with other modules goes here (things like conversion functions)
+- extensions: Everything here will be compiled to C and registered to SQLite and can be used in queries
+- natural.nim: Contains everything for the parsing of the natural syntax
+- operations: Defines the very important operation datatype and it's functions. A operation represents anything that can be done in DieSL.
+- script.nim: Takes care of executing DieSL script in the NimVM and retrieving the operations from there
 
 ## Extending DieSL with New Operations
 
