@@ -119,10 +119,8 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
 
 * Niklas Korz: 40% + aforementioned exportage library, in particular:
   * SQL generation and optimization
-
 * Benjamin Sparks: 30%, in particular:
   * String and Regex operations + Documentation
-
 * Samuel Melm: 30%, in particular:
   * Natural Language Parsing
 
