@@ -1,0 +1,18 @@
+# Basic example using the programmatic Nim syntax of DieSL.
+# Demonstrates string operations and for-loops.
+
+db.students.name = "Mr. / Mrs. " & db.students.firstName[2..5] & " " & db.students.secondName
+
+let forbiddenWords = @["rip", "aid", "vit"]
+for word in forbiddenWords:
+  db.students.firstName = db.students.firstName.remove(word)
+
+db.students.name = db.students.name
+  .trim(right)
+  .replace("Isi", "Osi")
+  .replace(db.students.firstName, db.students.secondName)
+
+db.students.secondName = db.students.secondName.replaceAll(@{
+  db.students.firstName: "the first name",
+  db.students.secondName: "the second name"
+})

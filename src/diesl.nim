@@ -9,39 +9,80 @@ export sqlite
 export sqliteviews
 
 when isMainModule:
+  # Standalone demo
+  import os
   import tables
+  import parsecsv
+  import streams
+  import db_sqlite
   import diesl/operations
+  import diesl/extensions/sqlite as sqliteextensions
+
+  if paramCount() < 2:
+    echo "Usage: " & paramStr(0) & " <mode> <scriptname>"
+    quit(QuitFailure)
+  let mode = paramStr(1)
+  if mode != "direct" and mode != "view":
+    echo "Mode must be one of 'direct' or 'view'"
+    quit(QuitFailure)
+  let scriptName = paramStr(2)
 
   let schema = newDatabaseSchema({
     "students": @{
       "name": ddtString,
       "firstName": ddtString,
       "secondName": ddtString,
-      "lastName": ddtString,
-      "age": ddtInteger
+      "age": ddtInteger,
+
+      "email": ddtString,
+      "data": ddtString
     }
   })
 
-  let exportedOperations = runScript("""
-db.students.name = "Mr. / Mrs. " & db.students.firstName[2..5] & " " & db.students.lastName
+  let scriptSource = readFile(scriptName)
+  let exportedOperations = runScript(scriptSource, schema)
 
-let forbiddenWords = @["first", "second", "third"]
-for word in forbiddenWords:
-  db.students.firstName = db.students.firstName.remove(word)
+  # Create database
+  let dbConn = open("demo.db", "", "", "")
+  dbConn.installCommands()
+  dbConn.exec(sql"DROP TABLE IF EXISTS students")
+  dbConn.exec(
+    sql"CREATE TABLE students (name TEXT, firstName TEXT, secondName TEXT, age INT, email TEXT, data TEXT)"
+  )
 
-db.students.name = db.students.name
-  .trim(right)
-  .replace("foo", "bar")
-  .replace(db.students.firstName, db.students.secondName)
+  # Populate with example data
+  var exampleDataFile = "examples/data.csv"
+  var exampleDataStream = newFileStream(exampleDataFile, fmRead)
+  var csvParser: CsvParser
+  csvParser.open(exampleDataStream, exampleDataFile)
+  # Skip header row
+  discard readRow(csvParser)
+  while readRow(csvParser):
+    dbConn.exec(
+      sql"INSERT INTO students (name, firstName, secondName, age, email, data) VALUES (?, ?, ?, ?, ?, ?)",
+      csvParser.row[1..^1]
+    )
+  csvParser.close()
 
-db.students.secondName = db.students.secondName.replaceAll(@{
-  db.students.firstName: "b",
-  db.students.secondName: "d"
-})
-""", schema)
+  if mode == "direct":
+    let queries = exportedOperations.toSqlite()
+    echo "Generated queries:"
+    for query in queries:
+      echo string(query)
+      dbConn.exec(query)
+    echo "Final data:"
+    for row in dbConn.fastRows(sql"SELECT * FROM students"):
+      echo row
+  elif mode == "view":
+    let (queries, tableAccessMap, views) = exportedOperations.toSqliteViews(schema)
+    echo "Generated queries:"
+    for query in queries:
+      echo string(query)
+      dbConn.exec(query)
+    echo "Table access map: ", $tableAccessMap
+    echo "Views: ", $views
+    echo "Final data:"
+    for row in dbConn.fastRows(sql"SELECT * FROM ?", tableAccessMap.getTableAccessName("students")):
+      echo row
 
-  let (queries, tableAccessMap, views) = exportedOperations.toSqliteViews(schema)
-  for query in queries:
-    echo string(query)
-  echo $tableAccessMap
-  echo $views
+  dbConn.close()

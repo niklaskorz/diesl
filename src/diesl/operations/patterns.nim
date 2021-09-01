@@ -11,7 +11,7 @@ import pattern_constants
 ## {IDENTIFIER}
 const patternRegex: string = r"\{(.*?)\}"
 
-const supportedRegex = {  
+const supportedRegex = {
   "hashtag": twitterHashtag,
   "twitterUser": twitterUsername,
   "email": emailRegex
@@ -20,7 +20,7 @@ const supportedRegex = {
 const supportedPatterns = toSeq(supportedRegex.keys).join(", ")
 
 
-proc pattern*(fmtString: string): string = 
+proc pattern*(fmtString: string): string =
   let extractedConstants: seq[string] = re.findAll(fmtString, patternRegex.re).deduplicate
   if extractedConstants.len() == 0:
     return fmtString
@@ -38,4 +38,5 @@ proc pattern*(fmtString: string): string =
       (fmt"{extractedConstant}", tableRegex)
 
   result = fmtString.multiReplace(replaceBy)
+  result = result.replace("?", r"\u3F")
 

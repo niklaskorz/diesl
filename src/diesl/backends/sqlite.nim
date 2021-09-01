@@ -5,9 +5,6 @@ import strutils
 import db_sqlite
 import ../operations
 import ../operations/patterns
-import ../extensions/sqlite
-
-import re
 
 proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
   case op.kind:
@@ -50,18 +47,18 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
     of dotToUpper:
       fmt"UPPER({op.toUpperValue.toSqlite})"
     of dotExtractOne:
-      fmt"extractOne({op.extractOneValue.toSqlite}, '{op.extractOnePattern.pattern}')"
+      fmt"extractOne({op.extractOneValue.toSqlite}, {dbQuote(op.extractOnePattern.pattern)})"
     of dotExtractMany:
-      fmt"extractMany({op.extractManyValue.toSqlite}, '{op.extractManyPattern.pattern}', {op.extractManyIndex})"
+      fmt"extractAll({op.extractManyValue.toSqlite}, {dbQuote(op.extractManyPattern.pattern)}, {op.extractManyIndex})"
     of dotRegexReplace:
-      fmt"rReplace({op.regexReplaceValue.toSqlite}, {op.regexReplaceTarget.toSqlite.pattern}, {op.regexReplaceReplacement.toSqlite})"
+      fmt"rReplace({op.regexReplaceValue.toSqlite}, {dbQuote(op.regexReplaceTarget.toSqlite.pattern)}, {op.regexReplaceReplacement.toSqlite})"
     of dotRegexReplaceAll:
       var value = op.replaceAllValue.toSqlite
       for pair in op.regexReplaceAllReplacements:
-        value = fmt"rReplace({value}, {pair.target.toSqlite.pattern}, {pair.replacement.toSqlite})"
+        value = fmt"rReplace({value}, {dbQuote(pair.target.toSqlite.pattern)}, {pair.replacement.toSqlite})"
       value
     of dotMatch:
-      "boolMatching({op.matchValue.toSqlite}, {op.matchPattern.pattern})"
+      fmt"boolMatching({op.matchValue.toSqlite}, {dbQuote(op.matchPattern.pattern)})"
 
     of dotPadString:
       let direction = case op.trimDirection:
