@@ -10,8 +10,10 @@ proc installCommands*(db: DbConn): void =
 
 proc extractOne(input: string, regex: string): string {.exportToSqlite3.} =
   var matches: seq[string] = @[]
+  echo regex.replace(r"\u3F", "?")
   let matchRegex = re(regex.replace(r"\u3F", "?"));
-  discard re.findBounds(input, matchRegex, matches)
+  echo re.match(input, matchRegex, matches)
+  echo matches
 
   return if len(matches) == 0:
      ""
@@ -22,7 +24,7 @@ proc extractOne(input: string, regex: string): string {.exportToSqlite3.} =
 proc extractAll(input: string, regex: string, index: int64): string {.exportToSqlite3.} =
   var matches: seq[string] = @[]
   let matchRegex = re(regex.replace(r"\u3F", "?"));
-  discard re.findBounds(input, matchRegex, matches)
+  discard re.match(input, matchRegex, matches)
 
   return if len(matches) == 0:
      ""
