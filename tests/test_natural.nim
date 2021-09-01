@@ -185,5 +185,58 @@ proc test_natural*() =
       check operationsEq(actualDB, expectedDB)
 
 
+    test "extract one":
+      expectedTable.text = expectedTable.text.extractOne("{email}")
+
+      change actualTable:
+        extract email from text
+
+      check operationsEq(actualDB, expectedDB)
+
+    test "extract one with string pattern":
+      expectedTable.text = expectedTable.text.extractOne("{email}{post-code}" )
+
+      change actualTable:
+        extract "{email}{post-code}" from text
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "extract one with specified column":
+      expectedTable.text = expectedTable.text.extractOne("{email}")
+
+      change text of actualTable:
+        extract email
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "extract all":
+      expectedTable.text = expectedTable.text.extractAll("{email}")
+
+      change actualTable:
+        extract all email from text
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "extract all with string pattern":
+      expectedTable.text = expectedTable.text.extractAll("{email}{post-code}" )
+
+      change actualTable:
+        extract all "{email}{post-code}" from text
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "extract all with specified column":
+      expectedTable.text = expectedTable.text.extractAll("{email}")
+
+      change text of actualTable:
+        extract all email
+
+      check operationsEq(actualDB, expectedDB)
+
+
 when isMainModule:
   test_natural()

@@ -239,19 +239,56 @@ proc transpileTakeWithoutColumn(command, table: NimNode): NimNode =
     else:
       result = command
 
-proc transpileExtract(command, table: NimNode): NimNode =
-  # TODO: can currently only capture extract one
-  # TODO: how can I capture beliebig many identifiers? how can I check that they're unique
+
+proc nodeToPattern(pattern: NimNode): NimNode =
+  ## Given a pattern string it is just returned
+  ## Given a pattern identifier it is wrapped pattern -> "{pattern}"
+  if pattern.kind == nnkStrLit: 
+    return pattern 
+  else: 
+    return newStrLitNode("{" & pattern.strVal & "}")
+  
+
+proc transpileExtractWithColumn(command, table, column: NimNode): NimNode =
   case command:
-    of Command[Ident(strVal: "extract"), @mthd, @pattern, Ident(strVal: "from"), @src]:
-      if mthd.strVal == "one":
-        result = newCall(ident"extractOne", src, pattern)
-      elif mthd.strVal == "all":
-        result = newCall(ident"extractAll", src, pattern)
-      else:
-        macros.error(fmt"Unknown extraction mode: '{mthd.strVal}'", command)
+    of Command[Ident(strVal: "extract"), @pattern] | 
+       Command[Ident(strVal: "extract"), Ident(strVal: "one"), @pattern]:
+      let patternNode = nodeToPattern(pattern)
+
+      result = quote do:
+        `table`.`column` = `table`.`column`.extractOne(`patternNode`)
+
+    of Command[Ident(strVal: "extract"), Ident(strVal: "all"), @pattern]:
+      let patterNode = nodeToPattern(pattern)
+      result = quote do:
+        `table`.`column` = `table`.`column`.extractAll(`patterNode`)
+      echo result.tostrlit
     else:
       result = command
+
+
+proc transpileExtractWithoutColumn(command, table: NimNode): NimNode =
+  case command:
+    of Command[Ident(strVal: "extract"), @pattern, Ident(strVal: "from"), @column] | 
+       Command[Ident(strVal: "extract"), Ident(strVal: "one"), @pattern, Ident(strVal: "from"), @column]:
+      let patternNode = nodeToPattern(pattern)
+      result = quote do:
+        `table`.`column` = `table`.`column`.extractOne(`patternNode`)
+    of Command[Ident(strVal: "extract"), Ident(strVal: "all"), @pattern, Ident(strVal: "from"), @column]:
+      let patternNode = nodeToPattern(pattern)
+      result = quote do:
+        `table`.`column` = `table`.`column`.extractAll(`patternNode`)
+      echo result.tostrlit
+    else:
+      result = command
+
+
+proc transpileExtract(command, table: NimNode, column: Option[NimNode]): NimNode =
+  if column.isSome():
+    return transpileExtractWithColumn(command, table, column.get())
+  else:
+    return transpileExtractWithoutColumn(command, table)
+
 
 proc transpileTake(command, table: NimNode, column: Option[NimNode]): NimNode =
   if column.isSome():
@@ -273,7 +310,7 @@ proc transpileCommand(table: NimNode, column: Option[NimNode], command: NimNode)
     of Command[Ident(strVal: "take"), .._]:
       return transpileTake(command, table, column)
     of Command[Ident(strVal: "extract"), .._]:
-      return transpileExtract(command, table)
+      return transpileExtract(command, table, column)
     else:
       return command
 
@@ -303,8 +340,3 @@ proc transpileChangeBlock(selector: NimNode, commands: NimNode): NimNode =
 # <column name> of <table name>
 macro change*(selector: untyped, commands: untyped): untyped = transpileChangeBlock(selector, commands)
 
-when isMainModule:
-  let db = Diesl()
-  change col of db.tab:
-    trim
-  echo $db.exportOperations()
