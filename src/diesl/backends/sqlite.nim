@@ -6,6 +6,24 @@ import db_sqlite
 import ../operations
 import ../operations/patterns
 
+proc countGroups(haystack: var string): int =
+  proc inner(haystack: var string, count: var int): int =
+    let left_bracket = haystack.find('(')
+    if left_bracket >= 0:
+      haystack = haystack[left_bracket + 1 .. ^1]
+      let right_bracket = haystack.find(')')
+
+      if right_bracket >= 0:
+        if haystack[..right_bracket].find('(') == -1:
+          count += 1
+        haystack = haystack[right_bracket + 1 .. ^1]
+      return inner(haystack, count)
+    else:
+      return count
+
+  var count = 0
+  return inner(haystack, count)
+
 proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
   case op.kind:
     of dotStore:
@@ -49,7 +67,8 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
     of dotExtractOne:
       fmt"extractOne({op.extractOneValue.toSqlite}, {dbQuote(op.extractOnePattern.pattern)})"
     of dotExtractMany:
-      fmt"extractAll({op.extractManyValue.toSqlite}, {dbQuote(op.extractManyPattern.pattern)}, {op.extractManyIndex})"
+      var pattern = op.extractManyPattern.pattern
+      fmt"extractAll({op.extractManyValue.toSqlite}, {dbQuote(pattern)}, {op.extractManyIndex}, {countGroups(pattern)})"
     of dotRegexReplace:
       fmt"rReplace({op.regexReplaceValue.toSqlite}, {dbQuote(op.regexReplaceTarget.toSqlite.pattern)}, {op.regexReplaceReplacement.toSqlite})"
     of dotRegexReplaceAll:
