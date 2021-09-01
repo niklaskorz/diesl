@@ -189,7 +189,7 @@ proc test_natural*() =
       expectedTable.text = expectedTable.text.extractOne("{email}")
 
       change actualTable:
-        extract email from text
+        extract one email from text
 
       check operationsEq(actualDB, expectedDB)
 
@@ -197,7 +197,7 @@ proc test_natural*() =
       expectedTable.text = expectedTable.text.extractOne("{email}{post-code}" )
 
       change actualTable:
-        extract "{email}{post-code}" from text
+        extract one "{email}{post-code}" from text
 
       check operationsEq(actualDB, expectedDB)
 
@@ -212,28 +212,18 @@ proc test_natural*() =
 
 
     test "extract all":
-      expectedTable.text = expectedTable.text.extractAll("{email}")
-
+      expectedTable[email, postCode, telephoneNumber] = expectedTable.text.extractAll("{email}{post-code}{telephone-number}" )
       change actualTable:
-        extract all email from text
-
-      check operationsEq(actualDB, expectedDB)
-
-
-    test "extract all with string pattern":
-      expectedTable.text = expectedTable.text.extractAll("{email}{post-code}" )
-
-      change actualTable:
-        extract all "{email}{post-code}" from text
+        extract all "{email}{post-code}{telephone-number}" from text into email, postCode and telephoneNumber
 
       check operationsEq(actualDB, expectedDB)
 
 
     test "extract all with specified column":
-      expectedTable.text = expectedTable.text.extractAll("{email}")
+      expectedTable[email, postCode, telephoneNumber] = expectedTable.text.extractAll("{email}{post-code}{telephone-number}" )
 
       change text of actualTable:
-        extract all email
+        extract all "{email}{post-code}{telephone-number}" into email, postCode and telephoneNumber
 
       check operationsEq(actualDB, expectedDB)
 

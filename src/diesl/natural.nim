@@ -249,20 +249,34 @@ proc nodeToPattern(pattern: NimNode): NimNode =
     return newStrLitNode("{" & pattern.strVal & "}")
   
 
+proc transpileExtractOne(pattern, table, column: NimNode): NimNode = 
+  let patternNode = nodeToPattern(pattern)
+
+  result = quote do:
+    `table`.`column` = `table`.`column`.extractOne(`patternNode`)
+
+
+proc transpileExtractAll(pattern: NimNode, targetColumns: seq[NimNode], table, column: NimNode): NimNode = 
+  let patterNode = nodeToPattern(pattern)
+  let parsedColumns = parseList(targetColumns)
+
+  # creates node like this: `table`[col1, col2, ...]
+  var assignmentTarget = nnkBracketExpr.newTree(@[table].concat(parsedColumns))
+
+  result = quote do:
+    `assignmentTarget` = `table`.`column`.extractAll(`patterNode`)
+
+
 proc transpileExtractWithColumn(command, table, column: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "extract"), @pattern] | 
        Command[Ident(strVal: "extract"), Ident(strVal: "one"), @pattern]:
-      let patternNode = nodeToPattern(pattern)
 
-      result = quote do:
-        `table`.`column` = `table`.`column`.extractOne(`patternNode`)
+      result = transpileExtractOne(pattern, table, column)
 
-    of Command[Ident(strVal: "extract"), Ident(strVal: "all"), @pattern]:
-      let patterNode = nodeToPattern(pattern)
-      result = quote do:
-        `table`.`column` = `table`.`column`.extractAll(`patterNode`)
-      echo result.tostrlit
+    of Command[Ident(strVal: "extract"), Ident(strVal: "all"), @pattern, Ident(strVal: "into"), all @targetColumns]:
+
+      result = transpileExtractAll(pattern, targetColumns, table, column)
     else:
       result = command
 
@@ -271,14 +285,11 @@ proc transpileExtractWithoutColumn(command, table: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "extract"), @pattern, Ident(strVal: "from"), @column] | 
        Command[Ident(strVal: "extract"), Ident(strVal: "one"), @pattern, Ident(strVal: "from"), @column]:
-      let patternNode = nodeToPattern(pattern)
-      result = quote do:
-        `table`.`column` = `table`.`column`.extractOne(`patternNode`)
-    of Command[Ident(strVal: "extract"), Ident(strVal: "all"), @pattern, Ident(strVal: "from"), @column]:
-      let patternNode = nodeToPattern(pattern)
-      result = quote do:
-        `table`.`column` = `table`.`column`.extractAll(`patternNode`)
-      echo result.tostrlit
+         result = transpileExtractOne(pattern, table, column)
+
+    of Command[Ident(strVal: "extract"), Ident(strVal: "all"), @pattern, Ident(strVal: "from"), @column, Ident(strVal: "into"), all @targetColumns]:
+      result = transpileExtractAll(pattern, targetColumns, table, column)
+
     else:
       result = command
 
@@ -339,4 +350,5 @@ proc transpileChangeBlock(selector: NimNode, commands: NimNode): NimNode =
 # or
 # <column name> of <table name>
 macro change*(selector: untyped, commands: untyped): untyped = transpileChangeBlock(selector, commands)
+
 
