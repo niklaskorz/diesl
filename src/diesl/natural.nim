@@ -10,6 +10,28 @@ import operations/conversion
 import fusion/matching
 {.experimental: "caseStmtMacros".}
 
+# ################# Keywords ############### #
+
+const BEGINNING = "beginning"
+const ENDING = "ending"
+const OF = "of"
+const FROM = "from"
+const IN = "in"
+const AND = "and"
+const WITH = "with"
+const TO = "to"
+const ONE = "one"
+const ALL = "all"
+const INTO = "into"
+
+const TRIM = "trim"
+const REPLACE = "replace"
+const REMOVE = "remove"
+const TAKE = "take"
+const EXTRACT = "extract"
+
+proc KW(node: NimNode, kw: string): bool =
+  return node.kind == nnkIdent and node.strVal == kw
 
 # parses lists like
 # a, b, c
@@ -22,7 +44,7 @@ proc parseList(nodes: seq[NimNode]): seq[NimNode] =
 
   # remove optional "and" in the second last position
   # cannot go out of bounds because of previous check
-  if nodes[^2].matches(Ident(strVal: "and")):
+  if nodes[^2].matches(_.KW(AND)):
     return concat(nodes[0..^3], nodes[^1..^1])
   else:
     return nodes
@@ -73,22 +95,22 @@ proc formatTrim(table, column, direction: NimNode): NimNode =
 proc trim(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
   case (columnOpt, command):
 
-    of (Some(@column), [Ident(strVal: "trim")]):
+    of (Some(@column), [_.KW(TRIM)]):
       return formatTrim(table, column, newIdentNode("both"))
 
-    of (Some(@column), [Ident(strVal: "trim"), Ident(strVal: "beginning")]):
+    of (Some(@column), [_.KW(TRIM), _.KW(BEGINNING)]):
       return formatTrim(table, column, newIdentNode("left"))
 
-    of (Some(@column), [Ident(strVal: "trim"), Ident(strVal: "ending")]):
+    of (Some(@column), [_.KW(TRIM), _.KW(ENDING)]):
       return formatTrim(table, column, newIdentNode("right"))
 
-    of (None(), [Ident(strVal: "trim"), @column]):
+    of (None(), [_.KW(TRIM), @column]):
       return formatTrim(table, column, newIdentNode("both"))
 
-    of (None(), [Ident(strVal: "trim"), Ident(strVal: "beginning"), Ident(strVal: "of"), @column]):
+    of (None(), [_.KW(TRIM), _.KW(BEGINNING), _.KW(OF), @column]):
       return formatTrim(table, column, newIdentNode("left"))
 
-    of (None(), [Ident(strVal: "trim"), Ident(strVal: "ending"), Ident(strVal: "of"), @column]):
+    of (None(), [_.KW(TRIM), _.KW(ENDING), _.KW(OF), @column]):
       return formatTrim(table, column, newIdentNode("right"))
 
     else:
@@ -107,7 +129,7 @@ proc replacementTable(replacements: var seq[NimNode]): NimNode =
 
   while replacements.len() > 0:
     case replacements:
-      of [@target, Ident(strVal: "with"), @replacement, all @rest]:
+      of [@target, _.KW(WITH), @replacement, all @rest]:
         replacements = rest
 
         replacementPairs.add((target, replacement))
@@ -131,16 +153,16 @@ proc formatReplaceAll(table, column: NimNode, replacements: var seq[NimNode]): N
 
 proc replace(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
   case (columnOpt, command):
-    of (Some(@column), [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement]):
+    of (Some(@column), [_.KW(REPLACE), @target, _.KW(WITH), @replacement]):
       return formatReplaceOne(table, column, target, replacement)
 
-    of (Some(@column), [Ident(strVal: "replace"), all @replacements]):
+    of (Some(@column), [_.KW(REPLACE), all @replacements]):
       return formatReplaceAll(table, column, replacements)
 
-    of (None(), [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement, Ident(strVal: "in"), @column]):
+    of (None(), [_.KW(REPLACE), @target, _.KW(WITH), @replacement, _.KW(IN), @column]):
       return formatReplaceOne(table, column, target, replacement)
 
-    of (None(), [Ident(strVal: "replace"), Ident(strVal: "in"), @column, all @replacements]):
+    of (None(), [_.KW(REPLACE), _.KW(IN), @column, all @replacements]):
       return formatReplaceAll(table, column, replacements)
 
     else:
@@ -166,16 +188,16 @@ proc formatRemoveAll(command, table, column: NimNode, targets: seq[NimNode]): Ni
 
 proc remove(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
   case (columnOpt, command):
-    of (Some(@column), [Ident(strVal: "remove"), @target]):
+    of (Some(@column), [_.KW(REMOVE), @target]):
       return formatRemoveOne(table, column, target)
 
-    of (Some(@column), [Ident(strVal: "remove"), all @targets]):
+    of (Some(@column), [_.KW(REMOVE), all @targets]):
       return formatRemoveAll(command, table, column, targets)
 
-    of (None(), [Ident(strVal: "remove"), @target, Ident(strVal: "from"), @column]):
+    of (None(), [_.KW(REMOVE), @target, _.KW(FROM), @column]):
       return formatRemoveOne(table, column, target)
 
-    of (None(), [Ident(strVal: "remove"), until @targets is Ident(strVal: "from"), Ident(strVal: "from"), @column]):
+    of (None(), [_.KW(REMOVE), until @targets is _.KW(FROM), _.KW(FROM), @column]):
       return formatRemoveAll(command, table, column, targets)
 
     else:
@@ -192,10 +214,10 @@ proc formatTake(table, column, lower, higher: NimNode): NimNode =
 
 proc take(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
   case (columnOpt, command):
-    of (Some(@column), [Ident(strVal: "take"), @lower, Ident(strVal: "to"), @higher]):
+    of (Some(@column), [_.KW(TAKE), @lower, _.KW(TO), @higher]):
       return formatTake(table, column, lower, higher)
 
-    of (None(), [Ident(strVal: "take"), @lower, Ident(strVal: "to"), @higher, Ident(strVal: "from"), @column]):
+    of (None(), [_.KW(TAKE), @lower, _.KW(TO), @higher, _.KW(FROM), @column]):
       return formatTake(table, column, lower, higher)
 
     else:
@@ -231,40 +253,41 @@ proc formatExtractAll(pattern: NimNode, targetColumns: seq[NimNode], table, colu
 
 proc extract(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
   case (columnOpt, command):
-    of (Some(@column), [Ident(strVal: "extract"), @pattern]):
+    of (Some(@column), [_.KW(EXTRACT), @pattern]):
       return formatExtractOne(pattern, table, column)
 
-    of (Some(@column), [Ident(strVal: "extract"), Ident(strVal: "one"), @pattern]):
+    of (Some(@column), [_.KW(EXTRACT), _.KW(ONE), @pattern]):
       return formatExtractOne(pattern, table, column)
 
-    of (Some(@column), [Ident(strVal: "extract"), Ident(strVal: "all"), @pattern, Ident(strVal: "into"), all @targetColumns]):
+    of (Some(@column), [_.KW(EXTRACT), _.KW(ALL), @pattern, _.KW(INTO), all @targetColumns]):
       return formatExtractAll(pattern, targetColumns, table, column)
 
-    of (None(), [Ident(strVal: "extract"), @pattern, Ident(strVal: "from"), @column]):
+    of (None(), [_.KW(EXTRACT), @pattern, _.KW(FROM), @column]):
       return formatExtractOne(pattern, table, column)
 
-    of (None(), [Ident(strVal: "extract"), Ident(strVal: "one"), @pattern, Ident(strVal: "from"), @column]):
+    of (None(), [_.KW(EXTRACT), _.KW(ONE), @pattern, _.KW(FROM), @column]):
       return formatExtractOne(pattern, table, column)
 
-    of (None(), [Ident(strVal: "extract"), Ident(strVal: "all"), @pattern, Ident(strVal: "from"), @column, Ident(strVal: "into"), all @targetColumns]):
+    of (None(), [_.KW(EXTRACT), _.KW(ALL), @pattern, _.KW(FROM), @column, _.KW(INTO), all @targetColumns]):
       return formatExtractAll(pattern, targetColumns, table, column)
 
     else:
       return command
 
+
 proc command(table: NimNode, column: Option[NimNode], command: NimNode): NimNode =
   var command = command.flatten()
 
   case command:
-    of Command[Ident(strVal: "trim"), .._]:
+    of Command[_.KW(TRIM), .._]:
       return trim(command, table, column)
-    of Command[Ident(strVal: "replace"), .._]:
+    of Command[_.KW(REPLACE), .._]:
       return replace(command, table, column)
-    of Command[Ident(strVal: "remove"), .._]:
+    of Command[_.KW(REMOVE), .._]:
       return remove(command, table, column)
-    of Command[Ident(strVal: "take"), .._]:
+    of Command[_.KW(TAKE), .._]:
       return take(command, table, column)
-    of Command[Ident(strVal: "extract"), .._]:
+    of Command[_.KW(EXTRACT), .._]:
       return extract(command, table, column)
     else:
       return command
@@ -275,7 +298,7 @@ proc changeBlock(selector: NimNode, commands: NimNode): NimNode =
   var column: Option[NimNode]
 
   case selector:
-    of Infix[Ident(strVal: "of"), @columnVal, @tableVal]:
+    of Infix[_.KW(OF), @columnVal, @tableVal]:
       table = tableVal
       column = some(columnVal)
     else:
@@ -295,4 +318,5 @@ proc changeBlock(selector: NimNode, commands: NimNode): NimNode =
 # <column name> of <table name>
 macro change*(selector: untyped, commands: untyped): untyped = 
   return changeBlock(selector, commands)
+
 
