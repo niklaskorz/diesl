@@ -1,10 +1,10 @@
 import diesl/script
-import diesl/natural
+import diesl/syntax
 import diesl/backends/sqlite
 import diesl/backends/sqliteviews
 
 export script
-export natural
+export syntax
 export sqlite
 export sqliteviews
 

@@ -3,7 +3,7 @@ import streams
 
 import test_backends_sqlite
 import test_backends_sqliteviews
-import test_natural
+import test_syntax
 import test_operations_base
 import test_operations_boundaries
 import test_operations_optimizations
@@ -17,7 +17,7 @@ addOutputFormatter(outputFormatter)
 
 test_backends_sqlite()
 test_backends_sqliteviews()
-test_natural()
+test_syntax()
 test_operations_base()
 test_operations_boundaries()
 test_operations_optimizations()
