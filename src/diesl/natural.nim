@@ -132,40 +132,34 @@ proc transpileReplacementTable(replacements: var seq[NimNode]): NimNode =
   result = newTableConstructor(replacementPairs)
 
 
-proc transpileReplaceWithColumn(command, table, column: NimNode): NimNode =
-  case command:
-    of [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement]:
-      result = quote do:
-        `table`.`column` = `table`.`column`.replace(`target`, `replacement`)
+proc transpileReplaceOne(table, column, target, replacement: NimNode): NimNode =
+  return quote do:
+      `table`.`column` = `table`.`column`.replace(`target`, `replacement`)
 
-    of [Ident(strVal: "replace"), all @replacements]:
+
+proc transpileReplaceAll(table, column: NimNode, replacements: var seq[NimNode]): NimNode =
       let replacementTable = transpileReplacementTable(replacements)
 
-      result = quote do:
+      return quote do:
         `table`.`column` = `table`.`column`.replaceAll(`replacementTable`)
+
+
+proc transpileReplace(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
+  case (columnOpt, command):
+    of (Some(@column), [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement]):
+      return transpileReplaceOne(table, column, target, replacement)
+
+    of (Some(@column), [Ident(strVal: "replace"), all @replacements]):
+      return transpileReplaceAll(table, column, replacements)
+
+    of (None(), [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement, Ident(strVal: "in"), @column]):
+      return transpileReplaceOne(table, column, target, replacement)
+
+    of (None(), [Ident(strVal: "replace"), Ident(strVal: "in"), @column, all @replacements]):
+      return transpileReplaceAll(table, column, replacements)
+
     else:
-      result = command
-
-
-proc transpileReplaceWithoutColumn(command, table: NimNode): NimNode =
-  case command:
-    of [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement, Ident(strVal: "in"), @column]:
-      result = quote do:
-        `table`.`column` = `table`.`column`.replace(`target`, `replacement`)
-
-    of [Ident(strVal: "replace"), Ident(strVal: "in"), @column, all @replacements]:
-      let replacementTable = transpileReplacementTable(replacements)
-
-      result = quote do:
-        `table`.`column` = `table`.`column`.replaceAll(`replacementTable`)
-    else:
-      result = command
-
-proc transpileReplace(command, table: NimNode, column: Option[NimNode]): NimNode =
-  if column.isSome:
-    return transpileReplaceWithColumn(command, table, column.get)
-  else:
-    return transpileReplaceWithoutColumn(command, table)
+      return command
 
 
 proc transpileRemoveWithColumn(command, table, column: NimNode): NimNode =
@@ -350,5 +344,4 @@ proc transpileChangeBlock(selector: NimNode, commands: NimNode): NimNode =
 # or
 # <column name> of <table name>
 macro change*(selector: untyped, commands: untyped): untyped = transpileChangeBlock(selector, commands)
-
 
