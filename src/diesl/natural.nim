@@ -182,29 +182,24 @@ proc remove(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
       return command
 
 
-proc takeWithColumn(command, table, column: NimNode): NimNode =
-  case command:
-    of Command[Ident(strVal: "take"), @matchedLower, Ident(strVal: "to"), @matchedHigher]:
-      let lower = newLit(matchedLower.intVal - 1)
-      let higher = newLit(matchedHigher.intVal - 1)
+proc formatTake(table, column, lower, higher: NimNode): NimNode =
+  let lowerNode = newLit(lower.intVal - 1)
+  let higherNode = newLit(higher.intVal - 1)
 
-      result = quote do:
-        `table`.`column` = `table`.`column`[int(`lower`)..int(`higher`)]
+  return quote do:
+    `table`.`column` = `table`.`column`[int(`lowerNode`)..int(`higherNode`)]
+
+
+proc take(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
+  case (columnOpt, command):
+    of (Some(@column), [Ident(strVal: "take"), @lower, Ident(strVal: "to"), @higher]):
+      return formatTake(table, column, lower, higher)
+
+    of (None(), [Ident(strVal: "take"), @lower, Ident(strVal: "to"), @higher, Ident(strVal: "from"), @column]):
+      return formatTake(table, column, lower, higher)
+
     else:
-      result = command
-
-
-proc takeWithoutColumn(command, table: NimNode): NimNode =
-  case command:
-    of Command[Ident(strVal: "take"), @matchedLower, Ident(strVal: "to"),
-        @matchedHigher, Ident(strVal: "from"), @column]:
-      let lower = newLit(matchedLower.intVal - 1)
-      let higher = newLit(matchedHigher.intVal - 1)
-
-      result = quote do:
-        `table`.`column` = `table`.`column`[int(`lower`)..int(`higher`)]
-    else:
-      result = command
+      return command
 
 
 proc nodeToPattern(pattern: NimNode): NimNode =
@@ -266,13 +261,6 @@ proc extract(command, table: NimNode, column: Option[NimNode]): NimNode =
     return extractWithColumn(command, table, column.get())
   else:
     return extractWithoutColumn(command, table)
-
-
-proc take(command, table: NimNode, column: Option[NimNode]): NimNode =
-  if column.isSome():
-    return takeWithColumn(command, table, column.get)
-  else:
-    return takeWithoutColumn(command, table)
 
 
 proc command(table: NimNode, column: Option[NimNode], command: NimNode): NimNode =
