@@ -211,57 +211,46 @@ proc nodeToPattern(pattern: NimNode): NimNode =
     return newStrLitNode("{" & pattern.strVal & "}")
   
 
-proc extractOne(pattern, table, column: NimNode): NimNode = 
+proc formatExtractOne(pattern, table, column: NimNode): NimNode = 
   let patternNode = nodeToPattern(pattern)
 
-  result = quote do:
+  return quote do:
     `table`.`column` = `table`.`column`.extractOne(`patternNode`)
 
 
-proc extractAll(pattern: NimNode, targetColumns: seq[NimNode], table, column: NimNode): NimNode = 
+proc formatExtractAll(pattern: NimNode, targetColumns: seq[NimNode], table, column: NimNode): NimNode = 
   let patterNode = nodeToPattern(pattern)
   let parsedColumns = parseList(targetColumns)
 
   # creates node like this: `table`[col1, col2, ...]
   var assignmentTarget = nnkBracketExpr.newTree(@[table].concat(parsedColumns))
 
-  result = quote do:
+  return quote do:
     `assignmentTarget` = `table`.`column`.extractAll(`patterNode`)
 
 
-proc extractWithColumn(command, table, column: NimNode): NimNode =
-  case command:
-    of Command[Ident(strVal: "extract"), @pattern] | 
-       Command[Ident(strVal: "extract"), Ident(strVal: "one"), @pattern]:
+proc extract(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
+  case (columnOpt, command):
+    of (Some(@column), [Ident(strVal: "extract"), @pattern]):
+      return formatExtractOne(pattern, table, column)
 
-      result = extractOne(pattern, table, column)
+    of (Some(@column), [Ident(strVal: "extract"), Ident(strVal: "one"), @pattern]):
+      return formatExtractOne(pattern, table, column)
 
-    of Command[Ident(strVal: "extract"), Ident(strVal: "all"), @pattern, Ident(strVal: "into"), all @targetColumns]:
+    of (Some(@column), [Ident(strVal: "extract"), Ident(strVal: "all"), @pattern, Ident(strVal: "into"), all @targetColumns]):
+      return formatExtractAll(pattern, targetColumns, table, column)
 
-      result = extractAll(pattern, targetColumns, table, column)
-    else:
-      result = command
+    of (None(), [Ident(strVal: "extract"), @pattern, Ident(strVal: "from"), @column]):
+      return formatExtractOne(pattern, table, column)
 
+    of (None(), [Ident(strVal: "extract"), Ident(strVal: "one"), @pattern, Ident(strVal: "from"), @column]):
+      return formatExtractOne(pattern, table, column)
 
-proc extractWithoutColumn(command, table: NimNode): NimNode =
-  case command:
-    of Command[Ident(strVal: "extract"), @pattern, Ident(strVal: "from"), @column] | 
-       Command[Ident(strVal: "extract"), Ident(strVal: "one"), @pattern, Ident(strVal: "from"), @column]:
-         result = extractOne(pattern, table, column)
-
-    of Command[Ident(strVal: "extract"), Ident(strVal: "all"), @pattern, Ident(strVal: "from"), @column, Ident(strVal: "into"), all @targetColumns]:
-      result = extractAll(pattern, targetColumns, table, column)
+    of (None(), [Ident(strVal: "extract"), Ident(strVal: "all"), @pattern, Ident(strVal: "from"), @column, Ident(strVal: "into"), all @targetColumns]):
+      return formatExtractAll(pattern, targetColumns, table, column)
 
     else:
-      result = command
-
-
-proc extract(command, table: NimNode, column: Option[NimNode]): NimNode =
-  if column.isSome():
-    return extractWithColumn(command, table, column.get())
-  else:
-    return extractWithoutColumn(command, table)
-
+      return command
 
 proc command(table: NimNode, column: Option[NimNode], command: NimNode): NimNode =
   var command = command.flatten()
