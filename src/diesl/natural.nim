@@ -75,7 +75,7 @@ proc translateDirection(direction: NimNode): NimNode =
       return newIdentNode("right")
 
 
-proc transpileTrimWithColumn(command, table, column: NimNode): NimNode =
+proc trimWithColumn(command, table, column: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "trim")]:
       result = quote do:
@@ -88,7 +88,7 @@ proc transpileTrimWithColumn(command, table, column: NimNode): NimNode =
       result = command
 
 
-proc transpileTrimWithoutColumn(command, table: NimNode): NimNode =
+proc trimWithoutColumn(command, table: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "trim"), @direction, Ident(strVal: "of"), @column]:
       let textDirection = translateDirection(direction)
@@ -103,21 +103,21 @@ proc transpileTrimWithoutColumn(command, table: NimNode): NimNode =
       result = command
 
 
-proc transpileTrim(command, table: NimNode, column: Option[NimNode]): NimNode =
+proc trim(command, table: NimNode, column: Option[NimNode]): NimNode =
   if column.isSome:
-    result = transpileTrimWithColumn(command, table, column.get)
+    result = trimWithColumn(command, table, column.get)
   else:
-    result = transpileTrimWithoutColumn(command, table)
+    result = trimWithoutColumn(command, table)
 
 
-# transpiles a list like
+# s a list like
 # replace ...:
 #   "foo" with "bar"
 #   "baz" with "bam"
 #
 # to
 # @{"foo": "bar", "baz": "bam"}
-proc transpileReplacementTable(replacements: var seq[NimNode]): NimNode =
+proc replacementTable(replacements: var seq[NimNode]): NimNode =
   var replacementPairs = newSeq[(NimNode, NimNode)]()
 
   while replacements.len() > 0:
@@ -132,37 +132,37 @@ proc transpileReplacementTable(replacements: var seq[NimNode]): NimNode =
   result = newTableConstructor(replacementPairs)
 
 
-proc transpileReplaceOne(table, column, target, replacement: NimNode): NimNode =
+proc replaceOne(table, column, target, replacement: NimNode): NimNode =
   return quote do:
       `table`.`column` = `table`.`column`.replace(`target`, `replacement`)
 
 
-proc transpileReplaceAll(table, column: NimNode, replacements: var seq[NimNode]): NimNode =
-      let replacementTable = transpileReplacementTable(replacements)
+proc replaceAll(table, column: NimNode, replacements: var seq[NimNode]): NimNode =
+      let replacementTable = replacementTable(replacements)
 
       return quote do:
         `table`.`column` = `table`.`column`.replaceAll(`replacementTable`)
 
 
-proc transpileReplace(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
+proc replace(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
   case (columnOpt, command):
     of (Some(@column), [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement]):
-      return transpileReplaceOne(table, column, target, replacement)
+      return replaceOne(table, column, target, replacement)
 
     of (Some(@column), [Ident(strVal: "replace"), all @replacements]):
-      return transpileReplaceAll(table, column, replacements)
+      return replaceAll(table, column, replacements)
 
     of (None(), [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement, Ident(strVal: "in"), @column]):
-      return transpileReplaceOne(table, column, target, replacement)
+      return replaceOne(table, column, target, replacement)
 
     of (None(), [Ident(strVal: "replace"), Ident(strVal: "in"), @column, all @replacements]):
-      return transpileReplaceAll(table, column, replacements)
+      return replaceAll(table, column, replacements)
 
     else:
       return command
 
 
-proc transpileRemoveWithColumn(command, table, column: NimNode): NimNode =
+proc removeWithColumn(command, table, column: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "remove"), @target]:
       result = quote do:
@@ -182,7 +182,7 @@ proc transpileRemoveWithColumn(command, table, column: NimNode): NimNode =
     else:
       result = command
 
-proc transpileRemoveWithoutColumn(command, table: NimNode): NimNode =
+proc removeWithoutColumn(command, table: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "remove"), @target, Ident(strVal: "from"), @column]:
       result = quote do:
@@ -202,14 +202,14 @@ proc transpileRemoveWithoutColumn(command, table: NimNode): NimNode =
       result = command
 
 
-proc transpileRemove(command, table: NimNode, column: Option[NimNode]): NimNode =
+proc remove(command, table: NimNode, column: Option[NimNode]): NimNode =
   if column.isSome:
-    return transpileRemoveWithColumn(command, table, column.get)
+    return removeWithColumn(command, table, column.get)
   else:
-    return transpileRemoveWithoutColumn(command, table)
+    return removeWithoutColumn(command, table)
 
 
-proc transpileTakeWithColumn(command, table, column: NimNode): NimNode =
+proc takeWithColumn(command, table, column: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "take"), @matchedLower, Ident(strVal: "to"), @matchedHigher]:
       let lower = newLit(matchedLower.intVal - 1)
@@ -221,7 +221,7 @@ proc transpileTakeWithColumn(command, table, column: NimNode): NimNode =
       result = command
 
 
-proc transpileTakeWithoutColumn(command, table: NimNode): NimNode =
+proc takeWithoutColumn(command, table: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "take"), @matchedLower, Ident(strVal: "to"),
         @matchedHigher, Ident(strVal: "from"), @column]:
@@ -243,14 +243,14 @@ proc nodeToPattern(pattern: NimNode): NimNode =
     return newStrLitNode("{" & pattern.strVal & "}")
   
 
-proc transpileExtractOne(pattern, table, column: NimNode): NimNode = 
+proc extractOne(pattern, table, column: NimNode): NimNode = 
   let patternNode = nodeToPattern(pattern)
 
   result = quote do:
     `table`.`column` = `table`.`column`.extractOne(`patternNode`)
 
 
-proc transpileExtractAll(pattern: NimNode, targetColumns: seq[NimNode], table, column: NimNode): NimNode = 
+proc extractAll(pattern: NimNode, targetColumns: seq[NimNode], table, column: NimNode): NimNode = 
   let patterNode = nodeToPattern(pattern)
   let parsedColumns = parseList(targetColumns)
 
@@ -261,66 +261,66 @@ proc transpileExtractAll(pattern: NimNode, targetColumns: seq[NimNode], table, c
     `assignmentTarget` = `table`.`column`.extractAll(`patterNode`)
 
 
-proc transpileExtractWithColumn(command, table, column: NimNode): NimNode =
+proc extractWithColumn(command, table, column: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "extract"), @pattern] | 
        Command[Ident(strVal: "extract"), Ident(strVal: "one"), @pattern]:
 
-      result = transpileExtractOne(pattern, table, column)
+      result = extractOne(pattern, table, column)
 
     of Command[Ident(strVal: "extract"), Ident(strVal: "all"), @pattern, Ident(strVal: "into"), all @targetColumns]:
 
-      result = transpileExtractAll(pattern, targetColumns, table, column)
+      result = extractAll(pattern, targetColumns, table, column)
     else:
       result = command
 
 
-proc transpileExtractWithoutColumn(command, table: NimNode): NimNode =
+proc extractWithoutColumn(command, table: NimNode): NimNode =
   case command:
     of Command[Ident(strVal: "extract"), @pattern, Ident(strVal: "from"), @column] | 
        Command[Ident(strVal: "extract"), Ident(strVal: "one"), @pattern, Ident(strVal: "from"), @column]:
-         result = transpileExtractOne(pattern, table, column)
+         result = extractOne(pattern, table, column)
 
     of Command[Ident(strVal: "extract"), Ident(strVal: "all"), @pattern, Ident(strVal: "from"), @column, Ident(strVal: "into"), all @targetColumns]:
-      result = transpileExtractAll(pattern, targetColumns, table, column)
+      result = extractAll(pattern, targetColumns, table, column)
 
     else:
       result = command
 
 
-proc transpileExtract(command, table: NimNode, column: Option[NimNode]): NimNode =
+proc extract(command, table: NimNode, column: Option[NimNode]): NimNode =
   if column.isSome():
-    return transpileExtractWithColumn(command, table, column.get())
+    return extractWithColumn(command, table, column.get())
   else:
-    return transpileExtractWithoutColumn(command, table)
+    return extractWithoutColumn(command, table)
 
 
-proc transpileTake(command, table: NimNode, column: Option[NimNode]): NimNode =
+proc take(command, table: NimNode, column: Option[NimNode]): NimNode =
   if column.isSome():
-    return transpileTakeWithColumn(command, table, column.get)
+    return takeWithColumn(command, table, column.get)
   else:
-    return transpileTakeWithoutColumn(command, table)
+    return takeWithoutColumn(command, table)
 
 
-proc transpileCommand(table: NimNode, column: Option[NimNode], command: NimNode): NimNode =
+proc command(table: NimNode, column: Option[NimNode], command: NimNode): NimNode =
   var command = command.flatten()
 
   case command:
     of Command[Ident(strVal: "trim"), .._]:
-      return transpileTrim(command, table, column)
+      return trim(command, table, column)
     of Command[Ident(strVal: "replace"), .._]:
-      return transpileReplace(command, table, column)
+      return replace(command, table, column)
     of Command[Ident(strVal: "remove"), .._]:
-      return transpileRemove(command, table, column)
+      return remove(command, table, column)
     of Command[Ident(strVal: "take"), .._]:
-      return transpileTake(command, table, column)
+      return take(command, table, column)
     of Command[Ident(strVal: "extract"), .._]:
-      return transpileExtract(command, table, column)
+      return extract(command, table, column)
     else:
       return command
 
 
-proc transpileChangeBlock(selector: NimNode, commands: NimNode): NimNode =
+proc changeBlock(selector: NimNode, commands: NimNode): NimNode =
   var table: NimNode
   var column: Option[NimNode]
 
@@ -337,11 +337,11 @@ proc transpileChangeBlock(selector: NimNode, commands: NimNode): NimNode =
   commands.expectKind nnkStmtList
 
   for command in commands.children:
-    result.add(transpileCommand(table, column, command))
+    result.add(command(table, column, command))
 
 # selector is one of:
 # <table name>
 # or
 # <column name> of <table name>
-macro change*(selector: untyped, commands: untyped): untyped = transpileChangeBlock(selector, commands)
+macro change*(selector: untyped, commands: untyped): untyped = changeBlock(selector, commands)
 
