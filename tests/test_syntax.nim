@@ -1,8 +1,9 @@
 
 import unittest
 
-import diesl/[operations, natural]
+import diesl/operations
 import diesl/operations/conversion
+import diesl/syntax/transpilation
 
 proc operationsEq(actualDB: Diesl, expectedDB: Diesl): bool =
   let expectedJson = exportOperationsJson(expectedDB)
@@ -11,7 +12,7 @@ proc operationsEq(actualDB: Diesl, expectedDB: Diesl): bool =
   return expectedJson == actualJson
 
 
-proc test_natural*() =
+proc test_syntax*() =
   suite "natural syntax for string operations":
 
     setup:
@@ -167,6 +168,13 @@ proc test_natural*() =
       check operationsEq(actualDB, expectedDB)
 
 
+#    test "replace with pattern":
+#      expectedTable.text = expectedTable.text.patternReplace("a pattern", "replacement")
+#
+#      change actualTable:
+#        replace pattern "a pattern" with "replacement" in text
+
+
     test "substring":
       expectedTable.text = expectedTable.text[1..3]
 
@@ -229,4 +237,4 @@ proc test_natural*() =
 
 
 when isMainModule:
-  test_natural()
+  test_syntax()

@@ -106,7 +106,7 @@ proc prepareScript(script: string, schema: DieslDatabaseSchema): PLLStream =
 import tables
 import operations
 import operations/conversion
-import natural
+import syntax
 
 let dbSchema = {schema.toNimCode()}
 let db = Diesl(dbSchema: dbSchema)
