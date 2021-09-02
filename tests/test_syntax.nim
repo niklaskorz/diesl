@@ -1,8 +1,9 @@
 
 import unittest
 
-import diesl/[operations, natural]
+import diesl/operations
 import diesl/operations/conversion
+import diesl/syntax/transpilation
 
 proc operationsEq(actualDB: Diesl, expectedDB: Diesl): bool =
   let expectedJson = exportOperationsJson(expectedDB)
@@ -11,7 +12,7 @@ proc operationsEq(actualDB: Diesl, expectedDB: Diesl): bool =
   return expectedJson == actualJson
 
 
-proc test_natural*() =
+proc test_syntax*() =
   suite "natural syntax for string operations":
 
     setup:
@@ -167,6 +168,45 @@ proc test_natural*() =
       check operationsEq(actualDB, expectedDB)
 
 
+    test "replace with pattern":
+      expectedTable.text = expectedTable.text.patternReplace("a pattern", "replacement")
+
+      change actualTable:
+        replace pattern "a pattern" with "replacement" in text
+
+      check operationsEq(actualDB, expectedDB)
+
+    test "replace with pattern and specific column":
+      expectedTable.text = expectedTable.text.patternReplace("a pattern", "replacement")
+
+      change text of actualTable:
+        replace pattern "a pattern" with "replacement"
+
+      check operationsEq(actualDB, expectedDB)
+
+    test "replace multiple patterns":
+      expectedTable.text = expectedTable.text.patternReplaceAll(@{"a pattern": "a replacement", 
+                                                                  "another pattern": "another replacement"})
+
+      change actualTable:
+        replace patterns in text: 
+          "a pattern" with "a replacement"
+          "another pattern" with "another replacement"
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "replace multiple patterns with specified column":
+      expectedTable.text = expectedTable.text.patternReplaceAll(@{"a pattern": "a replacement", 
+                                                                  "another pattern": "another replacement"})
+
+      change text of actualTable:
+        replace patterns: 
+          "a pattern" with "a replacement"
+          "another pattern" with "another replacement"
+
+      check operationsEq(actualDB, expectedDB)
+
     test "substring":
       expectedTable.text = expectedTable.text[1..3]
 
@@ -185,5 +225,65 @@ proc test_natural*() =
       check operationsEq(actualDB, expectedDB)
 
 
+    test "extract one":
+      expectedTable.text = expectedTable.text.extractOne("{email}")
+
+      change actualTable:
+        extract one email from text
+
+      check operationsEq(actualDB, expectedDB)
+
+    test "extract one with string pattern":
+      expectedTable.text = expectedTable.text.extractOne("{email}{post-code}" )
+
+      change actualTable:
+        extract one "{email}{post-code}" from text
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "extract one with specified column":
+      expectedTable.text = expectedTable.text.extractOne("{email}")
+
+      change text of actualTable:
+        extract email
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "extract all":
+      expectedTable[email, postCode, telephoneNumber] = expectedTable.text.extractAll("{email}{post-code}{telephone-number}" )
+      change actualTable:
+        extract all "{email}{post-code}{telephone-number}" from text into email, postCode and telephoneNumber
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "extract all with specified column":
+      expectedTable[email, postCode, telephoneNumber] = expectedTable.text.extractAll("{email}{post-code}{telephone-number}" )
+
+      change text of actualTable:
+        extract all "{email}{post-code}{telephone-number}" into email, postCode and telephoneNumber
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "split":
+      expectedTable[email, postCode, telephoneNumber] = expectedTable.text.split(",")
+
+      change actualTable:
+        split text on "," into email, postCode and telephoneNumber
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "split with specified column":
+      expectedTable[email, postCode, telephoneNumber] = expectedTable.text.split(",")
+
+      change text of actualTable:
+        split on "," into email, postCode and telephoneNumber
+
+      check operationsEq(actualDB, expectedDB)
+
 when isMainModule:
-  test_natural()
+  test_syntax()
