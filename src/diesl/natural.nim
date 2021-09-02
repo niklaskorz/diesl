@@ -65,49 +65,35 @@ proc newTableConstructor(pairs: seq[(NimNode, NimNode)]): NimNode =
 proc flatten(node: NimNode): NimNode =
   return newTree(nnkCommand, doFlatten(node))
 
-# TODO: make this a constant
-# const beginning = left
-proc translateDirection(direction: NimNode): NimNode =
-  case direction.strVal:
-    of "beginning":
-      return newIdentNode("left")
-    of "ending":
-      return newIdentNode("right")
+
+proc formatTrim(table, column, direction: NimNode): NimNode =
+      return quote do: `table`.`column` = `table`.`column`.trim(`direction`)
 
 
-proc trimWithColumn(command, table, column: NimNode): NimNode =
-  case command:
-    of Command[Ident(strVal: "trim")]:
-      result = quote do:
-        `table`.`column` = `table`.`column`.trim()
-    of Command[Ident(strVal: "trim"), @direction]:
-      let textDirection = translateDirection(direction)
-      result = quote do:
-        `table`.`column` = `table`.`column`.trim(`textDirection`)
+proc trim(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
+  case (columnOpt, command):
+
+    of (Some(@column), [Ident(strVal: "trim")]):
+      return formatTrim(table, column, newIdentNode("both"))
+
+    of (Some(@column), [Ident(strVal: "trim"), Ident(strVal: "beginning")]):
+      return formatTrim(table, column, newIdentNode("left"))
+
+    of (Some(@column), [Ident(strVal: "trim"), Ident(strVal: "ending")]):
+      return formatTrim(table, column, newIdentNode("right"))
+
+    of (None(), [Ident(strVal: "trim"), @column]):
+      return formatTrim(table, column, newIdentNode("both"))
+
+    of (None(), [Ident(strVal: "trim"), Ident(strVal: "beginning"), Ident(strVal: "of"), @column]):
+      return formatTrim(table, column, newIdentNode("left"))
+
+    of (None(), [Ident(strVal: "trim"), Ident(strVal: "ending"), Ident(strVal: "of"), @column]):
+      return formatTrim(table, column, newIdentNode("right"))
+
+
     else:
-      result = command
-
-
-proc trimWithoutColumn(command, table: NimNode): NimNode =
-  case command:
-    of Command[Ident(strVal: "trim"), @direction, Ident(strVal: "of"), @column]:
-      let textDirection = translateDirection(direction)
-
-      result = quote do:
-        `table`.`column` = `table`.`column`.trim(`textDirection`)
-
-    of Command[Ident(strVal: "trim"), @column]:
-      result = quote do:
-        `table`.`column` = `table`.`column`.trim()
-    else:
-      result = command
-
-
-proc trim(command, table: NimNode, column: Option[NimNode]): NimNode =
-  if column.isSome:
-    result = trimWithColumn(command, table, column.get)
-  else:
-    result = trimWithoutColumn(command, table)
+      return command
 
 
 # s a list like
@@ -343,5 +329,6 @@ proc changeBlock(selector: NimNode, commands: NimNode): NimNode =
 # <table name>
 # or
 # <column name> of <table name>
-macro change*(selector: untyped, commands: untyped): untyped = changeBlock(selector, commands)
+macro change*(selector: untyped, commands: untyped): untyped = 
+  return changeBlock(selector, commands)
 
