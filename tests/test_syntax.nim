@@ -268,5 +268,22 @@ proc test_syntax*() =
       check operationsEq(actualDB, expectedDB)
 
 
+    test "split":
+      expectedTable[email, postCode, telephoneNumber] = expectedTable.text.split(",")
+
+      change actualTable:
+        split text on "," into email, postCode and telephoneNumber
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "split with specified column":
+      expectedTable[email, postCode, telephoneNumber] = expectedTable.text.split(",")
+
+      change text of actualTable:
+        split on "," into email, postCode and telephoneNumber
+
+      check operationsEq(actualDB, expectedDB)
+
 when isMainModule:
   test_syntax()

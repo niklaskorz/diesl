@@ -268,12 +268,15 @@ proc formatExtractOne(pattern, table, column: NimNode): NimNode =
     `table`.`column` = `table`.`column`.extractOne(`patternNode`)
 
 
+proc multiColumnAssignmentTarget(table: NimNode, columns: seq[NimNode]): NimNode =
+  return nnkBracketExpr.newTree(@[table].concat(columns))
+
+ 
 proc formatExtractAll(pattern: NimNode, targetColumns: seq[NimNode], table, column: NimNode): NimNode = 
   let patterNode = nodeToPattern(pattern)
-  let parsedColumns = parseList(targetColumns)
 
   # creates node like this: `table`[col1, col2, ...]
-  var assignmentTarget = nnkBracketExpr.newTree(@[table].concat(parsedColumns))
+  let assignmentTarget = multiColumnAssignmentTarget(table, parseList(targetColumns))
 
   return quote do:
     `assignmentTarget` = `table`.`column`.extractAll(`patterNode`)
@@ -303,20 +306,39 @@ proc extract(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
       return command
 
 
+proc formatSplit(table, column, separator: NimNode, targetColumns: seq[NimNode]): NimNode =
+
+  let assignmentTarget = multiColumnAssignmentTarget(table, parseList(targetColumns))
+  return quote do:
+    `assignmentTarget` = `table`.`column`.split(`separator`)
+
+    
+
+proc split(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
+  case (columnOpt, command):
+    of (Some(@column), [_.KW(SPLIT), _.KW(ON), @separator, _.KW(INTO), all @targetColumns]):
+      return formatSplit(table, column, separator, targetColumns)
+
+    of (None(), [_.KW(SPLIT), @column, _.KW(ON), @separator, _.KW(INTO), all @targetColumns]):
+      return formatSplit(table, column, separator, targetColumns)
+
+
 proc command(table: NimNode, column: Option[NimNode], command: NimNode): NimNode =
   var command = command.flatten()
 
-  case command:
-    of Command[_.KW(TRIM), .._]:
+  case command[0].strVal:
+    of TRIM:
       return trim(command, table, column)
-    of Command[_.KW(REPLACE), .._]:
+    of REPLACE:
       return replace(command, table, column)
-    of Command[_.KW(REMOVE), .._]:
+    of REMOVE:
       return remove(command, table, column)
-    of Command[_.KW(TAKE), .._]:
+    of TAKE:
       return take(command, table, column)
-    of Command[_.KW(EXTRACT), .._]:
+    of EXTRACT:
       return extract(command, table, column)
+    of SPLIT:
+      return split(command, table, column)
     else:
       return command
 
