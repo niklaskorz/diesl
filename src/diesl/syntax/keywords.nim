@@ -1,8 +1,6 @@
 
 import macros
 
-const BEGINNING* = "beginning"
-const ENDING* = "ending"
 const OF* = "of"
 const FROM* = "from"
 const IN* = "in"
@@ -12,6 +10,11 @@ const TO* = "to"
 const ONE* = "one"
 const ALL* = "all"
 const INTO* = "into"
+
+const BEGINNING* = "beginning"
+const ENDING* = "ending"
+const PATTERN* = "pattern"
+const PATTERNS* = "patterns"
 
 const TRIM* = "trim"
 const REPLACE* = "replace"

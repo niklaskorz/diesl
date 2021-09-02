@@ -96,26 +96,42 @@ proc trim(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
       return command
 
 
-# s a list like
-# replace ...:
-#   "foo" with "bar"
-#   "baz" with "bam"
-#
-# to
-# @{"foo": "bar", "baz": "bam"}
-proc replacementTable(replacements: var seq[NimNode]): NimNode =
-  var replacementPairs = newSeq[(NimNode, NimNode)]()
+proc splitAtSeparatorKW(nodes: seq[NimNode], separator: string): Option[seq[(NimNode, NimNode)]] = 
+  ## splits sequence of nim nodes that are separeted by an separator
+  ## like: foo with bar, baz with bam ...
+  
+  var nodes = nodes
+  var pairs  = newSeq[(NimNode, NimNode)]()
 
-  while replacements.len() > 0:
-    case replacements:
-      of [@target, _.KW(WITH), @replacement, all @rest]:
-        replacements = rest
+  while nodes.len() > 0:
+    case nodes:
+      of [@first, _.KW(separator), @second, all @rest]:
+        nodes = rest
 
-        replacementPairs.add((target, replacement))
+        pairs.add((first, second))
+
       else:
-        echo "could not match substitution"
+        return none(seq[(NimNode, NimNode)])
 
-  result = newTableConstructor(replacementPairs)
+  return some(pairs)
+
+
+
+proc replacementTable(replacements: seq[NimNode]): Option[NimNode] =
+  ## transforms a list like
+  ## replace ...:
+  ##   "foo" with "bar"
+  ##   "baz" with "bam"
+  ##
+  ## to
+  ## @{"foo": "bar", "baz": "bam"}
+
+  let replacementNodes = replacements.splitAtSeparatorKW(WITH)
+
+  if replacementNodes.isSome():
+    return newTableConstructor(replacementNodes.get()).some()
+  else:
+    return none(NimNode)
 
 
 proc formatReplaceOne(table, column, target, replacement: NimNode): NimNode =
@@ -123,26 +139,59 @@ proc formatReplaceOne(table, column, target, replacement: NimNode): NimNode =
       `table`.`column` = `table`.`column`.replace(`target`, `replacement`)
 
 
-proc formatReplaceAll(table, column: NimNode, replacements: var seq[NimNode]): NimNode =
+proc formatReplaceOnePattern(table, column, target, replacement: NimNode): NimNode =
+  return quote do:
+      `table`.`column` = `table`.`column`.patternReplace(`target`, `replacement`)
+
+
+proc formatReplaceAll(command, table, column: NimNode, replacements: var seq[NimNode]): NimNode =
       let replacementTable = replacementTable(replacements)
 
-      return quote do:
-        `table`.`column` = `table`.`column`.replaceAll(`replacementTable`)
+      case replacementTable:
+        of Some(@replacementNodes):
+          return quote do:
+            `table`.`column` = `table`.`column`.replaceAll(`replacementNodes`)
+        else:
+          return command
+
+
+proc formatReplaceAllPatterns(command, table, column: NimNode, replacements: var seq[NimNode]): NimNode =
+      let replacementTable = replacementTable(replacements)
+
+      case replacementTable:
+        of Some(@replacementNodes):
+          return quote do:
+            `table`.`column` = `table`.`column`.patternReplaceAll(`replacementNodes`)
+        else:
+          return command
 
 
 proc replace(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
   case (columnOpt, command):
+
+    of (Some(@column), [_.KW(REPLACE), _.KW("patterns"), all @replacements]):
+      return formatReplaceAllPatterns(command, table, column, replacements)
+
     of (Some(@column), [_.KW(REPLACE), @target, _.KW(WITH), @replacement]):
       return formatReplaceOne(table, column, target, replacement)
 
+    of (Some(@column), [_.KW(REPLACE), _.KW(PATTERN), @target, _.KW(WITH), @replacement]):
+      return formatReplaceOnePattern(table, column, target, replacement)
+
     of (Some(@column), [_.KW(REPLACE), all @replacements]):
-      return formatReplaceAll(table, column, replacements)
+      return formatReplaceAll(command, table, column, replacements)
 
     of (None(), [_.KW(REPLACE), @target, _.KW(WITH), @replacement, _.KW(IN), @column]):
       return formatReplaceOne(table, column, target, replacement)
 
     of (None(), [_.KW(REPLACE), _.KW(IN), @column, all @replacements]):
-      return formatReplaceAll(table, column, replacements)
+      return formatReplaceAll(command, table, column, replacements)
+
+    of (None(), [_.KW(REPLACE), _.KW(PATTERN), @target, _.KW(WITH), @replacement, _.KW(IN), @column]):
+      return formatReplaceOnePattern(table, column, target, replacement)
+
+    of (None(), [_.KW(REPLACE), _.KW(PATTERNS), _.KW(IN), @column, all @replacements]):
+      return formatReplaceAllPatterns(command, table, column, replacements)
 
     else:
       return command

@@ -168,12 +168,44 @@ proc test_syntax*() =
       check operationsEq(actualDB, expectedDB)
 
 
-#    test "replace with pattern":
-#      expectedTable.text = expectedTable.text.patternReplace("a pattern", "replacement")
-#
-#      change actualTable:
-#        replace pattern "a pattern" with "replacement" in text
+    test "replace with pattern":
+      expectedTable.text = expectedTable.text.patternReplace("a pattern", "replacement")
 
+      change actualTable:
+        replace pattern "a pattern" with "replacement" in text
+
+      check operationsEq(actualDB, expectedDB)
+
+    test "replace with pattern and specific column":
+      expectedTable.text = expectedTable.text.patternReplace("a pattern", "replacement")
+
+      change text of actualTable:
+        replace pattern "a pattern" with "replacement"
+
+      check operationsEq(actualDB, expectedDB)
+
+    test "replace multiple patterns":
+      expectedTable.text = expectedTable.text.patternReplaceAll(@{"a pattern": "a replacement", 
+                                                                  "another pattern": "another replacement"})
+
+      change actualTable:
+        replace patterns in text: 
+          "a pattern" with "a replacement"
+          "another pattern" with "another replacement"
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "replace multiple patterns with specified column":
+      expectedTable.text = expectedTable.text.patternReplaceAll(@{"a pattern": "a replacement", 
+                                                                  "another pattern": "another replacement"})
+
+      change text of actualTable:
+        replace patterns: 
+          "a pattern" with "a replacement"
+          "another pattern" with "another replacement"
+
+      check operationsEq(actualDB, expectedDB)
 
     test "substring":
       expectedTable.text = expectedTable.text[1..3]
