@@ -91,7 +91,6 @@ proc trim(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
     of (None(), [Ident(strVal: "trim"), Ident(strVal: "ending"), Ident(strVal: "of"), @column]):
       return formatTrim(table, column, newIdentNode("right"))
 
-
     else:
       return command
 
@@ -118,12 +117,12 @@ proc replacementTable(replacements: var seq[NimNode]): NimNode =
   result = newTableConstructor(replacementPairs)
 
 
-proc replaceOne(table, column, target, replacement: NimNode): NimNode =
+proc formatReplaceOne(table, column, target, replacement: NimNode): NimNode =
   return quote do:
       `table`.`column` = `table`.`column`.replace(`target`, `replacement`)
 
 
-proc replaceAll(table, column: NimNode, replacements: var seq[NimNode]): NimNode =
+proc formatReplaceAll(table, column: NimNode, replacements: var seq[NimNode]): NimNode =
       let replacementTable = replacementTable(replacements)
 
       return quote do:
@@ -133,66 +132,54 @@ proc replaceAll(table, column: NimNode, replacements: var seq[NimNode]): NimNode
 proc replace(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
   case (columnOpt, command):
     of (Some(@column), [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement]):
-      return replaceOne(table, column, target, replacement)
+      return formatReplaceOne(table, column, target, replacement)
 
     of (Some(@column), [Ident(strVal: "replace"), all @replacements]):
-      return replaceAll(table, column, replacements)
+      return formatReplaceAll(table, column, replacements)
 
     of (None(), [Ident(strVal: "replace"), @target, Ident(strVal: "with"), @replacement, Ident(strVal: "in"), @column]):
-      return replaceOne(table, column, target, replacement)
+      return formatReplaceOne(table, column, target, replacement)
 
     of (None(), [Ident(strVal: "replace"), Ident(strVal: "in"), @column, all @replacements]):
-      return replaceAll(table, column, replacements)
+      return formatReplaceAll(table, column, replacements)
 
     else:
       return command
 
 
-proc removeWithColumn(command, table, column: NimNode): NimNode =
-  case command:
-    of Command[Ident(strVal: "remove"), @target]:
-      result = quote do:
-        `table`.`column` = `table`.`column`.remove(`target`)
-    of Command[Ident(strVal: "remove"), all @targetsVal]:
-      let targets = parseList(targetsVal)
-
-      if targets.len() == 0:
-        return command
-
-      result = newStmtList()
-
-      for target in targets:
-        result.add(quote do: `table`.`column` = `table`.`column`.remove(`target`))
+proc formatRemoveOne(table, column, target: NimNode): NimNode =
+  return quote do:
+    `table`.`column` = `table`.`column`.remove(`target`)
 
 
-    else:
-      result = command
+proc formatRemoveAll(command, table, column: NimNode, targets: seq[NimNode]): NimNode = 
+  let targetList = parseList(targets)
 
-proc removeWithoutColumn(command, table: NimNode): NimNode =
-  case command:
-    of Command[Ident(strVal: "remove"), @target, Ident(strVal: "from"), @column]:
-      result = quote do:
-        `table`.`column` = `table`.`column`.remove(`target`)
-    of Command[Ident(strVal: "remove"), until @targetsVal is Ident(strVal: "from"), Ident(strVal: "from"), @column]:
-      let targets = parseList(targetsVal)
+  if targetList.len() == 0:
+    return command
 
-      if targets.len() == 0:
-        return command
+  result = newStmtList()
 
-      result = newStmtList()
+  for target in targetList:
+    result.add(quote do: `table`.`column` = `table`.`column`.remove(`target`))
 
-      for target in targets:
-        result.add(quote do: `table`.`column` = `table`.`column`.remove(`target`))
+
+proc remove(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
+  case (columnOpt, command):
+    of (Some(@column), [Ident(strVal: "remove"), @target]):
+      return formatRemoveOne(table, column, target)
+
+    of (Some(@column), [Ident(strVal: "remove"), all @targets]):
+      return formatRemoveAll(command, table, column, targets)
+
+    of (None(), [Ident(strVal: "remove"), @target, Ident(strVal: "from"), @column]):
+      return formatRemoveOne(table, column, target)
+
+    of (None(), [Ident(strVal: "remove"), until @targets is Ident(strVal: "from"), Ident(strVal: "from"), @column]):
+      return formatRemoveAll(command, table, column, targets)
 
     else:
-      result = command
-
-
-proc remove(command, table: NimNode, column: Option[NimNode]): NimNode =
-  if column.isSome:
-    return removeWithColumn(command, table, column.get)
-  else:
-    return removeWithoutColumn(command, table)
+      return command
 
 
 proc takeWithColumn(command, table, column: NimNode): NimNode =
