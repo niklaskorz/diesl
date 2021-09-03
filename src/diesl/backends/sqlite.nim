@@ -93,7 +93,9 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
       fmt"stringSplit({op.stringSplitValue.toSqlite}, {op.stringSplitBy}, {op.stringSplitIndex})"
 
 
-proc toSqlite*(operations: seq[DieslOperation]): seq[SqlQuery] {.gcSafe.} =
+proc toSqlite*(
+  operations: seq[DieslOperation]
+): seq[SqlQuery] {.gcSafe, deprecated: "Use operations.toSqlitePrepared(db) instead".} =
   var queries: seq[SqlQuery]
   for operation in operations:
     assert operation.kind == dotStore or operation.kind == dotStoreMany
@@ -101,3 +103,14 @@ proc toSqlite*(operations: seq[DieslOperation]): seq[SqlQuery] {.gcSafe.} =
     queries.add(SqlQuery(query))
   return queries
 
+
+proc toSqlitePrepared*(
+  operations: seq[DieslOperation],
+  db: DbConn
+): seq[SqlPrepared] {.gcSafe.} =
+  var queries: seq[SqlPrepared]
+  for operation in operations:
+    assert operation.kind == dotStore or operation.kind == dotStoreMany
+    let query = operation.toSqlite()
+    queries.add(db.prepare(query))
+  return queries

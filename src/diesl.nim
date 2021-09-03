@@ -65,20 +65,22 @@ when isMainModule:
   csvParser.close()
 
   if mode == "direct":
-    let queries = exportedOperations.toSqlite()
+    let queries = exportedOperations.toSqlitePrepared(dbConn)
     echo "Generated queries:"
     for query in queries:
-      echo string(query)
+      #echo string(query)
       dbConn.exec(query)
+      query.finalize()
     echo "Final data:"
     for row in dbConn.fastRows(sql"SELECT * FROM students"):
       echo row
   elif mode == "view":
-    let (queries, tableAccessMap, views) = exportedOperations.toSqliteViews(schema)
+    let (queries, tableAccessMap, views) = exportedOperations.toSqliteViewsPrepared(dbConn, schema)
     echo "Generated queries:"
     for query in queries:
-      echo string(query)
+      #echo string(query)
       dbConn.exec(query)
+      query.finalize()
     echo "Table access map: ", $tableAccessMap
     echo "Views: ", $views
     echo "Final data:"

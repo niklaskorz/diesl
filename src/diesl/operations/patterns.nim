@@ -38,5 +38,4 @@ proc pattern*(fmtString: string): string =
       (fmt"{extractedConstant}", tableRegex)
 
   result = fmtString.multiReplace(replaceBy)
-  result = result.replace("?", r"\u3F")
 

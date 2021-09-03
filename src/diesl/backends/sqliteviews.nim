@@ -5,7 +5,7 @@ import sugar
 import algorithm
 import random
 import tables
-import db_common
+import db_sqlite
 import ../operations
 import sqlite
 
@@ -78,13 +78,17 @@ proc randomId(): string =
   let characters = "abcdefghijklmnopqrstuvwxyz0123456789"
   (0..16).mapIt(sample(characters)).join("")
 
+
 type ToSqliteViewsResult* = tuple
   queries: seq[SqlQuery]
   tableAccessMap: TableAccessMap
   views: seq[string]
 
-proc toSqliteViews*(operations: seq[DieslOperation],
-    schema: DieslDatabaseSchema, tableAccessMap: TableAccessMap = TableAccessMap()): ToSqliteViewsResult =
+proc toSqliteViews*(
+  operations: seq[DieslOperation],
+  schema: DieslDatabaseSchema,
+  tableAccessMap: TableAccessMap = TableAccessMap()
+): ToSqliteViewsResult {.deprecated: "Use operations.toSqliteViewsPrepared(db, schema, tableAccessMap) instead".} =
   var updatedTableAccessMap = tableAccessMap
   var views: seq[string]
   let dieslId = randomId()
@@ -97,14 +101,61 @@ proc toSqliteViews*(operations: seq[DieslOperation],
   return (queries, updatedTableAccessMap, views)
 
 
+type ToSqliteViewsPreparedResult* = tuple
+  queries: seq[SqlPrepared]
+  tableAccessMap: TableAccessMap
+  views: seq[string]
+
+proc toSqliteViewsPrepared*(
+  operations: seq[DieslOperation],
+  db: DbConn,
+  schema: DieslDatabaseSchema,
+  tableAccessMap: TableAccessMap = TableAccessMap(),
+): ToSqliteViewsPreparedResult =
+  var updatedTableAccessMap = tableAccessMap
+  var views: seq[string]
+  let dieslId = randomId()
+  var viewId = 0
+  var queries: seq[SqlPrepared]
+  for operation in operations:
+    let query = operation.toSqliteView(schema, updatedTableAccessMap, views,
+        dieslId, viewId)
+    queries.add(db.prepare(query))
+  return (queries, updatedTableAccessMap, views)
+
+
 type RemoveSqliteViewsResult* = tuple
   queries: seq[SqlQuery]
   tableAccessMap: TableAccessMap
 
-proc removeSqliteViews*(views: seq[string], tableAccessMap: TableAccessMap): RemoveSqliteViewsResult =
+proc removeSqliteViews*(
+  views: seq[string],
+  tableAccessMap: TableAccessMap
+): RemoveSqliteViewsResult {.deprecated: "Use removeSqliteViewsPrepared(views, tableAccessMap, db) instead".} =
   var queries: seq[SqlQuery]
   for view in views.reversed():
     queries.add(SqlQuery(fmt"DROP VIEW {view}"))
+  let updatedTableAccessMap = toSeq(tableAccessMap.pairs).map(
+    (pair) => (
+      pair[0],
+      pair[1].filter((name) => name notin views)
+    )
+  ).toTable()
+  return (queries, updatedTableAccessMap)
+
+
+type RemoveSqliteViewsPreparedResult* = tuple
+  queries: seq[SqlPrepared]
+  tableAccessMap: TableAccessMap
+
+proc removeSqliteViewsPrepared*(
+  views: seq[string],
+  tableAccessMap: TableAccessMap,
+  db: DbConn
+): RemoveSqliteViewsPreparedResult =
+  var queries: seq[SqlPrepared]
+  for view in views.reversed():
+    queries.add(db.prepare(fmt"DROP VIEW {view}"))
   let updatedTableAccessMap = toSeq(tableAccessMap.pairs).map(
     (pair) => (
       pair[0],
