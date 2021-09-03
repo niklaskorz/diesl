@@ -95,7 +95,7 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
 
 proc toSqlite*(
   operations: seq[DieslOperation]
-): seq[SqlQuery] {.gcSafe, deprecated: "Use operations.toSqlitePrepared(db) instead".} =
+): seq[SqlQuery] {.gcSafe.} =
   var queries: seq[SqlQuery]
   for operation in operations:
     assert operation.kind == dotStore or operation.kind == dotStoreMany
@@ -103,14 +103,3 @@ proc toSqlite*(
     queries.add(SqlQuery(query))
   return queries
 
-
-proc toSqlitePrepared*(
-  operations: seq[DieslOperation],
-  db: DbConn
-): seq[SqlPrepared] {.gcSafe.} =
-  var queries: seq[SqlPrepared]
-  for operation in operations:
-    assert operation.kind == dotStore or operation.kind == dotStoreMany
-    let query = operation.toSqlite()
-    queries.add(db.prepare(query))
-  return queries
