@@ -4,28 +4,28 @@ import sequtils
 
 proc toOperation*(value: string): DieslOperation =
   ## Lift a string into an operation
-  ## 
-  ## Example: 
+  ##
+  ## Example:
   ## ```nim
   ## "Hello World".toOperation
   ## ```
   DieslOperation(kind: dotStringLiteral, stringValue: value)
 
-proc lit*(value: string): DieslOperation = 
+proc lit*(value: string): DieslOperation =
   ## An alias of toOperation
   value.toOperation
 
 proc trim*(value: DieslOperation, direction: TextDirection = both): DieslOperation =
   ## Trim whitespace according to `direction` parameter
-  ## 
-  ## Examples: 
+  ##
+  ## Examples:
   ## ```nim
   ## # Only trim on whitespace on the left side
-  ## db.students.name = db.students.name.trim(left) 
-  ## 
+  ## db.students.name = db.students.name.trim(left)
+  ##
   ## # Only trim on whitespace on the right side
-  ## db.students.name = db.students.name.trim(right) 
-  ## 
+  ## db.students.name = db.students.name.trim(right)
+  ##
   ## # Trim whitespace on both sides
   ## db.students.name = db.students.name.trim(both)
   ## db.students.name = db.students.name.trim()
@@ -39,23 +39,23 @@ proc substring(value: DieslOperation, range: Slice[int]): DieslOperation =
 
 proc `[]`*(value: DieslOperation, range: Slice[int]): DieslOperation =
   ## Slice strings according to `range` parameter
-  ## 
+  ##
   ## Examples:
   ## ```nim
   ## # Extracts all characters between the third (incl.) and sixth (excl.) points
-  ## db.students.name = db.students.name[2..5] 
+  ## db.students.name = db.students.name[2..5]
   ## ```
   value.substring(range)
 
 proc replace*(value: DieslOperation, target: DieslOperation,
     replacement: DieslOperation): DieslOperation =
   ## Replace all occurrences of `target` in `value` by `replacement`
-  ## 
+  ##
   ## Examples:
   ## ```nim
   ## # Replace "Hello" with "World"
   ## db.migration.new = db.migration.old.replace("Hello".toOperation, "World".toOperation)
-  ## 
+  ##
   ## # Replace every student's first name with "Mr."
   ## db.student.firstName = db.student.firstName(db.students.firstName, "Mr. ")
   ## ```
@@ -68,22 +68,22 @@ proc replace*(value: DieslOperation, target: DieslOperation,
 
 proc replaceAll*(value: DieslOperation, replacements: seq[(DieslOperation,
     DieslOperation)]): DieslOperation =
-  ## Pairwise replacing according to `replacements`. 
+  ## Pairwise replacing according to `replacements`.
   ## The first entry is the target, the second is what the target is replaced by
-  ## 
+  ##
   ## Examples:
   ## ```nim
   ## # All replacements occur in the name column
   ## db.students.name = db.students.name.replaceAll(@{
   ##    # Replace every occurrence of a student's first name with "Mr."
   ##    db.students.firstName: "Mr. ",
-  ## 
+  ##
   ##    # Replace every "<LastName>" with the student's last name
   ##    "<LastName>": db.students.lastName,
-  ## 
+  ##
   ##    # General Kenobi
   ##    "Hello": "there",
-  ## 
+  ##
   ##    # Replace every occurrence of a student's columnA with the columnB entry
   ##    db.students.columnA: db.students.columnB
   ## })
@@ -98,7 +98,7 @@ proc replaceAll*(value: DieslOperation, replacements: seq[(DieslOperation,
 
 proc remove*(value: DieslOperation, target: DieslOperation): DieslOperation =
   ## Remove all occurrences of `target` from `value`.
-  ## 
+  ##
   ## Examples:
   ## ```nim
   ## db.students.name = db.students.name.remove("some swear word")
@@ -113,14 +113,14 @@ proc stringConcat(valueA: DieslOperation,
     stringConcatValueB: valueB.assertDataType({ddtString})
   )
 
-proc `&`*(valueA: DieslOperation, valueB: DieslOperation): DieslOperation = 
+proc `&`*(valueA: DieslOperation, valueB: DieslOperation): DieslOperation =
   ## Concatenate strings from two columns
-  ## 
+  ##
   ## Examples:
   ## ```nim
   ## # Concat two columns and store in concat
   ## db.student.concat = db.students.lhs & db.students.rhs
-  ## 
+  ##
   ## # Create the student's full name from their first and last names
   ## db.student.fullName = db.students.firstName & " " & db.students.lastName
   ## ```
@@ -128,16 +128,16 @@ proc `&`*(valueA: DieslOperation, valueB: DieslOperation): DieslOperation =
 
 proc toLower*(value: DieslOperation): DieslOperation =
   ## Convert a column's strings to lowercase
-  ## 
+  ##
   ## Examples:
   ## ```nim
   ## db.students.lower = db.students.mixedCase.toLower()
-  ## ``` 
+  ## ```
   DieslOperation(kind: dotToLower, toLowerValue: value.assertDataType({ddtString}))
 
 proc toUpper*(value: DieslOperation): DieslOperation =
-  ## Convert a column's strings to lowercase
-  ## 
+  ## Convert a column's strings to uppercase
+  ##
   ## Examples:
   ## ```nim
   ## db.students.upper = db.students.mixedCase.toUpper()
@@ -145,8 +145,8 @@ proc toUpper*(value: DieslOperation): DieslOperation =
   DieslOperation(kind: dotToUpper, toUpperValue: value.assertDataType({ddtString}))
 
 proc extractOne*(extractFrom: DieslOperation, fmtString: string): DieslOperation =
-  ## Extract the first occurrence according to the regex in `fmtString` 
-  ## 
+  ## Extract the first occurrence according to the regex in `fmtString`
+  ##
   ## Examples:
   ## ```nim
   ## db.student.hashtag = db.student.blob.extractOne("{hashtag}")
@@ -158,8 +158,8 @@ proc extractOne*(extractFrom: DieslOperation, fmtString: string): DieslOperation
   )
 
 proc extractAll*(extractFrom: DieslOperation, fmtString: string): DieslOperation =
-  ## Extract the all occurrences according to the regex in `fmtString` 
-  ## 
+  ## Extract the all occurrences according to the regex in `fmtString`
+  ##
   ## Examples:
   ## ```nim
   ## db.students[firstName, lastName] = db.students.name.extractAll("([a-z]+) ([a-z]+)")
@@ -173,7 +173,7 @@ proc extractAll*(extractFrom: DieslOperation, fmtString: string): DieslOperation
 
 proc padStringValue*(value: DieslOperation, direction: TextDirection, cnt: int, padWith: char = ' '): DieslOperation =
   ## Pad string with characters so it fits a specific minimum size
-  ## 
+  ##
   ## Examples:
   ## ```
   ## db.students.name = db.students.name.padStringValue(left, 5, "x")
@@ -188,7 +188,7 @@ proc padStringValue*(value: DieslOperation, direction: TextDirection, cnt: int, 
 
 proc split*(splitFrom: DieslOperation, splitOn: string): DieslOperation =
   ## Split one column into multiple columns based on `splitOn`
-  ## 
+  ##
   ## Examples:
   ## ```nim
   ## db.students[firstName, lastName] = db.students.name.split(" ")
@@ -204,7 +204,7 @@ proc patternReplace*(value: DieslOperation, target: DieslOperation,
     replacement: DieslOperation): DieslOperation =
   ## Replace all occurrences of `target` in `value` by `replacement`.
   ## This is the regex-based counterpart of `replace`
-  ## 
+  ##
   ## Examples:
   ## ```nim
   ## # Replace pattern in name with "Mr. "
@@ -219,9 +219,9 @@ proc patternReplace*(value: DieslOperation, target: DieslOperation,
 
 proc patternReplaceAll*(value: DieslOperation, replacements: seq[(DieslOperation,
     DieslOperation)]): DieslOperation =
-  ## Pairwise replacing according to `replacements`. 
+  ## Pairwise replacing according to `replacements`.
   ## The first entry is the target, the second is what the target is replaced by
-  ## 
+  ##
   ## Examples:
   ## ```nim
   ## # Replace pattern pairs in column "name"
@@ -240,7 +240,7 @@ proc patternReplaceAll*(value: DieslOperation, replacements: seq[(DieslOperation
   )
 proc match*(value: DieslOperation, pattern: string): DieslOperation =
   ## Compute boolean values for each entry corresponding to whether the given `pattern` matches.
-  ## 
+  ##
   ## Examples:
   ## ```nim
   ## db.students.coolNamesMask = db.students.match("(?:Ben)")
