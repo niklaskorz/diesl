@@ -3,6 +3,22 @@
 ## Documentation
 The documentation of the DSL API can be found here: https://pvs-hd.gitlab.io/ot/diesl/documentation/
 
+## Running the demo
+
+First, download and extract the [latest build of the demo](https://gitlab.com/pvs-hd/ot/diesl/-/jobs/artifacts/develop/download?job=build%20demo).
+Then, you can run the demo binary with one of the example scripts from the `example/` folder or with any other DieSL script file you have written.
+The demo binary supports two modes: `direct` and `views`.
+In `direct` mode, the DieSL operations are translated into SQL `UPDATE` statements and the demo table is queried and printed directly.
+In `views` mode, the operations are translated into SQL `CREATE VIEW` statements and the last created view is queried and printed.
+Example:
+
+```
+# Linux
+./diesl examples/nim.diesl
+# Windows
+.\diesl.exe examples\nim.diesl
+```
+
 ## How it works
 
 DieSL code consists of one or more change macros (which is defined in [transpilation.nim](src/diesl/syntax/transpilation.nim)). When a script is passed into the [runScript](src/diesl/script.nim#L127) function it is executed in a NimVM where the macro is expanded. The [change macro](src/diesl/syntax/transpilation.nim#L304) looks for all Nim statements that match a pattern of the DieSL commands and translates them to their Nim counterpart - all Nim statements inbetween stay the same. After that the code is evaluated by the Nim interpreter. __Important:__ This does not execute any changes on the database it just creates an [object](src/diesl/operations/base.nim#L16) representing what operations should take place. This object is then retrieved from the VM and translated to the target language (currently only SQLite).
