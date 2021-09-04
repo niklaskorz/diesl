@@ -103,7 +103,7 @@ proc toSqlite*(
     queries.add(query)
   return queries
 
-proc exec*(db: DbConn, query: string) {.gcSafe.} =
+proc exec*(db: DbConn, query: string) {.noSideEffect, gcsafe, locks: 0.} =
   ## Convenience function for executing queries
   ## as prepared statements.
   ## Necessary to allow direct usage of '?' characters
