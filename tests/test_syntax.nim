@@ -20,6 +20,9 @@ proc test_syntax*() =
         "table": @{
           "text": ddtString,
           "otherText": ddtString,
+          "email": ddtString,
+          "postCode": ddtString,
+          "telephoneNumber": ddtString,
         }
       }))
 
@@ -27,6 +30,9 @@ proc test_syntax*() =
           "table": @{
             "text": ddtString,
             "otherText": ddtString,
+            "email": ddtString,
+            "postCode": ddtString,
+            "telephoneNumber": ddtString,
           }
         }))
 
