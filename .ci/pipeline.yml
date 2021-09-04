@@ -4,6 +4,7 @@ default:
 
 stages:
     - test
+    - build
     - docs
     - publish-coverage
 
@@ -28,6 +29,18 @@ unit tests:
     rules:
         - if: '$CI_COMMIT_BRANCH == "master"'
         - if: '$CI_COMMIT_BRANCH == "develop"'
+
+build demo:
+    stage: build
+    script:
+        - apt-get install -y mingw-w64
+        - nimble build
+        - nimble build -d:mingw
+    artifacts:
+        paths:
+            - diesl
+            - diesl.exe
+            - examples/
 
 build docs:
     stage: docs
