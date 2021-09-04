@@ -80,7 +80,7 @@ template `.=`*(table: DieslTable, column: untyped,
 
 proc storeMany*(table: DieslTable, columns: seq[string], values: seq[DieslOperation]) =
   assert columns.len == values.len, "must provide as many values as columns"
-  let types = values.map(toDataType)
+  let types = columns.map(column => table.getColumnType(column))
   var op = DieslOperation(
     kind: dotStoreMany,
     storeManyTable: table.pName,
