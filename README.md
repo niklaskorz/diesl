@@ -116,11 +116,10 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
 ```
 
 
-# Side Projects
+## Side Projects
 
-[Making Nim functions available to SQLite](https://github.com/niklaskorz/nim-exporttosqlite3/)
-
-[Tracking TODOs in the project](https://github.com/preslavmihaylov/todocheck/pull/160)
+- [Making Nim functions available to SQLite](https://github.com/niklaskorz/nim-exporttosqlite3/)
+- [Tracking TODOs in the project](https://github.com/preslavmihaylov/todocheck/pull/160)
 
 
 
@@ -131,7 +130,7 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
 * Benjamin Sparks: 30%, in particular:
   * String and Regex operations + Documentation
 * Samuel Melm: 30%, in particular:
-  * Natural Language Parsing
+  * Natural Syntax Parsing (macros)
 
 All aspects of requirements, main implementation, testing etc., were shared amongst the team and assigned during meetings in the Issue Tracker.
 Accordingly, this means that the responsibility of main and test code was shared equally.
