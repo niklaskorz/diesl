@@ -7,6 +7,8 @@ The documentation of the DSL API can be found here: https://pvs-hd.gitlab.io/ot/
 
 First, download and extract the [latest build of the demo](https://gitlab.com/pvs-hd/ot/diesl/-/jobs/artifacts/develop/download?job=build%20demo).
 Then, you can run the demo binary with one of the example scripts from the `example/` folder or with any other DieSL script file you have written.
+You may also modify the demo data in `example/data.csv`.
+While you may change all rows and also add or remove rows, you currently can't change the structure of the demo data without updating the code of the demo in `src/diesl.nim`.
 The demo binary supports two modes: `direct` and `views`.
 In `direct` mode, the DieSL operations are translated into SQL `UPDATE` statements and the demo table is queried and printed directly.
 In `views` mode, the operations are translated into SQL `CREATE VIEW` statements and the last created view is queried and printed.
