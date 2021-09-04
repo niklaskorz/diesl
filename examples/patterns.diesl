@@ -1,7 +1,0 @@
-# Pattern matching examples for extraction and replacement.
-# Using both the Nim-syntax and the macro-based natural syntax.
-
-db.students.email = db.students.data.extractOne(r"{email}")
-db.students[firstName, secondName] = db.students.name.extractAll(r"(\w+) (\w+)")
-
-# TODO: natural syntax example

@@ -1,13 +1,13 @@
 # Basic example using the macro-based natural syntax of DieSL.
-# Demonstrates string operations and for-loops.
+# Demonstrates string operations.
 
 change db.students:
     trim ending of firstName
-    remove "bad word", "terrible word" and "curse word" from firstName
+    remove "rip", "aid" and "vit" from firstName
 
-    replace "David" with "Daniel" in firstName
+    replace "Isi" with "Daniel" in firstName
 
     replace in secondName:
-        "Schmidt" with "Schmitt"
-        "Mayer" with "Meier"
-        "Maier" with "Meier"
+        "Neil" with "Naile"
+        "Deasmhumhain" with "Deasman"
+        "flight" with "wood"

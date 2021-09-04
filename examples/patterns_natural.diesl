@@ -1,0 +1,6 @@
+# Pattern matching examples for extraction.
+# Using the macro-based natural syntax.
+
+change db.students:
+  extract email from data
+  extract all r"(\w+) (\w+)" from name into firstName and secondName

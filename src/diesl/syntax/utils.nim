@@ -38,10 +38,10 @@ proc newTableConstructor*(pairs: seq[(NimNode, NimNode)]): NimNode =
   result = nnkPrefix.newTree(newIdentNode("@"), result)
 
 
-proc splitAtSeparatorKW*(nodes: seq[NimNode], separator: string): Option[seq[(NimNode, NimNode)]] = 
+proc splitAtSeparatorKW*(nodes: seq[NimNode], separator: string): Option[seq[(NimNode, NimNode)]] =
   ## splits sequence of nim nodes that are separeted by an separator
   ## like: foo with bar, baz with bam ...
-  
+
   var nodes = nodes
   var pairs  = newSeq[(NimNode, NimNode)]()
 
@@ -60,9 +60,9 @@ proc splitAtSeparatorKW*(nodes: seq[NimNode], separator: string): Option[seq[(Ni
 proc nodeToPattern*(pattern: NimNode): NimNode =
   ## Given a pattern string it is just returned
   ## Given a pattern identifier it is wrapped pattern -> "{pattern}"
-  if pattern.kind == nnkStrLit: 
-    return pattern 
-  else: 
+  if pattern.kind == nnkStrLit or pattern.kind == nnkRStrLit:
+    return pattern
+  else:
     return newStrLitNode("{" & pattern.strVal & "}")
 
 

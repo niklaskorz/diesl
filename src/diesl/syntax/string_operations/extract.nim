@@ -9,21 +9,21 @@ import fusion/matching
 {.experimental: "caseStmtMacros".}
 
 
-proc formatExtractOne(pattern, table, column: NimNode): NimNode = 
+proc formatExtractOne(pattern, table, column: NimNode): NimNode =
   let patternNode = nodeToPattern(pattern)
 
   return quote do:
     `table`.`column` = `table`.`column`.extractOne(`patternNode`)
 
 
-proc formatExtractAll(pattern: NimNode, targetColumns: seq[NimNode], table, column: NimNode): NimNode = 
-  let patterNode = nodeToPattern(pattern)
+proc formatExtractAll(pattern: NimNode, targetColumns: seq[NimNode], table, column: NimNode): NimNode =
+  let patternNode = nodeToPattern(pattern)
 
   # creates node like this: `table`[col1, col2, ...]
   let assignmentTarget = multiColumnAssignmentTarget(table, parseList(targetColumns))
 
   return quote do:
-    `assignmentTarget` = `table`.`column`.extractAll(`patterNode`)
+    `assignmentTarget` = `table`.`column`.extractAll(`patternNode`)
 
 
 proc extract*(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =

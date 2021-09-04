@@ -1,5 +1,5 @@
 # Basic example using the programmatic Nim syntax of DieSL.
-# Demonstrates string operations and for-loops.
+# Demonstrates string operations.
 
 db.students.name = "Mr. / Mrs. " & db.students.firstName[2..5] & " " & db.students.secondName
 
