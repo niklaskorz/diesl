@@ -105,13 +105,7 @@ proc test_syntax*() =
 
 
     test "remove multiple targets":
-      # TODO we should test data not ast
-      # this would fail:
-      # expectedTable.text = expectedTable.text.remove("ba").remove("oo").remove("z")
-
-      expectedTable.text = expectedTable.text.remove("ba")
-      expectedTable.text = expectedTable.text.remove("oo")
-      expectedTable.text = expectedTable.text.remove("z")
+      expectedTable.text = expectedTable.text.remove("ba").remove("oo").remove("z")
 
       change actualTable:
         remove "ba", "oo" and "z" from text
@@ -186,11 +180,11 @@ proc test_syntax*() =
       check operationsEq(actualDB, expectedDB)
 
     test "replace multiple patterns":
-      expectedTable.text = expectedTable.text.patternReplaceAll(@{"a pattern": "a replacement", 
+      expectedTable.text = expectedTable.text.patternReplaceAll(@{"a pattern": "a replacement",
                                                                   "another pattern": "another replacement"})
 
       change actualTable:
-        replace patterns in text: 
+        replace patterns in text:
           "a pattern" with "a replacement"
           "another pattern" with "another replacement"
 
@@ -198,11 +192,11 @@ proc test_syntax*() =
 
 
     test "replace multiple patterns with specified column":
-      expectedTable.text = expectedTable.text.patternReplaceAll(@{"a pattern": "a replacement", 
+      expectedTable.text = expectedTable.text.patternReplaceAll(@{"a pattern": "a replacement",
                                                                   "another pattern": "another replacement"})
 
       change text of actualTable:
-        replace patterns: 
+        replace patterns:
           "a pattern" with "a replacement"
           "another pattern" with "another replacement"
 
