@@ -5,9 +5,10 @@ import sugar
 import algorithm
 import random
 import tables
-import db_sqlite
 import ../operations
 import sqlite
+
+export exec
 
 randomize()
 
@@ -80,7 +81,7 @@ proc randomId(): string =
 
 
 type ToSqliteViewsResult* = tuple
-  queries: seq[SqlQuery]
+  queries: seq[string]
   tableAccessMap: TableAccessMap
   views: seq[string]
 
@@ -93,25 +94,25 @@ proc toSqliteViews*(
   var views: seq[string]
   let dieslId = randomId()
   var viewId = 0
-  var queries: seq[SqlQuery]
+  var queries: seq[string]
   for operation in operations:
     let query = operation.toSqliteView(schema, updatedTableAccessMap, views,
         dieslId, viewId)
-    queries.add(SqlQuery(query))
+    queries.add(query)
   return (queries, updatedTableAccessMap, views)
 
 
 type RemoveSqliteViewsResult* = tuple
-  queries: seq[SqlQuery]
+  queries: seq[string]
   tableAccessMap: TableAccessMap
 
 proc removeSqliteViews*(
   views: seq[string],
   tableAccessMap: TableAccessMap
 ): RemoveSqliteViewsResult =
-  var queries: seq[SqlQuery]
+  var queries: seq[string]
   for view in views.reversed():
-    queries.add(SqlQuery(fmt"DROP VIEW {view}"))
+    queries.add(fmt"DROP VIEW {view}")
   let updatedTableAccessMap = toSeq(tableAccessMap.pairs).map(
     (pair) => (
       pair[0],

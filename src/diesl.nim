@@ -76,10 +76,8 @@ when isMainModule:
     echo "Generated queries:"
     for query in queries:
       echo ""
-      echo string(query)
-      let preparedStatement = dbConn.prepare(string(query))
-      dbConn.exec(preparedStatement)
-      preparedStatement.finalize()
+      echo query
+      dbConn.exec(query)
     echo ""
     echo "Final data:"
     echo ""
@@ -92,10 +90,8 @@ when isMainModule:
     echo "Generated queries:"
     for query in queries:
       echo ""
-      echo string(query)
-      let preparedStatement = dbConn.prepare(string(query))
-      dbConn.exec(preparedStatement)
-      preparedStatement.finalize()
+      echo query
+      dbConn.exec(query)
     echo ""
     echo "Final data:"
     echo ""

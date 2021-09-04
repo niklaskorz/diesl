@@ -95,11 +95,19 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
 
 proc toSqlite*(
   operations: seq[DieslOperation]
-): seq[SqlQuery] {.gcSafe.} =
-  var queries: seq[SqlQuery]
+): seq[string] {.gcSafe.} =
+  var queries: seq[string]
   for operation in operations:
     assert operation.kind == dotStore or operation.kind == dotStoreMany
     let query = operation.toSqlite()
-    queries.add(SqlQuery(query))
+    queries.add(query)
   return queries
 
+proc exec*(db: DbConn, query: string) {.gcSafe.} =
+  ## Convenience function for executing queries
+  ## as prepared statements.
+  ## Necessary to allow direct usage of '?' characters
+  ## in queries (e.g., for regex patterns).
+  let prepared = db.prepare(query)
+  db.exec(prepared)
+  prepared.finalize()
