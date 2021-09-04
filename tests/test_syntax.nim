@@ -19,12 +19,14 @@ proc test_syntax*() =
       let expectedDB = Diesl(dbSchema: newDatabaseSchema({
         "table": @{
           "text": ddtString,
+          "otherText": ddtString,
         }
       }))
 
       let actualDB = Diesl(dbSchema: newDatabaseSchema({
           "table": @{
             "text": ddtString,
+            "otherText": ddtString,
           }
         }))
 
@@ -32,8 +34,7 @@ proc test_syntax*() =
       var expectedTable = expectedDB.table
       var actualTable = actualDB.table
 
-    # TODO: test that there is no ast transformation in this case
-    # since it is not needed
+
     test "trim without parameter":
       expectedTable.text = actualTable.text.trim()
 
@@ -229,15 +230,16 @@ proc test_syntax*() =
       expectedTable.text = expectedTable.text.extractOne("{email}")
 
       change actualTable:
-        extract one email from text
+        extract email from text
 
       check operationsEq(actualDB, expectedDB)
+
 
     test "extract one with string pattern":
       expectedTable.text = expectedTable.text.extractOne("{email}{post-code}" )
 
       change actualTable:
-        extract one "{email}{post-code}" from text
+        extract "{email}{post-code}" from text
 
       check operationsEq(actualDB, expectedDB)
 
@@ -247,6 +249,24 @@ proc test_syntax*() =
 
       change text of actualTable:
         extract email
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "extract one into column":
+      expectedTable.otherText = expectedTable.text.extractOne("{email}")
+
+      change actualTable:
+        extract email from text into otherText
+
+      check operationsEq(actualDB, expectedDB)
+
+
+    test "extract one into column with specified column":
+      expectedTable.otherText = expectedTable.text.extractOne("{email}")
+
+      change text of actualTable:
+        extract email into otherText
 
       check operationsEq(actualDB, expectedDB)
 
