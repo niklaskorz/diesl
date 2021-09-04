@@ -74,8 +74,8 @@ when isMainModule:
   if mode == "direct":
     let queries = exportedOperations.toSqlite()
     echo "Generated queries:"
-    echo ""
     for query in queries:
+      echo ""
       echo string(query)
       let preparedStatement = dbConn.prepare(string(query))
       dbConn.exec(preparedStatement)
@@ -90,8 +90,8 @@ when isMainModule:
     let (queries, tableAccessMap, views) = exportedOperations.toSqliteViews(schema)
     discard views
     echo "Generated queries:"
-    echo ""
     for query in queries:
+      echo ""
       echo string(query)
       let preparedStatement = dbConn.prepare(string(query))
       dbConn.exec(preparedStatement)
