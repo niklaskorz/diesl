@@ -1,4 +1,3 @@
-
 default:
     image: registry.gitlab.com/pvs-hd/ot/diesl
 
@@ -36,10 +35,14 @@ build demo:
         - apt-get install -y mingw-w64
         - nimble build
         - nimble build -d:mingw
+        - wget https://nim-lang.org/download/dlls.zip
+        - unzip dlls.zip
     artifacts:
         paths:
             - diesl
             - diesl.exe
+            - pcre64.dll
+            - sqlite3_64.dll
             - examples/
 
 build docs:
