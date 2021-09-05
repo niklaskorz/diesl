@@ -9,16 +9,26 @@ First, download and extract the [latest build of the demo](https://gitlab.com/pv
 Then, you can run the demo binary with one of the example scripts from the `example/` folder or with any other DieSL script file you have written.
 You may also modify the demo data in `example/data.csv`.
 While you may change all rows and also add or remove rows, you currently can't change the structure of the demo data without updating the code of the demo in `src/diesl.nim`.
+
 The demo binary supports two modes: `direct` and `views`.
 In `direct` mode, the DieSL operations are translated into SQL `UPDATE` statements and the demo table is queried and printed directly.
 In `views` mode, the operations are translated into SQL `CREATE VIEW` statements and the last created view is queried and printed.
+
 Example:
 
 ```
 # Linux
-./diesl examples/nim.diesl
+./diesl.out direct examples/nim.diesl
 # Windows
-.\diesl.exe examples\nim.diesl
+.\diesl.exe direct examples\nim.diesl
+```
+
+If you want to build the project from source instead of running the prebuilt binaries (e.g., if you want to run the DieSL demo on macOS), make sure you have `nim` and `nimble` installed. Then run the following from the root directory of the repository:
+
+```
+nimble update
+# nimble run -- <mode> <file>
+nimble run -- direct examples/nim.diesl
 ```
 
 ## How it works
