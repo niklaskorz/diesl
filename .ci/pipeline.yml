@@ -37,11 +37,13 @@ build demo:
         - nimble build -d:mingw
         - wget https://nim-lang.org/download/dlls.zip
         - unzip dlls.zip
+        - mv ./diesl ./diesl.out
+        - mv ./src/diesl ./diesl
         - cp -r /nim/lib ./stdlib
         - cp -r /root/.nimble/pkgs/fusion-1.0 ./fusion
     artifacts:
         paths:
-            - diesl
+            - diesl.out
             - diesl.exe
             - pcre64.dll
             - sqlite3_64.dll
