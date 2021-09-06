@@ -20,7 +20,7 @@ change db.students:
   # or:
   extract hashtag from name
   # Extract groups with pattern
-  extract all "([a-z]+) ([a-z]+)" from name into firstName and secondName
+  extract "([a-z]+) ([a-z]+)" from name into firstName and secondName
   # Replace pattern in name with "Mr. "
   replace pattern "{email}" with "Mr. " in name
   # Replace pattern pairs in column "name"

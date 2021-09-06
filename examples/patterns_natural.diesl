@@ -3,4 +3,4 @@
 
 change db.students:
   extract email from data into email
-  extract all r"(\w+) (\w+)" from name into firstName and secondName
+  extract r"(\w+) (\w+)" from name into firstName and secondName
