@@ -152,6 +152,51 @@ change db.students:
   split name on " " into firstName, secondName
 ```
 
+## Running DieSL Scripts
+
+To run DieSL scripts inside your own application, use this repository as a package through nimble:
+
+```nim
+requires "https://gitlab.com/pvs-hd/ot/diesl.git >= 0.4.0"
+
+Then, use the DieSL modules:
+
+```nim
+import db_sqlite
+import diesl
+# needed for functions like pattern extraction
+import diesl/extensions/sqlite
+
+# Open your sqlite database
+let db = open(...)
+
+# Install DieSL sqlite extensions
+db.installCommands()
+
+# Define your database schema
+let schema = newDatabaseSchema({ ... })
+
+# Read your user's script
+let scriptSource = ...
+
+# Run script and receive result
+let exportedOperations = runScript(scriptSource, schema)
+
+# Option A: Translate operations to Sqlite UPDATE statements
+let queries = exportedOperations.toSqlite()
+
+# Option B: Translate operations to Sqlite CREATE VIEW statements
+let (queries, tableAccessMap, views) = exportedOperations.toSqliteViews(schema)
+# tableAccessMap.getTableAccessName(tableName) returns the last view name created for a certain table
+
+# Run generated queries
+for query in queries:
+  db.exec(query)
+
+# Close your sqlite database
+db.close()
+```
+
 ## How it works
 
 DieSL code consists of one or more change macros (which is defined in [transpilation.nim](src/diesl/syntax/transpilation.nim)). When a script is passed into the [runScript](src/diesl/script.nim#L127) function it is executed in a NimVM where the macro is expanded. The [change macro](src/diesl/syntax/transpilation.nim#L304) looks for all Nim statements that match a pattern of the DieSL commands and translates them to their Nim counterpart - all Nim statements inbetween stay the same. After that the code is evaluated by the Nim interpreter. __Important:__ This does not execute any changes on the database it just creates an [object](src/diesl/operations/base.nim#L16) representing what operations should take place. This object is then retrieved from the VM and translated to the target language (currently only SQLite).
