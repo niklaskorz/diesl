@@ -293,8 +293,8 @@ More complex actions are tricky to implement or cannot be solely implemented in 
 To this end, [extension methods](src/diesl/extensions/sqlite.nim) can be implemented.
 This approach was deemed viable for string padding, where Nim provides corresponding methods in the standard library and SQLite does not.
 
-First, the scalar [padding](src/diesl/extensions/sqlite.nim#37) procedure is defined in Nim.
-It is important that the procedure have the `exportToSqlite3` pragma applied, so that [installCommands](src/diesl/extensions/sqlite.nim#8) can register the procedures during initialisation.
+First, the scalar [padding](src/diesl/extensions/sqlite.nim#L37) procedure is defined in Nim.
+It is important that the procedure have the `exportToSqlite3` pragma applied, so that [installCommands](src/diesl/extensions/sqlite.nim#L8) can register the procedures during initialisation.
 Finally, the SQLite codegen shall generate SQL that calls the padding procedure as if it were a builtin SQLite function:
 
 ```nim
