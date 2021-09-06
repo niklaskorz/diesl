@@ -1,7 +1,9 @@
 # The DieSL Language
 
 ## Documentation
-The documentation of the DSL API can be found here: https://pvs-hd.gitlab.io/ot/diesl/documentation/
+
+The documentation of the DieSL API can be found [here](https://pvs-hd.gitlab.io/ot/diesl/documentation/).
+In particular, see the [documentation for string operations](https://pvs-hd.gitlab.io/ot/diesl/documentation/diesl/operations/strings.html).
 
 ## Running the demo
 
@@ -29,6 +31,128 @@ If you want to build the project from source instead of running the prebuilt bin
 nimble update
 # nimble run -- <mode> <file>
 nimble run -- direct examples/nim.diesl
+```
+
+## Writing DieSL Scripts
+
+DieSL is based on NimScript and thus supports most of Nim's language features.
+To express data manipulations, DieSL offers two APIs: a programmatic API that uses Nim's function calls to stay as close to the language as possible, and a natural API that is based on a macro block called `change`.
+
+### The Nim Way
+
+In the programmatic API, tables can be accessed as `db.tableName` and columns as `db.tableName.columnName`. To assign values to a column, use the assignment operator `db.tableName.columnName = newValue`.
+You can also assign to multiple columns at once, for example when you want to assign the same value to multiple columns (`db.tableName[columnA, columnB] = "same value!"`) or use an operation that returns multiple values (`db.tableName[columnA, columnB] = db.tableName.columnC.split(",")`).
+Here is an overview of supported operations:
+
+```nim
+# Store a value in table "students" column "name"
+db.students.name = "Hello world"
+# Load a value from column "firstName" and store in "name"
+db.students.name = db.students.firstName
+# Concat two columns with a space inbetween and store in name
+db.students.name = db.students.firstName & " " & db.students.lastName
+# Trim whitespace character on left and right of name column
+db.students.name = db.students.name.trim() # or .trim(both)
+# Trim whitespace character on left of name column
+db.students.name = db.students.name.trim(left)
+# Trim whitespace character on right of name column
+db.students.name = db.students.name.trim(right)
+# Take only characters from zero-based index 2 to 5 from name
+db.students.name = db.students.name[2..5]
+# Replace firstName in name with "Mr. "
+db.students.name = db.students.name.replace(db.students.firstName, "Mr. ")
+# Replace pairs in column name
+db.students.name = db.students.name.replaceAll(@{
+  db.students.firstName: "Mr. ",
+  "<LastName>": db.students.lastName,
+  "Hello": "there",
+  db.students.columnA: db.students.columnB
+})
+# Replace value in column with empty string
+db.students.name = db.students.name.remove("some swear word")
+# Lower case the whole string
+db.students.name = db.students.name.toLower()
+# Upper case the whole string
+db.students.name = db.students.name.toUpper()
+# Extract first occurence of pattern
+db.students.name = db.students.name.extractOne("{hashtag}")
+# Extract groups with pattern
+db.students[firstName, lastName] = db.students.name.extractAll("([a-z]+) ([a-z]+)")
+# Replace pattern in name with "Mr. "
+db.students.name = db.students.name.patternReplace("{email}", "Mr. ")
+# Replace pattern pairs in column "name"
+db.students.name = db.students.name.patternReplaceAll(@{
+  "{email}": "Mr. ",
+  "[a-z]+": db.students.lastName,
+  "{hashtag}": "there",
+})
+# Split column
+db.students[firstName, lastName] = db.students.name.split(" ")
+# Pad string with characters so it fits a specific minimum size
+db.students.name = db.students.name.padStringValue(left, 5, "x")
+```
+
+### The Natural Way
+
+To make it easier to get started with DieSL, our naturally looking macro-based API can be used instead.
+This allows using DieSL even if you are unfamiliar with programming.
+The base of this API is the `change` block that operates on a table, for example:
+
+```nim
+# Modify table "students"
+change db.students:
+  # Remove whitespace from end of column "firstName"
+  trim ending of firstName
+  # Remove any occurence of "bad word" in column "secondName"
+  remove "bad word" from secondName
+```
+
+If you only want to apply operations to a single column, you can also use this shorter variant:
+
+```nim
+# Modify column "firstName" of table "students"
+change firstName of db.students:
+  # Remove whitespace from end of column
+  trim ending
+  # Remove any occurence of "bad word" in column
+  remove "bad word"
+```
+
+Here is an overview of supported operations (executable example in `examples/all_natural.diesl`):
+
+```nim
+change db.students:
+  # Trim whitespace character on left and right of name column
+  trim name
+  # Trim whitespace character on left of name column
+  trim beginning of name
+  # Trim whitespace character on right of name column
+  trim ending of name
+  # Take only characters from 1-based index 3 to 6 (zero-based index 2 to 5) from name
+  take 3 to 6 from name
+  # Replace "Señor " in name with "Mr. "
+  replace "Señor " with "Mr. " in name
+  # Replace pairs in column name
+  replace in name:
+    "Señor " with "Mr. "
+    "Hello" with "there"
+  # Replace value in column with empty string
+  remove "some swear word" from name
+  # Extract first occurence of pattern
+  extract "{hashtag}" from name
+  # or:
+  extract hashtag from name
+  # Extract groups with pattern
+  extract all "([a-z]+) ([a-z]+)" from name into firstName and secondName
+  # Replace pattern in name with "Mr. "
+  replace pattern "{email}" with "Mr. " in name
+  # Replace pattern pairs in column "name"
+  replace patterns in name:
+    "{email}" with "Mr. "
+    "[a-z]+" with "<secondName>"
+    "{hashtag}" with "there"
+  # Split column
+  split name on " " into firstName, secondName
 ```
 
 ## How it works

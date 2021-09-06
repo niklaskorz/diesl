@@ -72,7 +72,7 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
     of dotRegexReplace:
       fmt"rReplace({op.regexReplaceValue.toSqlite}, {dbQuote(op.regexReplaceTarget.toSqlite.pattern)}, {op.regexReplaceReplacement.toSqlite})"
     of dotRegexReplaceAll:
-      var value = op.replaceAllValue.toSqlite
+      var value = op.regexReplaceAllValue.toSqlite
       for pair in op.regexReplaceAllReplacements:
         value = fmt"rReplace({value}, {dbQuote(pair.target.toSqlite.pattern)}, {pair.replacement.toSqlite})"
       value
@@ -90,7 +90,7 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
       let padWith: char = op.padStringWith[0]
       fmt"padding({op.padStringValue.toSqlite}, {direction}, {op.padStringCount}, {padWith})"
     of dotStringSplit:
-      fmt"stringSplit({op.stringSplitValue.toSqlite}, {op.stringSplitBy}, {op.stringSplitIndex})"
+      fmt"stringSplit({op.stringSplitValue.toSqlite}, {dbQuote(op.stringSplitBy)}, {op.stringSplitIndex})"
 
 
 proc toSqlite*(
