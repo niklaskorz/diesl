@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.4.0"
+version       = "1.0.0"
 author        = "Benjamin Sparks, Niklas Korz, Samuel Melm"
 description   = "The DieSL language"
 license       = "MIT"
