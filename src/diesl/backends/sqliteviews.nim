@@ -5,9 +5,10 @@ import sugar
 import algorithm
 import random
 import tables
-import db_common
 import ../operations
 import sqlite
+
+export exec
 
 randomize()
 
@@ -78,33 +79,40 @@ proc randomId(): string =
   let characters = "abcdefghijklmnopqrstuvwxyz0123456789"
   (0..16).mapIt(sample(characters)).join("")
 
+
 type ToSqliteViewsResult* = tuple
-  queries: seq[SqlQuery]
+  queries: seq[string]
   tableAccessMap: TableAccessMap
   views: seq[string]
 
-proc toSqliteViews*(operations: seq[DieslOperation],
-    schema: DieslDatabaseSchema, tableAccessMap: TableAccessMap = TableAccessMap()): ToSqliteViewsResult =
+proc toSqliteViews*(
+  operations: seq[DieslOperation],
+  schema: DieslDatabaseSchema,
+  tableAccessMap: TableAccessMap = TableAccessMap()
+): ToSqliteViewsResult =
   var updatedTableAccessMap = tableAccessMap
   var views: seq[string]
   let dieslId = randomId()
   var viewId = 0
-  var queries: seq[SqlQuery]
+  var queries: seq[string]
   for operation in operations:
     let query = operation.toSqliteView(schema, updatedTableAccessMap, views,
         dieslId, viewId)
-    queries.add(SqlQuery(query))
+    queries.add(query)
   return (queries, updatedTableAccessMap, views)
 
 
 type RemoveSqliteViewsResult* = tuple
-  queries: seq[SqlQuery]
+  queries: seq[string]
   tableAccessMap: TableAccessMap
 
-proc removeSqliteViews*(views: seq[string], tableAccessMap: TableAccessMap): RemoveSqliteViewsResult =
-  var queries: seq[SqlQuery]
+proc removeSqliteViews*(
+  views: seq[string],
+  tableAccessMap: TableAccessMap
+): RemoveSqliteViewsResult =
+  var queries: seq[string]
   for view in views.reversed():
-    queries.add(SqlQuery(fmt"DROP VIEW {view}"))
+    queries.add(fmt"DROP VIEW {view}")
   let updatedTableAccessMap = toSeq(tableAccessMap.pairs).map(
     (pair) => (
       pair[0],
@@ -112,3 +120,4 @@ proc removeSqliteViews*(views: seq[string], tableAccessMap: TableAccessMap): Rem
     )
   ).toTable()
   return (queries, updatedTableAccessMap)
+

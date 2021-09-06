@@ -9,14 +9,25 @@ proc installCommands*(db: DbConn): void =
   db.registerFunctions()
 
 proc extractOne(input: string, regex: string): string {.exportToSqlite3.} =
-  var matches: seq[string] = @[]
-  let matchRegex = re(regex);
-  let (l, r) = re.findBounds(input, matchRegex, matches)
+  let matchRegex = re(regex)
+  let (l, r) = re.findBounds(input, matchRegex)
 
-  return if l == -1 and r == 0:
+  return if (l, r) == (-1, 0):
+    ""
+  else:
+    input[l..r]
+
+proc extractAll(input: string, regex: string, index: int64, groupCount: int64): string {.exportToSqlite3.} =
+  var groups = newSeq[tuple[first, last: int]](groupCount)
+
+  let matchRegex = re(regex)
+  let (cl, cr) = re.findBounds(input, matchRegex, groups)
+
+  return if (cl, cr) == (-1, 0) or index >= len(groups):
      ""
   else:
-    return matches[0]
+    let (l, r) = groups[index]
+    input[l..r]
 
 
 proc rReplace(input: string, old: string, nw: string): string {.exportToSqlite3.} =

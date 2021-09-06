@@ -1,10 +1,6 @@
-import strformat
-import sequtils
 import macros
-import tables
 import options
 
-import ../operations
 import ../operations/conversion
 
 import fusion/matching
@@ -59,7 +55,7 @@ proc changeBlock(selector: NimNode, commands: NimNode): NimNode =
 # <table name>
 # or
 # <column name> of <table name>
-macro change*(selector: untyped, commands: untyped): untyped = 
+macro change*(selector: untyped, commands: untyped): untyped =
   return changeBlock(selector, commands)
 
 

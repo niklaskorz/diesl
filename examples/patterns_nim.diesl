@@ -1,0 +1,6 @@
+# Pattern matching examples for extraction.
+# Using the Nim-syntax.
+
+db.students.email = db.students.data.extractOne(r"{email}")
+db.students[firstName, secondName] = "oh no we lost data!"
+db.students[firstName, secondName] = db.students.name.extractAll(r"(\w+) (\w+)")

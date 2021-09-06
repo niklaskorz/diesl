@@ -3,6 +3,34 @@
 ## Documentation
 The documentation of the DSL API can be found here: https://pvs-hd.gitlab.io/ot/diesl/documentation/
 
+## Running the demo
+
+First, download and extract the [latest build of the demo](https://gitlab.com/pvs-hd/ot/diesl/-/jobs/artifacts/develop/download?job=build%20demo).
+Then, you can run the demo binary with one of the example scripts from the `example/` folder or with any other DieSL script file you have written.
+You may also modify the demo data in `example/data.csv`.
+While you may change all rows and also add or remove rows, you currently can't change the structure of the demo data without updating the code of the demo in `src/diesl.nim`.
+
+The demo binary supports two modes: `direct` and `views`.
+In `direct` mode, the DieSL operations are translated into SQL `UPDATE` statements and the demo table is queried and printed directly.
+In `views` mode, the operations are translated into SQL `CREATE VIEW` statements and the last created view is queried and printed.
+
+Example:
+
+```
+# Linux
+./diesl.out direct examples/nim.diesl
+# Windows
+.\diesl.exe direct examples\nim.diesl
+```
+
+If you want to build the project from source instead of running the prebuilt binaries (e.g., if you want to run the DieSL demo on macOS), make sure you have `nim` and `nimble` installed. Then run the following from the root directory of the repository:
+
+```
+nimble update
+# nimble run -- <mode> <file>
+nimble run -- direct examples/nim.diesl
+```
+
 ## How it works
 
 DieSL code consists of one or more change macros (which is defined in [transpilation.nim](src/diesl/syntax/transpilation.nim)). When a script is passed into the [runScript](src/diesl/script.nim#L127) function it is executed in a NimVM where the macro is expanded. The [change macro](src/diesl/syntax/transpilation.nim#L304) looks for all Nim statements that match a pattern of the DieSL commands and translates them to their Nim counterpart - all Nim statements inbetween stay the same. After that the code is evaluated by the Nim interpreter. __Important:__ This does not execute any changes on the database it just creates an [object](src/diesl/operations/base.nim#L16) representing what operations should take place. This object is then retrieved from the VM and translated to the target language (currently only SQLite).
@@ -116,11 +144,10 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
 ```
 
 
-# Side Projects
+## Side Projects
 
-[Making Nim functions available to SQLite](https://github.com/niklaskorz/nim-exporttosqlite3/)
-
-[Tracking TODOs in the project](https://github.com/preslavmihaylov/todocheck/pull/160)
+- [Making Nim functions available to SQLite](https://github.com/niklaskorz/nim-exporttosqlite3/)
+- [Tracking TODOs in the project](https://github.com/preslavmihaylov/todocheck/pull/160)
 
 
 
@@ -131,7 +158,7 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
 * Benjamin Sparks: 30%, in particular:
   * String and Regex operations + Documentation
 * Samuel Melm: 30%, in particular:
-  * Natural Language Parsing
+  * Natural Syntax Parsing (macros)
 
 All aspects of requirements, main implementation, testing etc., were shared amongst the team and assigned during meetings in the Issue Tracker.
 Accordingly, this means that the responsibility of main and test code was shared equally.

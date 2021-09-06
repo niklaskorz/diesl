@@ -1,9 +1,9 @@
-
 default:
     image: registry.gitlab.com/pvs-hd/ot/diesl
 
 stages:
     - test
+    - build
     - docs
     - publish-coverage
 
@@ -28,6 +28,29 @@ unit tests:
     rules:
         - if: '$CI_COMMIT_BRANCH == "master"'
         - if: '$CI_COMMIT_BRANCH == "develop"'
+
+build demo:
+    stage: build
+    script:
+        - apt-get install -y mingw-w64 unzip
+        - nimble build
+        - nimble build -d:mingw
+        - wget https://nim-lang.org/download/dlls.zip
+        - unzip dlls.zip
+        - mv ./diesl ./diesl.out
+        - mv ./src/diesl ./diesl
+        - cp -r /nim/lib ./stdlib
+        - cp -r /root/.nimble/pkgs/fusion-1.0 ./fusion
+    artifacts:
+        paths:
+            - diesl.out
+            - diesl.exe
+            - pcre64.dll
+            - sqlite3_64.dll
+            - diesl/
+            - stdlib/
+            - fusion/
+            - examples/
 
 build docs:
     stage: docs

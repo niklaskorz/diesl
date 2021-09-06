@@ -5,9 +5,24 @@ import strutils
 import db_sqlite
 import ../operations
 import ../operations/patterns
-import ../extensions/sqlite
 
-import re
+proc countGroups(haystack: var string): int =
+  proc inner(haystack: var string, count: var int): int =
+    let left_bracket = haystack.find('(')
+    if left_bracket >= 0:
+      haystack = haystack[left_bracket + 1 .. ^1]
+      let right_bracket = haystack.find(')')
+
+      if right_bracket >= 0:
+        if haystack[..right_bracket].find('(') == -1:
+          count += 1
+        haystack = haystack[right_bracket + 1 .. ^1]
+      return inner(haystack, count)
+    else:
+      return count
+
+  var count = 0
+  return inner(haystack, count)
 
 proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
   case op.kind:
@@ -50,18 +65,19 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
     of dotToUpper:
       fmt"UPPER({op.toUpperValue.toSqlite})"
     of dotExtractOne:
-      fmt"extractOne({op.extractOneValue.toSqlite}, '{op.extractOnePattern.pattern}')"
+      fmt"extractOne({op.extractOneValue.toSqlite}, {dbQuote(op.extractOnePattern.pattern)})"
     of dotExtractMany:
-      fmt"extractMany({op.extractManyValue.toSqlite}, '{op.extractManyPattern.pattern}', {op.extractManyIndex})"
+      var pattern = op.extractManyPattern.pattern
+      fmt"extractAll({op.extractManyValue.toSqlite}, {dbQuote(pattern)}, {op.extractManyIndex}, {countGroups(pattern)})"
     of dotRegexReplace:
-      fmt"rReplace({op.regexReplaceValue.toSqlite}, {op.regexReplaceTarget.toSqlite.pattern}, {op.regexReplaceReplacement.toSqlite})"
+      fmt"rReplace({op.regexReplaceValue.toSqlite}, {dbQuote(op.regexReplaceTarget.toSqlite.pattern)}, {op.regexReplaceReplacement.toSqlite})"
     of dotRegexReplaceAll:
       var value = op.replaceAllValue.toSqlite
       for pair in op.regexReplaceAllReplacements:
-        value = fmt"rReplace({value}, {pair.target.toSqlite.pattern}, {pair.replacement.toSqlite})"
+        value = fmt"rReplace({value}, {dbQuote(pair.target.toSqlite.pattern)}, {pair.replacement.toSqlite})"
       value
     of dotMatch:
-      "boolMatching({op.matchValue.toSqlite}, {op.matchPattern.pattern})"
+      fmt"boolMatching({op.matchValue.toSqlite}, {dbQuote(op.matchPattern.pattern)})"
 
     of dotPadString:
       let direction = case op.trimDirection:
@@ -77,11 +93,21 @@ proc toSqlite*(op: DieslOperation): string {.gcSafe.} =
       fmt"stringSplit({op.stringSplitValue.toSqlite}, {op.stringSplitBy}, {op.stringSplitIndex})"
 
 
-proc toSqlite*(operations: seq[DieslOperation]): seq[SqlQuery] {.gcSafe.} =
-  var queries: seq[SqlQuery]
+proc toSqlite*(
+  operations: seq[DieslOperation]
+): seq[string] {.gcSafe.} =
+  var queries: seq[string]
   for operation in operations:
     assert operation.kind == dotStore or operation.kind == dotStoreMany
     let query = operation.toSqlite()
-    queries.add(SqlQuery(query))
+    queries.add(query)
   return queries
 
+proc exec*(db: DbConn, query: string) {.noSideEffect, gcsafe, locks: 0.} =
+  ## Convenience function for executing queries
+  ## as prepared statements.
+  ## Necessary to allow direct usage of '?' characters
+  ## in queries (e.g., for regex patterns).
+  let prepared = db.prepare(query)
+  db.exec(prepared)
+  prepared.finalize()

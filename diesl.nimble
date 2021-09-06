@@ -5,6 +5,7 @@ author        = "Benjamin Sparks, Niklas Korz, Samuel Melm"
 description   = "The DieSL language"
 license       = "MIT"
 srcDir        = "src"
+bin           = @["diesl"]
 
 
 # Dependencies
@@ -15,6 +16,7 @@ requires "compiler"
 requires "eminim >= 2.8"
 requires "https://gitlab.com/pvs-hd/ot/core.git >= 0.2.7"
 requires "exporttosqlite3 >= 0.2.0"
+requires "terminaltables" # for demo output
 
 task test_ci, "runs tests and generates a report":
   exec "nimble c -r tests/run_tests.nim"
