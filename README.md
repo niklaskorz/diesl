@@ -20,9 +20,9 @@ Example:
 
 ```
 # Linux
-./diesl.out direct examples/nim.diesl
+./diesl.out direct examples/basic_nim.diesl
 # Windows
-.\diesl.exe direct examples\nim.diesl
+.\diesl.exe direct examples\basic_nim.diesl
 ```
 
 If you want to build the project from source instead of running the prebuilt binaries (e.g., if you want to run the DieSL demo on macOS), make sure you have `nim` and `nimble` installed. Then run the following from the root directory of the repository:
@@ -42,7 +42,8 @@ To express data manipulations, DieSL offers two APIs: a programmatic API that us
 
 In the programmatic API, tables can be accessed as `db.tableName` and columns as `db.tableName.columnName`. To assign values to a column, use the assignment operator `db.tableName.columnName = newValue`.
 You can also assign to multiple columns at once, for example when you want to assign the same value to multiple columns (`db.tableName[columnA, columnB] = "same value!"`) or use an operation that returns multiple values (`db.tableName[columnA, columnB] = db.tableName.columnC.split(",")`).
-Here is an overview of supported operations:
+
+Here is an overview of supported operations (executable example in `examples/all_nim.diesl`):
 
 ```nim
 # Store a value in table "students" column "name"
@@ -50,7 +51,7 @@ db.students.name = "Hello world"
 # Load a value from column "firstName" and store in "name"
 db.students.name = db.students.firstName
 # Concat two columns with a space inbetween and store in name
-db.students.name = db.students.firstName & " " & db.students.lastName
+db.students.name = db.students.firstName & " " & db.students.secondName
 # Trim whitespace character on left and right of name column
 db.students.name = db.students.name.trim() # or .trim(both)
 # Trim whitespace character on left of name column
@@ -64,9 +65,7 @@ db.students.name = db.students.name.replace(db.students.firstName, "Mr. ")
 # Replace pairs in column name
 db.students.name = db.students.name.replaceAll(@{
   db.students.firstName: "Mr. ",
-  "<LastName>": db.students.lastName,
-  "Hello": "there",
-  db.students.columnA: db.students.columnB
+  db.students.secondName: "Hello"
 })
 # Replace value in column with empty string
 db.students.name = db.students.name.remove("some swear word")
@@ -77,19 +76,17 @@ db.students.name = db.students.name.toUpper()
 # Extract first occurence of pattern
 db.students.name = db.students.name.extractOne("{hashtag}")
 # Extract groups with pattern
-db.students[firstName, lastName] = db.students.name.extractAll("([a-z]+) ([a-z]+)")
+db.students[firstName, secondName] = db.students.name.extractAll("([a-z]+) ([a-z]+)")
 # Replace pattern in name with "Mr. "
 db.students.name = db.students.name.patternReplace("{email}", "Mr. ")
 # Replace pattern pairs in column "name"
 db.students.name = db.students.name.patternReplaceAll(@{
   "{email}": "Mr. ",
-  "[a-z]+": db.students.lastName,
+  "[a-z]+": "Hello",
   "{hashtag}": "there",
 })
 # Split column
-db.students[firstName, lastName] = db.students.name.split(" ")
-# Pad string with characters so it fits a specific minimum size
-db.students.name = db.students.name.padStringValue(left, 5, "x")
+db.students[firstName, secondName] = db.students.name.split(" ")
 ```
 
 ### The Natural Way
