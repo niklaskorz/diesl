@@ -10,10 +10,6 @@ const TO* = "to"
 const INTO* = "into"
 const ON* = "on"
 
-
-const ONE* = "one"
-const ALL* = "all"
-
 const BEGINNING* = "beginning"
 const ENDING* = "ending"
 const PATTERN* = "pattern"

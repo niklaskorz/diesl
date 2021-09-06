@@ -274,7 +274,7 @@ proc test_syntax*() =
     test "extract all":
       expectedTable[email, postCode, telephoneNumber] = expectedTable.text.extractAll("{email}{post-code}{telephone-number}" )
       change actualTable:
-        extract all "{email}{post-code}{telephone-number}" from text into email, postCode and telephoneNumber
+        extract "{email}{post-code}{telephone-number}" from text into email, postCode and telephoneNumber
 
       check operationsEq(actualDB, expectedDB)
 
@@ -283,7 +283,7 @@ proc test_syntax*() =
       expectedTable[email, postCode, telephoneNumber] = expectedTable.text.extractAll("{email}{post-code}{telephone-number}" )
 
       change text of actualTable:
-        extract all "{email}{post-code}{telephone-number}" into email, postCode and telephoneNumber
+        extract "{email}{post-code}{telephone-number}" into email, postCode and telephoneNumber
 
       check operationsEq(actualDB, expectedDB)
 

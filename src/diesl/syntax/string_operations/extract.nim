@@ -33,26 +33,22 @@ proc formatExtractAll(pattern: NimNode, targetColumns: seq[NimNode], table, colu
 
 proc extract*(command, table: NimNode, columnOpt: Option[NimNode]): NimNode =
   case (columnOpt, command):
-    of (Some(@column), [_.KW(EXTRACT),            @pattern]) |
-       (Some(@column), [_.KW(EXTRACT), _.KW(ONE), @pattern]):
+    of (Some(@column), [_.KW(EXTRACT), @pattern]):
       return formatExtractOne(pattern, table, column)
 
-    of (Some(@column), [_.KW(EXTRACT),            @pattern, _.KW(INTO), @targetColumn]) |
-       (Some(@column), [_.KW(EXTRACT), _.KW(ONE), @pattern, _.KW(INTO), @targetColumn]):
+    of (Some(@column), [_.KW(EXTRACT), @pattern, _.KW(INTO), @targetColumn]):
       return formatExtractOneWithTargetColumn(pattern, table, column, targetColumn)
 
-    of (Some(@column), [_.KW(EXTRACT), _.KW(ALL), @pattern, _.KW(INTO), all @targetColumns]):
+    of (Some(@column), [_.KW(EXTRACT), @pattern, _.KW(INTO), all @targetColumns]):
       return formatExtractAll(pattern, targetColumns, table, column)
 
-    of (None(), [_.KW(EXTRACT),            @pattern, _.KW(FROM), @column]) |
-       (None(), [_.KW(EXTRACT), _.KW(ONE), @pattern, _.KW(FROM), @column]):
+    of (None(), [_.KW(EXTRACT), @pattern, _.KW(FROM), @column]):
       return formatExtractOne(pattern, table, column)
 
-    of (None(), [_.KW(EXTRACT),            @pattern, _.KW(FROM), @column, _.KW(INTO), @targetColumn]) |
-       (None(), [_.KW(EXTRACT), _.KW(ONE), @pattern, _.KW(FROM), @column, _.KW(INTO), @targetColumn]):
+    of (None(), [_.KW(EXTRACT), @pattern, _.KW(FROM), @column, _.KW(INTO), @targetColumn]):
       return formatExtractOneWithTargetColumn(pattern, table, column, targetColumn)
 
-    of (None(), [_.KW(EXTRACT), _.KW(ALL), @pattern, _.KW(FROM), @column, _.KW(INTO), all @targetColumns]):
+    of (None(), [_.KW(EXTRACT), @pattern, _.KW(FROM), @column, _.KW(INTO), all @targetColumns]):
       return formatExtractAll(pattern, targetColumns, table, column)
 
     else:
