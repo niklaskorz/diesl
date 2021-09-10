@@ -14,7 +14,7 @@ requires "nim >= 1.4.4"
 requires "fusion >= 1.0"
 requires "compiler"
 requires "eminim >= 2.8"
-requires "https://gitlab.com/pvs-hd/ot/core.git >= 0.2.7"
+requires "https://gitlab.com/pvs-hd/ot/backend.git >= 0.3.0"
 requires "exporttosqlite3 >= 0.2.0"
 requires "terminaltables" # for demo output
 
