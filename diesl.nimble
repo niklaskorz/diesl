@@ -1,11 +1,10 @@
 # Package
 
-version       = "1.1.0"
+version       = "1.1.1"
 author        = "Benjamin Sparks, Niklas Korz, Samuel Melm"
 description   = "The DieSL language"
 license       = "MIT"
 srcDir        = "src"
-bin           = @["diesl"]
 
 
 # Dependencies
