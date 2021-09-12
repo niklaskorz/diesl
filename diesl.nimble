@@ -5,6 +5,8 @@ author        = "Benjamin Sparks, Niklas Korz, Samuel Melm"
 description   = "The DieSL language"
 license       = "MIT"
 srcDir        = "src"
+bin           = @["diesl"]
+installExt    = @["nim"]
 
 
 # Dependencies
